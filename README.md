@@ -1,14 +1,13 @@
 ## Description
 
-Q2K Key Map parSer ver. 0.0.69 (who knows) by 2Cas (c) 2018
+Q2K Key Map parSer ver. 0.0.6969 (who knows) by 2Cas (c) 2018
 
 For parsing keymaps from QMK Firmware style keymap.c files to Keyplus YAML format
 
 
 ## Setup
 
-Requires: Python3.4 pyyaml pyparsing
-avr-gcc
+Requires: python3 pyyaml pyparsing avr-gcc
 
 ## QMK Directory
 
@@ -18,11 +17,11 @@ OR specify a QMK folder location by modifying prepr.py
 
 ## Run
 Run with:
-python3 prepr.py [KEYBOARD NAME] [CMD LINE OPTIONS]
+./Q2K.py [KEYBOARD NAME] [CMD LINE OPTIONS]
 
 For example:
-python3 prepr.py clueboard/66 -r rev2
-python3 prepr.py k_type -m default
+./Q2K.py clueboard/66 -r rev2
+./Q2K.py k_type -m default
 
 Run python3 prepr.py -h for cmd line options
 
