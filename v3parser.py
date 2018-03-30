@@ -1,5 +1,6 @@
 # Q2K Keyboard Map parSer
 import re
+import sys
 import pyparsing as pp
 
 from kb_classes import *
@@ -42,28 +43,31 @@ def read_keymap(s):
                    new_data.append(line)
 
             data = ''.join(new_data)
-
             data_list = []
 
             LBRAC, RBRAC,EQ, COMMA = map(pp.Suppress,"{}=,")
-            headfunc = pp.Literal('const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS]')
-            header = pp.Group(headfunc + EQ + LBRAC)
+            keycode = pp.Word(pp.alphas+'_', pp.alphanums+'_'+'('+')')
+            headfunc_s = pp.Literal('const uint16_t')
+            headfunc_m = pp.Literal('PROGMEM')
+            headfunc_e = pp.Literal('keymaps[][MATRIX_ROWS][MATRIX_COLS]')
+            header = pp.Group(headfunc_s + pp.Optional(headfunc_m) + headfunc_e + EQ + LBRAC)
 
             layer_string = pp.Word(pp.printables) | pp.Word(pp.nums)
             layern = pp.Group( layer_string + EQ)
 
-            keycode = pp.Word(pp.alphas+'_', pp.alphanums+'_'+'('+')')
             keycode_list = pp.Group(keycode + pp.ZeroOrMore(COMMA + keycode) + pp.Optional(COMMA))
             row = LBRAC + keycode_list + RBRAC
             keym_layer = LBRAC + pp.OneOrMore(row + pp.Optional(',')) + RBRAC
 
-            km_func = pp.Suppress(header) + pp.OneOrMore( pp.Optional(layern) + keym_layer('keymaps') + pp.Optional(COMMA) ) + RBRAC
+            km_func = pp.Suppress(header) + pp.OneOrMore( pp.Optional(layern) + keym_layer + pp.Optional(COMMA) ) + RBRAC
 
             for tokens, start, stop in km_func.scanString(data):
                 data_list = tokens
 
     except FileNotFoundError:
        print('File not found - '+s)
+       print('Parsing cannot continue without keymap, terminating')
+       sys.exit()
 
     curr_layer = keymap_layer()
     curr_layer_name = ''
@@ -108,7 +112,7 @@ def read_keymap(s):
             curr_layer = keymap_layer(curr_layer_name)
             curr_layer.set_keymap(curr_keymap)
             curr_layer.set_matrix_cols(col_len)
-            layout_list.append(curr_layer)
+            layer_list.append(curr_layer)
             layer_index += 1
             curr_layer_name = str(layer_index)
             curr_keymap = []
@@ -121,11 +125,11 @@ def read_keymap(s):
     if len(layer_list) == 0:
         print('Failed to parse keymap file '+s)
         raise ParseError()
-    """
+    
     for layer in layer_list:
         print(layer.get_name()) 
         print(layer.get_keymap())
-    """
+    
     layer_list = convert_keymap(layer_list)
     return layer_list
 

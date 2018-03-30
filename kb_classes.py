@@ -48,6 +48,8 @@ class kb_info:
         for r in self.rev_info:
            if r._name == rev:
                return r
+           if r._name == 'n/a':
+               return r
     def get_keymap_list(self):
         return self._keymapL
 

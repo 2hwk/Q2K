@@ -16,7 +16,7 @@ KBD_LIST = []
 
 #QMK_DIR = '/mnt/c/Users/Evan/Documents/qmk/qmk_firmware-master/'
 QMK_DIR = 'qmk/'
-KB_INFO = 'src/yaml/kb_info.yaml'
+KB_INFO = 'src/kb_info.yaml'
 OUTPUT_DIR = 'out/'
 
 def print_keyboard_list():
@@ -152,7 +152,7 @@ def preproc_keymap(kbc):
     # OUTPUT
     output = OUTPUT_DIR+kb+rev+km
     argkm = [keym, '-o', output]
-    argv = cc + libs + argkm    # arguments:  gcc, -E, -D [define], [ -I<libs> ], keymap, -o output
+    argv = cc + libs + argkm    # arguments:  cpp, -D [define], [ -I<libs> ], keymap, -o output
     # setup output path
     outputdir = output[:-9]
     if not os.path.exists(outputdir):
@@ -298,11 +298,12 @@ def main():
     # Check config.h for matrix pinout
 
     # Check cache/run preprocessor for keymap.c
-    #km_loc = init_cache_keymap(current_kbc)
-    init_cache_keymap(current_kbc)
+    #init_cache_keymap(current_kbc)
+    km_loc = init_cache_keymap(current_kbc)
     # Parse this keymap file and return raw layout data
-    km_layers = read_kb_keymap(current_kbc)
-    #km_layers = read_keymap(km_loc)
+    #km_layers = read_kb_keymap(current_kbc)
+    km_layers = read_keymap(km_loc)
+
     '''
     for l in km_layers:
        print(l.get_name()) 
