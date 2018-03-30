@@ -1,6 +1,9 @@
 Q2K Key Map parSer
+
 ver. 0.0.69 (who knows)
+
 by 2Cas (c) 2018
+
 MIT license
 
 For parsing keymaps from QMK Firmware style keymap.c files to Keyplus YAML format
