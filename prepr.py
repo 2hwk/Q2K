@@ -120,7 +120,7 @@ def init_cache_keymap(kbc):
         preproc_keymap(kbc)
 
     revObj.set_output_keymap(output)
-    return output
+    #return output
 
 
 def preproc_keymap(kbc):
@@ -298,11 +298,11 @@ def main():
     # Check config.h for matrix pinout
 
     # Check cache/run preprocessor for keymap.c
-    #init_cache_keymap(current_kbc)
-    km_loc = init_cache_keymap(current_kbc)
+    init_cache_keymap(current_kbc)
+    #km_loc = init_cache_keymap(current_kbc)
     # Parse this keymap file and return raw layout data
-    #km_layers = read_kb_keymap(current_kbc)
-    km_layers = read_keymap(km_loc)
+    km_layers = read_kb_keymap(current_kbc)
+    #km_layers = read_keymap(km_loc)
 
     '''
     for l in km_layers:

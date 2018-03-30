@@ -70,7 +70,7 @@ def read_keymap(s):
        sys.exit()
 
     curr_layer = keymap_layer()
-    curr_layer_name = ''
+    curr_layer_name = '0'
     curr_keymap = []
     layer_index = 0
     col_len = 0
@@ -79,7 +79,6 @@ def read_keymap(s):
     layer_has_name = False
     
     for row in data_list:
-
         # Hit a comma, go to next row
         if row == ',':
             next_layer = False
@@ -99,8 +98,7 @@ def read_keymap(s):
                  layer_index += 1
                  continue
              else:
-                print('Failed to parse keymap file '+s)
-                raise ParseError()
+                raise RuntimeError('Failed to parse keymap file '+s)
         # append to current keymap
         elif next_layer == False:
             curr_keymap = curr_keymap + list(row)
@@ -114,9 +112,13 @@ def read_keymap(s):
             curr_layer.set_matrix_cols(col_len)
             layer_list.append(curr_layer)
             layer_index += 1
+            # ^ Previous Lines
             curr_layer_name = str(layer_index)
             curr_keymap = []
-    
+            # < Current Line
+            curr_keymap = curr_keymap + list(row)
+            next_layer = True
+       
     curr_layer = keymap_layer(curr_layer_name)
     curr_layer.set_keymap(curr_keymap)
     curr_layer.set_matrix_cols(col_len)
@@ -125,12 +127,13 @@ def read_keymap(s):
     if len(layer_list) == 0:
         print('Failed to parse keymap file '+s)
         raise ParseError()
-    
+        
+    layer_list = convert_keymap(layer_list)
+    """
     for layer in layer_list:
         print(layer.get_name()) 
         print(layer.get_keymap())
-    
-    layer_list = convert_keymap(layer_list)
+    """
     return layer_list
 
 def find_layout_header(kbc):

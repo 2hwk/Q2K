@@ -81,7 +81,8 @@ def merge_layout_template(layers, templates, select=-1):
         index = select
 
     if templates is None or len(templates) == 0:
-        merge_layout_template(layers)
+        temp = build_layout_from_keymap(layers)
+        merge_layout_template(layers, temp)
     if len(templates) == 1:
         index = 0
         print('Building with template: '+templates[0].get_name())
@@ -107,12 +108,18 @@ def merge_layout_template(layers, templates, select=-1):
     
         layout_template = templates[index].get_layout()
         layout = copy.deepcopy(layout_template)
-
         keycode_array = l.get_keymap()
+        max_index = len(keycode_array)
+
         for i, rows in enumerate(layout_template):
             for j, ind in enumerate(rows):
-                layout[i][j] = keycode_array[ind]
-
+                if ind < max_index:
+                    layout[i][j] = keycode_array[ind]
+                else:
+                    print('error has occured: invalid array value: '+str(ind))
+                    print('fatal error: corrupt layout template or keymap')
+                    raise IndexError('Layout contains index which is out of range')
+                    
         col_limit = l.get_matrix_cols()
         layout_template = convert_keyplus_matrix(layout_template, col_limit)
 
@@ -122,13 +129,13 @@ def merge_layout_template(layers, templates, select=-1):
         """
         print(l.get_name())
         layerprint = l.get_keymap()
-
+        
         for row in layerprint:
             print(row)
 
         for row in layout_template:
             print(row)
-        """
+       """
     print('SUCCESS!')
 
 
