@@ -1,0 +1,3057 @@
+- !!python/object:kb_classes.kb_info
+  _kbname: lets_split
+  _keymapL: [fabian, kris, xk, pitty, heartrobotninja, dlaroe, OLED_sample, henxing,
+    default, DE_simple, smt, piemod, xyverz, adam, mbsurfer, waples, mjt, khord, poker]
+  _klibs: [lets_split]
+  _revL: [rev1, rev2]
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: rev1
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+  - !!python/object:kb_classes.rev_info
+    _name: rev2
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: minidox
+  _keymapL: [tomb0y, default, that_canadian, khitsule]
+  _klibs: [minidox]
+  _revL: [rev1]
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: rev1
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: iris
+  _keymapL: [swedish, rdhaene, yanfali, lewisridden, hag, transmogrified, default,
+    hexwire]
+  _klibs: [iris]
+  _revL: [rev1_led, rev1, rev2]
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: rev1_led
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+  - !!python/object:kb_classes.rev_info
+    _name: rev1
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+  - !!python/object:kb_classes.rev_info
+    _name: rev2
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: helix
+  _keymapL: [OLED_sample, default, led_test, five_rows, default]
+  _klibs: [helix]
+  _revL: [rev1, rev2]
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: rev1
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+  - !!python/object:kb_classes.rev_info
+    _name: rev2
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: preonic
+  _keymapL: [dudeofawesome, kinesis, choromanski, dlaroe, CMD-Preonic, '0xdec', nikchi,
+    default, bucktooth, that_canadian, ekis_isa, jacwib, blake-newman, smt, xyverz,
+    zach]
+  _klibs: [preonic]
+  _revL: [rev1, rev2]
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: rev1
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+  - !!python/object:kb_classes.rev_info
+    _name: rev2
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: orthodox
+  _keymapL: [drashna, default]
+  _klibs: [orthodox]
+  _revL: [rev3, rev3_teensy, rev1]
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: rev3
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+  - !!python/object:kb_classes.rev_info
+    _name: rev3_teensy
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+  - !!python/object:kb_classes.rev_info
+    _name: rev1
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: fourier
+  _keymapL: [default]
+  _klibs: [fourier]
+  _revL: [rev1]
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: rev1
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: eco
+  _keymapL: [default, that_canadian, hexwire]
+  _klibs: [eco]
+  _revL: [rev1, rev2]
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: rev1
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+  - !!python/object:kb_classes.rev_info
+    _name: rev2
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: zen
+  _keymapL: [default]
+  _klibs: [zen]
+  _revL: [rev1]
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: rev1
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: viterbi
+  _keymapL: [drashna, fido, default, dwallace, hexwire]
+  _klibs: [viterbi]
+  _revL: [rev1]
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: rev1
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: levinson
+  _keymapL: [losinggeneration, default, bakingpy2u]
+  _klibs: [levinson]
+  _revL: [rev1, rev2]
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: rev1
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+  - !!python/object:kb_classes.rev_info
+    _name: rev2
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: planck
+  _keymapL: [gunp, pvc, fabian, dudeofawesome, cbbrowne, lucas, max, brandon, matrixman,
+    vifon, callum, bbaserdem, coloneljesus, emilyh, circuit, dodger, experimental,
+    jhenahan, kloki, alexey, dzobert, originerd, dr0ck, navi, dlaroe, pok3r, leo,
+    chance, jirgn, lae3, dbroqua, joe, phreed, espynn, dr_notsokind, grahampheath,
+    premek, sean, zrichard, gabriel, not-quite-neo, impossible, aviator, unicode,
+    luke, corvec, tak3over, jeremy-dev, jacob, myoung34, default, that_canadian, priyadi,
+    sgoodwin, ab, bone2planck, handwired_binaryplease, pete, jeebak, lukas, mason,
+    tehwalris, charlie, kelorean, smt, mjtnumsym, neo2planck, narze, angerthosenear,
+    austin, johannes, rodhaene, daniel, kmontag42, piemod, xyverz, rai-suta, paget,
+    yale, dc, dshields, mollat, kyle, zach, david, basic, tong92, steno, thermal_printer,
+    ajp10304, nico, yang, mjt, mitch, khord]
+  _klibs: [planck]
+  _revL: [rev4, rev3, rev5]
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: rev4
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+  - !!python/object:kb_classes.rev_info
+    _name: rev3
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+  - !!python/object:kb_classes.rev_info
+    _name: rev5
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: nyquist
+  _keymapL: [losinggeneration, pitty, kim-kim, default, 333fred, DivergeJM, jojiichan,
+    hexwire]
+  _klibs: [nyquist]
+  _revL: [rev1]
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: rev1
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: clueboard/66
+  _keymapL: [unix_optimized, maximised, 66_ansi, tetris, mrscooty, win_optimized,
+    magicmonty, caps_fn, mac_optimized, 66_iso, colemak, default, mouse_keys, bloodlvst,
+    skully, shift_fn, smt, xyverz, manofinterests, serubin, jokrik]
+  _klibs: [clueboard, '66']
+  _revL: [rev3, rev1, rev2]
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: rev3
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+  - !!python/object:kb_classes.rev_info
+    _name: rev1
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+  - !!python/object:kb_classes.rev_info
+    _name: rev2
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: ergo42
+  _keymapL: [default-macOS, default]
+  _klibs: [ergo42]
+  _revL: [rev1]
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: rev1
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: false
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/atreus50
+  _keymapL: [default]
+  _klibs: [handwired, atreus50]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/magicforce68
+  _keymapL: [default]
+  _klibs: [handwired, magicforce68]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/frenchdev
+  _keymapL: [default]
+  _klibs: [handwired, frenchdev]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/woodpad
+  _keymapL: [drashna, default]
+  _klibs: [handwired, woodpad]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/trackpoint
+  _keymapL: [default]
+  _klibs: [handwired, trackpoint]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/space_oddity
+  _keymapL: [default]
+  _klibs: [handwired, space_oddity]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/CMD60
+  _keymapL: [default]
+  _klibs: [handwired, CMD60]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/ortho5x13
+  _keymapL: [default]
+  _klibs: [handwired, ortho5x13]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/onekey
+  _keymapL: [default]
+  _klibs: [handwired, onekey]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/arrow_pad
+  _keymapL: [pad_21, default, pad_24]
+  _klibs: [handwired, arrow_pad]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/dactyl
+  _keymapL: [dvorak, default, erincalling]
+  _klibs: [handwired, dactyl]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/gamenum
+  _keymapL: [default]
+  _klibs: [handwired, gamenum]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/kbod
+  _keymapL: [default]
+  _klibs: [handwired, kbod]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/numpad20
+  _keymapL: [default]
+  _klibs: [handwired, numpad20]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/dactyl_manuform
+  _keymapL: [dvorak, default]
+  _klibs: [handwired, dactyl_manuform]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/reddot
+  _keymapL: [default]
+  _klibs: [handwired, reddot]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/traveller
+  _keymapL: [default]
+  _klibs: [handwired, traveller]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/pilcrow
+  _keymapL: [default]
+  _klibs: [handwired, pilcrow]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/promethium
+  _keymapL: [default, priyadi]
+  _klibs: [handwired, promethium]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/terminus_mini
+  _keymapL: [default]
+  _klibs: [handwired, terminus_mini]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/minorca
+  _keymapL: [rgb, default]
+  _klibs: [handwired, minorca]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/magicforce61
+  _keymapL: [default]
+  _klibs: [handwired, magicforce61]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/MS_sculpt_mobile
+  _keymapL: [milestogo, default]
+  _klibs: [handwired, MS_sculpt_mobile]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/retro_refit
+  _keymapL: [default]
+  _klibs: [handwired, retro_refit]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/maartenwut
+  _keymapL: [default]
+  _klibs: [handwired, maartenwut]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: handwired/fivethirteen
+  _keymapL: [default]
+  _klibs: [handwired, fivethirteen]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: jj40
+  _keymapL: [default, oscillope, krusli, ajp10304, fun40]
+  _klibs: [jj40]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: jd45
+  _keymapL: [blakedietz, justin, default, jeebak, mjt6u, mjt]
+  _klibs: [jd45]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: chimera_ergo
+  _keymapL: [default]
+  _klibs: [chimera_ergo]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: jj50
+  _keymapL: [default]
+  _klibs: [jj50]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: xd75
+  _keymapL: [colinta, fabian, cbbrowne, skewwhiffy, emilyh, kloki, germanized, kim-kim,
+    kim-kim-xd73, atomic_style, adi, default, c4software_bepo]
+  _klibs: [xd75]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: ergodox_infinity
+  _keymapL: [dudeofawesome, trulyergonomic, not-quite-neo, gordon, default, rask,
+    narze, nordic_ergo, halfkeyboard]
+  _klibs: [ergodox_infinity]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: kinesis
+  _keymapL: [milestogo, salty, dvorak, default, xyverz]
+  _klibs: [kinesis]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: sweet16
+  _keymapL: [dlaroe, default]
+  _klibs: [sweet16]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: christmas_tree
+  _keymapL: [default]
+  _klibs: [christmas_tree]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: meira
+  _keymapL: [takmiya, grahampheath, default]
+  _klibs: [meira]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: gonnerd
+  _keymapL: [gam3cat, default, tkl, mauin]
+  _klibs: [gonnerd]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: acr60
+  _keymapL: [default, mitch]
+  _klibs: [acr60]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: roadkit
+  _keymapL: [singlesBrent, singles, default, flipphone, mjt, khord]
+  _klibs: [roadkit]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: miuni32
+  _keymapL: [ht_156, adam-lee, default, ki]
+  _klibs: [miuni32]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: hhkb
+  _keymapL: [jp_mac, lxol, blakedietz, rdg_jp, jp, cinaeco, dbroqua, shela, default,
+    sh_jp, smt, mjt]
+  _klibs: [hhkb]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: obelus
+  _keymapL: [default]
+  _klibs: [obelus]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: 9key
+  _keymapL: [default]
+  _klibs: [9key]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: dk60
+  _keymapL: [default]
+  _klibs: [dk60]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: daisy
+  _keymapL: [default]
+  _klibs: [daisy]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: cospad
+  _keymapL: [default]
+  _klibs: [cospad]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: subatomic
+  _keymapL: [default]
+  _klibs: [subatomic]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: bmini
+  _keymapL: [default]
+  _klibs: [bmini]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: jd40
+  _keymapL: [default, vanagon]
+  _klibs: [jd40]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: amj40
+  _keymapL: [fabian, myee, default]
+  _klibs: [amj40]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: crawlpad
+  _keymapL: [default]
+  _klibs: [crawlpad]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: satan
+  _keymapL: [stanleylai, rask63, ben_iso, denolfe, dkrieger, unxmaal, chaser, dbroqua,
+    addcninblue, mark1, colemak, default, iso_split_rshift, isoHHKB, sethbc, admiralStrokers,
+    smt, midi, poker]
+  _klibs: [satan]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: e6v2
+  _keymapL: [amnesia0287, default]
+  _klibs: [e6v2]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: lfkeyboards/lfkpad
+  _keymapL: [default]
+  _klibs: [lfkeyboards, lfkpad]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: lfkeyboards/lfk78
+  _keymapL: [default, iso, ca178858, split_bs_osx]
+  _klibs: [lfkeyboards, lfk78]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: lfkeyboards/lfk87
+  _keymapL: [default, iso, gbchk, ca178858]
+  _klibs: [lfkeyboards, lfk87]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: lfkeyboards/smk65
+  _keymapL: [default, iso]
+  _klibs: [lfkeyboards, smk65]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: lfkeyboards/mini1800
+  _keymapL: [default, ca178858]
+  _klibs: [lfkeyboards, mini1800]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: dilly
+  _keymapL: [default]
+  _klibs: [dilly]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: bananasplit
+  _keymapL: [coloneljesus, kamon, default, '0010', rask, jockyxu1122_ansi, jockyxu1122_iso,
+    nic, hhkbanana]
+  _klibs: [bananasplit]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: bantam44
+  _keymapL: [default]
+  _klibs: [bantam44]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: atomic
+  _keymapL: [pvc, default]
+  _klibs: [atomic]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: fc660c
+  _keymapL: [default]
+  _klibs: [fc660c]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: mt40
+  _keymapL: [default]
+  _klibs: [mt40]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: ok60
+  _keymapL: [ebrowncross, default]
+  _klibs: [ok60]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: mf68_ble
+  _keymapL: [default]
+  _klibs: [mf68_ble]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: amj60
+  _keymapL: [default, iso_split_rshift, maximized]
+  _klibs: [amj60]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: diverge3
+  _keymapL: [default]
+  _klibs: [diverge3]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: nano
+  _keymapL: [default]
+  _klibs: [nano]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: unloved_bastard
+  _keymapL: [default]
+  _klibs: [unloved_bastard]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: ca66
+  _keymapL: [default]
+  _klibs: [ca66]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: ymd96
+  _keymapL: [JJ50, default]
+  _klibs: [ymd96]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: mitosis
+  _keymapL: [datagrok, default, carvac_dv, mjt]
+  _klibs: [mitosis]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: hadron
+  _keymapL: [side_numpad, default]
+  _klibs: [hadron]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: v60_type_r
+  _keymapL: [vimouse, default]
+  _klibs: [v60_type_r]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: katana60
+  _keymapL: [rominronin, colemak, default]
+  _klibs: [katana60]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: infinity60
+  _keymapL: [jpetermans, hasu, depariel, default]
+  _klibs: [infinity60]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: contra
+  _keymapL: [default, basic, dana]
+  _klibs: [contra]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: atreus62
+  _keymapL: [atreus52, mneme, default, xyverz, pcewing, mfluid]
+  _klibs: [atreus62]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: dz60
+  _keymapL: [tailcall, iso_7u_space, model42, f3d3, atlacat, n0velty, iso_6u_space,
+    dbroqua, default, Ansi_plus_fn_arrows, 60_plus_arrows, itsaferbie, LEdiodes]
+  _klibs: [dz60]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: mf68
+  _keymapL: [default]
+  _klibs: [mf68]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: whitefox
+  _keymapL: [jetpacktuxedo, kim-kim, default, matt3o]
+  _klibs: [whitefox]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: chimera_ls
+  _keymapL: [default]
+  _klibs: [chimera_ls]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: sixkeyboard
+  _keymapL: [default]
+  _klibs: [sixkeyboard]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: lightsaver
+  _keymapL: [default, rasmus]
+  _klibs: [lightsaver]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: ergodox_ez
+  _keymapL: [dvorak_42_key, matrixman, saha, vim, bepo_tm_style, blakedietz, heartrobotninja,
+    default, testing, profet_80, smurmann, steno, default_osx]
+  _klibs: [ergodox_ez]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: org60
+  _keymapL: [boardy, default]
+  _klibs: [org60]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: xd60
+  _keymapL: [stanleylai, rooski, yuuki, petesmom, Jos, cheese, split_bksp_arrows,
+    default, iso, kmontag42, krusli]
+  _klibs: [xd60]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: ymdk_np21
+  _keymapL: [default]
+  _klibs: [ymdk_np21]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: kitten_paw
+  _keymapL: [ickerwx, default]
+  _klibs: [kitten_paw]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: kbd75
+  _keymapL: [default, iso, smt, adit]
+  _klibs: [kbd75]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: converter/ibm_terminal
+  _keymapL: [default, priyadi]
+  _klibs: [converter, ibm_terminal]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: converter/usb_usb
+  _keymapL: [coloneljesus, default, ble]
+  _klibs: [converter, usb_usb]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: deltasplit75
+  _keymapL: [protosplit, default, itsaferbie]
+  _klibs: [deltasplit75]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: chibios_test
+  _keymapL: [default]
+  _klibs: [chibios_test]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: atreus
+  _keymapL: [classic, dvorak_42_key, replicaJunction, gerb, xk, jeremy, henxing, default,
+    khitsule, alphadox, erlandsona, xyverz]
+  _klibs: [atreus]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: pegasushoof
+  _keymapL: [blowrak, default]
+  _klibs: [pegasushoof]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: phantom
+  _keymapL: [default, rgbmod, xyverz]
+  _klibs: [phantom]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: cu24
+  _keymapL: [default]
+  _klibs: [cu24]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: gh80_3000
+  _keymapL: [iso_wkl, iso_default, default, iso_std, ansi_wkl, ansi_std]
+  _klibs: [gh80_3000]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: tv44
+  _keymapL: [jetpacktuxedo, default, jeebak, belak, smt, xyverz, tong92, budi, core,
+    mjt]
+  _klibs: [tv44]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: uk78
+  _keymapL: [default, rask]
+  _klibs: [uk78]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: k_type
+  _keymapL: [default, belak]
+  _klibs: [k_type]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: fc980c
+  _keymapL: [actuation-point-example, coloneljesus, default]
+  _klibs: [fc980c]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: knops/mini
+  _keymapL: [default, knops]
+  _klibs: [knops, mini]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: dichotemy
+  _keymapL: [default]
+  _klibs: [dichotemy]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: ps2avrGB
+  _keymapL: [default]
+  _klibs: [ps2avrGB]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: do60
+  _keymapL: [test, default]
+  _klibs: [do60]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: niu_mini
+  _keymapL: [default, mason, planck]
+  _klibs: [niu_mini]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: kmac
+  _keymapL: [winkeyless, default]
+  _klibs: [kmac]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: m10a
+  _keymapL: [gam3cat, default]
+  _klibs: [m10a]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: felix
+  _keymapL: [default]
+  _klibs: [felix]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: tkc1800
+  _keymapL: [default, wkl]
+  _klibs: [tkc1800]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: s65_x
+  _keymapL: [default, iso, kelorean, smt, nall]
+  _klibs: [s65_x]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: prime_r
+  _keymapL: [rooski, default]
+  _klibs: [prime_r]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: chimera_ortho
+  _keymapL: [gordon, default]
+  _klibs: [chimera_ortho]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: jc65/v32a
+  _keymapL: [naut, default]
+  _klibs: [jc65, v32a]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: jc65/v32u4
+  _keymapL: [jetpacktuxedo, dead_encryption, na7thana, gam3cat, naut, coth, default]
+  _klibs: [jc65, v32u4]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: gh60
+  _keymapL: [dbroqua_7U, bluezio, dbroqua, maxr1998, default, sethbc, xyverz, robotmaxtron]
+  _klibs: [gh60]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: tada68
+  _keymapL: [amnesia0287, rgb, ardakilic, isoish, tshack, wamsm_tada, default, stephengrier,
+    trashcat, maartenwut, raylas]
+  _klibs: [tada68]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: rama/m6_a
+  _keymapL: [default, knops]
+  _klibs: [rama, m6_a]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: kc60
+  _keymapL: [stanleylai, dbroqua, default, sgoodwin, mechmerlin, wigguno, ws2812,
+    workman-dead, dbroqua_hhkb]
+  _klibs: [kc60]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: 1up60rgb
+  _keymapL: [tsangan, default, iso]
+  _klibs: [1up60rgb]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: xmmx
+  _keymapL: [toad_iso_wkl, xmmx_iso_wk, toad_iso_wk, xmmx_ansi_wk, toad_ansi_wkl,
+    xmmx_ansi_wkl, toad, default, toad_ansi_wk, xmmx_iso_wkl]
+  _klibs: [xmmx]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: cu75
+  _keymapL: [default, iso]
+  _klibs: [cu75]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: eagle_viper/v2
+  _keymapL: [profanum429, default, mechmerlin]
+  _klibs: [eagle_viper, v2]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: tiger_lily
+  _keymapL: [default]
+  _klibs: [tiger_lily]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: 6ball
+  _keymapL: [default]
+  _klibs: [6ball]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: kbd66
+  _keymapL: [ansi, default, iso, maartenwut]
+  _klibs: [kbd66]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: mechmini/v2
+  _keymapL: [2u_space_ortho, 625_space, ortho, default, split_space]
+  _klibs: [mechmini, v2]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: mechmini/v1
+  _keymapL: [default]
+  _klibs: [mechmini, v1]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: the_ruler
+  _keymapL: [default]
+  _klibs: [the_ruler]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: tomato
+  _keymapL: [default]
+  _klibs: [tomato]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: laplace
+  _keymapL: [default, bakingpy]
+  _klibs: [laplace]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: frosty_flake
+  _keymapL: [nikchi, default, tkl, QFR_JM]
+  _klibs: [frosty_flake]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: bfake
+  _keymapL: [default, mechmerlin]
+  _klibs: [bfake]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: ergodone
+  _keymapL: [kloki, default]
+  _klibs: [ergodone]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: s60_x
+  _keymapL: [bluebear, hhkb, amnesia0287, default_rgb, custom, hasu, dbroqua, jpec,
+    poker_set, default, iso, spacefn, plain, poker_bit, ansi_qwertz, poker, iso_rgb]
+  _klibs: [s60_x]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: kona_classic
+  _keymapL: [ansi_arrows_lcap, iso_split_arrows, ansi, ansi_arrows, default, ansi_split_arrows,
+    ansi_split, iso, iso_split, iso_arrows]
+  _klibs: [kona_classic]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: maxipad
+  _keymapL: [default]
+  _klibs: [maxipad]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: chocopad
+  _keymapL: [default]
+  _klibs: [chocopad]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: alps64
+  _keymapL: [default]
+  _klibs: [alps64]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: four_banger
+  _keymapL: [default]
+  _klibs: [four_banger]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: clueboard/66_hotswap
+  _keymapL: [66_ansi, default]
+  _klibs: [clueboard, 66_hotswap]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: clueboard/60
+  _keymapL: [yanfali, default, default_aek]
+  _klibs: [clueboard, '60']
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: clueboard/17
+  _keymapL: [default]
+  _klibs: [clueboard, '17']
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: clueboard/card
+  _keymapL: [rgb_effects, default]
+  _klibs: [clueboard, card]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: gherkin
+  _keymapL: [talljoe, default, wanleg, steno, mjt, itsaferbie]
+  _klibs: [gherkin]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: vision_division
+  _keymapL: [default]
+  _klibs: [vision_division]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: amjpad
+  _keymapL: [max, ortho_right, ortho_left, default]
+  _klibs: [amjpad]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: octagon/v2
+  _keymapL: [default]
+  _klibs: [octagon, v2]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: octagon/v1
+  _keymapL: [default]
+  _klibs: [octagon, v1]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: pearl
+  _keymapL: [jetpacktuxedo, default]
+  _klibs: [pearl]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: alu84
+  _keymapL: [turbomech, default]
+  _klibs: [alu84]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: jm60
+  _keymapL: [default, poker3]
+  _klibs: [jm60]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
+- !!python/object:kb_classes.kb_info
+  _kbname: atom47
+  _keymapL: [default, LEdiodes]
+  _klibs: [atom47]
+  _revL: []
+  keymap_name: ''
+  rev: ''
+  rev_info:
+  - !!python/object:kb_classes.rev_info
+    _name: n/a
+    build_layout: []
+    build_m_col_pins: []
+    build_m_row_pins: []
+    build_templates: []
+    isDefault: true
+    mcuL: []
+    output_keymap: ''
