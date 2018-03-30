@@ -1,3 +1,5 @@
+# Q2K Keyboard Map parSer
+
 import copy
 
 from kb_classes import *
@@ -18,9 +20,7 @@ def convert_keymap(layers):
             else:
                 layer[i] = keycode(kc)
         l.set_keymap(layer)
-    print('________________________________________')
     return layers
-
 
 def func(qmk_func, layer_list):
     # Currently only handles layer switching functions
@@ -117,8 +117,8 @@ def merge_layout_template(layers, templates, select=-1):
                     layout[i][j] = keycode_array[ind]
                 else:
                     print('error has occured: invalid array value: '+str(ind))
-                    print('fatal error: corrupt layout template or keymap')
-                    sys.exit()                    
+                    print('fatal error: corrupt/incompatible layout template or keymap')
+                    exit()                    
         col_limit = l.get_matrix_cols()
         layout_template = convert_keyplus_matrix(layout_template, col_limit)
 

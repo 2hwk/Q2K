@@ -1,11 +1,11 @@
 # Q2K Keyboard Map parSer
 import re
-import sys
 import pyparsing as pp
 
 from kb_classes import *
+from kb_global import *
+
 from convert import convert_keymap
-from prepr import QMK_DIR
 
 def clean_split(li, ch):
 
@@ -83,22 +83,20 @@ def read_keymap(s):
         if row == ',':
             next_layer = False
             continue
-        # If layer name
-        elif len(row) == 1 and len(row[0]) > 1:
-             if row[0][0] == '[' and row[0][-1] == ']':
-                 if next_layer:
-                     curr_layer = keymap_layer(curr_layer_name)
-                     curr_layer.set_keymap(curr_keymap)
-                     curr_layer.set_matrix_cols(col_len)
-                     layer_list.append(curr_layer)
-                     curr_keymap = []
-                 layer_has_name = True
-                 next_layer = False
-                 curr_layer_name = row[0][1:-1]
-                 layer_index += 1
-                 continue
-             else:
-                raise RuntimeError('Failed to parse keymap file '+s)
+        
+        elif len(row) == 1 and len(row[0]) > 1 and row[0][0] == '[' and row[0][-1] == ']':
+             # is a layer name
+            if next_layer:
+                 curr_layer = keymap_layer(curr_layer_name)
+                 curr_layer.set_keymap(curr_keymap)
+                 curr_layer.set_matrix_cols(col_len)
+                 layer_list.append(curr_layer)
+                 curr_keymap = []
+            layer_has_name = True
+            next_layer = False
+            curr_layer_name = row[0][1:-1]
+            layer_index += 1
+            continue
         # append to current keymap
         elif next_layer == False:
             curr_keymap = curr_keymap + list(row)
@@ -125,6 +123,7 @@ def read_keymap(s):
     layer_list.append(curr_layer)
 
     if len(layer_list) == 0 or layer_list is None:
+        print('Parsed and found no keymap')
         raise RuntimeError('Failed to parse keymap file '+s)
 
     layer_list = convert_keymap(layer_list)
@@ -223,7 +222,7 @@ def read_layout_header(s):
                         line = line.replace('\\','')
                         line = clean_split(line, ',')
                         for element in line:
-                            if len(element) > 9:  
+                            if len(element) > 15:  
                                 print('Current file '+s+' failed conversion')
                                 return
                         curr_template.add_layout_line(line)
@@ -273,13 +272,13 @@ def read_layout_header(s):
                             layout[i][j] = index
                             array[index] = col                            
                             print('Array key recovery succeeded!')
-                            print('________________________________________')
                             break
                         except ValueError:
                             continue
                     if layout[i][j] == col:
                         print('Array key recovery failed')
-                        print('________________________________________')
+                        raise RuntimeError('missing macro variable in: '+s)
+
                     #print("File: "+s)
         t.set_layout(layout)
 

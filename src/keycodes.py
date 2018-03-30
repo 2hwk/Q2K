@@ -1,3 +1,5 @@
+# Q2K Keyboard Map parSer
+
 qmk_to_keyp = {
     "KC_NO"                 :  " no ", #- giorgio, 2018
     "KC_TRNS"               :  "____",
