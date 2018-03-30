@@ -12,7 +12,7 @@ Requires: python3 pyyaml pyparsing avr-gcc
 ## QMK Directory
 
 You can either copy your qmk isntallation into a folder in /Q2K/qmk 
-OR specify a QMK folder location by modifying prepr.py
+OR specify a QMK folder location by modifying kb_globals.py
 
 
 ## Run
