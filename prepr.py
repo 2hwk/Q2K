@@ -25,6 +25,39 @@ def print_keyboard_list():
     for kbc in KBD_LIST:
         printkb.append(kbc.get_name())
     print(printkb)    
+# Q2K Keyboard Map parSer
+
+import sys, os, argparse
+import subprocess, glob
+import yaml
+import re
+
+from kb_classes import *
+from v3parser import *
+from convert import *
+
+
+KBD_LIST = []
+#N_MCU = [ "chibios_test", "ergodox_infinity", "handwired/magiforce61", "handwired/MS_sculpt_mobile", "infinity60", "jm60", "k_type", "kinesis", "lfkeyboards/smk65", "lfkeyboards/lfk87", "mechmini/v1", "subatomic", "tkc1800", "uk78", "vision_division", "whitefox"]
+#V_USB = [ "bfake", "bmini", "jj40", "mt40", "pearl", "ps2avrGB", "ymd96" ]
+
+#QMK_DIR = '/mnt/c/Users/Evan/Documents/qmk/qmk_firmware-master/'
+QMK_DIR = 'qmk/'
+KB_INFO = 'src/kb_info.yaml'
+OUTPUT_DIR = 'out/'
+
+def print_keyboard_list():
+
+    printkb = []
+    for kbc in KBD_LIST:
+        printkb.append(kbc.get_name())
+    print(printkb)    
+
+
+def print_keymap_list(kb):
+
+    printkm = []
+    for kbc in KBD_LIST:
 
 
 def print_keymap_list(kb):
@@ -86,8 +119,8 @@ def check_parse_argv(kb, km='default', rev=''):
                 sys.exit()
             # If KB matches, and KM and REV do not conflict, set values and return kb_info class
             kbc.set_rev(rev)
-            if rev != '':
-                kbc.add_lib(rev)
+            #if rev != '':
+                #kbc.add_lib(rev)
             kbc.set_keymap(km)
             return kbc
         else:
@@ -113,8 +146,7 @@ def init_cache_keymap(kbc):
         output = OUTPUT_DIR+kb+rev+km
 
     if os.path.isfile(output):
-        print('Using cached '+km+' file')
-        print('________________________________________')    
+        print('Using cached '+km+' file')  
     else:  
         print('Generating '+km+'...')
         preproc_keymap(kbc)
@@ -125,15 +157,17 @@ def init_cache_keymap(kbc):
 
 def preproc_keymap(kbc):
 
-    kblibs = kbc.get_libs()
     qdir = QMK_DIR +'keyboards/'
     
     kb = kbc.get_name()+'/'
     km = kbc.get_keymap()+'/keymap.c'
+    kblibs = list(kbc.get_libs())
     if kbc.get_rev() != '':
+        kblibs.append(rev)
         rev = kbc.get_rev()+'/'
     else:
         rev = ''
+
     # GCC -E
     cc = ['cpp']
     # -D
@@ -161,6 +195,7 @@ def preproc_keymap(kbc):
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
+    print(argv)
     subprocess.call(argv)
 
 
@@ -171,7 +206,6 @@ def init_cache_info(kb_info_yaml):
         try:
             with open(kb_info_yaml, 'r') as f:
                 KBD_LIST = yaml.load(f)
-                print('________________________________________')
                 print('Using Cached kb_info.yaml')
 
         except FileNotFoundError:
@@ -198,7 +232,6 @@ def write_info(kb_info_yaml):
         rev = folders[-1]
         kbname = '/'.join(folders[:-1])
         kblibs = []
-        #path = ''
         for f in folders[:-1]:
             kblibs.append(f)
 
@@ -321,6 +354,9 @@ def main():
     else:
         merge_layout_template(km_layers, km_template)
     # needs a version for failure at the <keyboard>.h reading stage
+    
+    dump_yaml(KB_INFO)
+
 
 if __name__ == "__main__":
     main()

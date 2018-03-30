@@ -31,6 +31,7 @@ class kb_info:
 
     def add_lib(self, lib):
         self._klibs.append(lib)
+        print(lib)
 
     def get_name(self):
         return self._kbname
@@ -153,15 +154,9 @@ class keymap_layer:
 
         self.matrix = []
         self.matrix_cols = 0
-        self.matrix_row_pins = []
-        self.matrix_col_pins = []
 
     def set_keymap(self, k):
         self.keymap = k
-
-    def set_pins(self, rp, cp):
-        self.matrix_row_pins = rp
-        self.matrix_col_pins = cp
 
     def set_matrix_cols(self, c):
         self.matrix_cols = c
@@ -183,9 +178,3 @@ class keymap_layer:
 
     def get_matrix_cols(self):
         return self.matrix_cols
-
-    def get_col_pins(self):
-        return self.matrix_col_pins
-
-    def get_row_pins(self):
-        return self.matrix_row_pins

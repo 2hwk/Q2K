@@ -124,10 +124,9 @@ def read_keymap(s):
     curr_layer.set_matrix_cols(col_len)
     layer_list.append(curr_layer)
 
-    if len(layer_list) == 0:
-        print('Failed to parse keymap file '+s)
-        raise ParseError()
-        
+    if len(layer_list) == 0 or layer_list is None:
+        raise RuntimeError('Failed to parse keymap file '+s)
+
     layer_list = convert_keymap(layer_list)
     """
     for layer in layer_list:
@@ -141,13 +140,14 @@ def find_layout_header(kbc):
     rev = kbc.get_rev()
     revObj = kbc.get_rev_info(rev)
     # qmk/keyboards/
-    kblibs = kbc.get_libs()
+    kblibs = list(kbc.get_libs())
+    if rev != '':
+        kblibs.append(rev)
     qdir = QMK_DIR +'keyboards/'
 
     folders = []
     path = ''
     for kbl in kblibs:
-
         path += kbl+'/'
         folders.append(path)
 

@@ -118,8 +118,7 @@ def merge_layout_template(layers, templates, select=-1):
                 else:
                     print('error has occured: invalid array value: '+str(ind))
                     print('fatal error: corrupt layout template or keymap')
-                    raise IndexError('Layout contains index which is out of range')
-                    
+                    sys.exit()                    
         col_limit = l.get_matrix_cols()
         layout_template = convert_keyplus_matrix(layout_template, col_limit)
 
