@@ -17,7 +17,7 @@ python3 prepr.py clueboard/66 -r rev2
 
 Run python3 prepr.py -h for cmd line options
 
-## Command Line
+## Commands
 Usage: python3 prepr.py [KEYBOARD] [-h] [-m keymap] [-r ver] [-L] [-M] [-R] [-S string] [-c keymap] 
 
 positional arguments:
@@ -42,5 +42,9 @@ optional arguments:
   
   -c keymap   Select keymap template index
   
+
+
+## Other Notes
+
 
 VERY alpha, not every keyboard is gaurenteed to work 100%. Lots of uncaught exceptions will be thrown
