@@ -5,7 +5,7 @@ import pyparsing as pp
 
 from kb_classes import *
 from convert import convert_keymap
-from prepr import QMK_DIR
+from main import QMK_DIR
 
 def clean_split(li, ch):
 

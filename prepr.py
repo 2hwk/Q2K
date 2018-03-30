@@ -25,39 +25,6 @@ def print_keyboard_list():
     for kbc in KBD_LIST:
         printkb.append(kbc.get_name())
     print(printkb)    
-# Q2K Keyboard Map parSer
-
-import sys, os, argparse
-import subprocess, glob
-import yaml
-import re
-
-from kb_classes import *
-from v3parser import *
-from convert import *
-
-
-KBD_LIST = []
-#N_MCU = [ "chibios_test", "ergodox_infinity", "handwired/magiforce61", "handwired/MS_sculpt_mobile", "infinity60", "jm60", "k_type", "kinesis", "lfkeyboards/smk65", "lfkeyboards/lfk87", "mechmini/v1", "subatomic", "tkc1800", "uk78", "vision_division", "whitefox"]
-#V_USB = [ "bfake", "bmini", "jj40", "mt40", "pearl", "ps2avrGB", "ymd96" ]
-
-#QMK_DIR = '/mnt/c/Users/Evan/Documents/qmk/qmk_firmware-master/'
-QMK_DIR = 'qmk/'
-KB_INFO = 'src/kb_info.yaml'
-OUTPUT_DIR = 'out/'
-
-def print_keyboard_list():
-
-    printkb = []
-    for kbc in KBD_LIST:
-        printkb.append(kbc.get_name())
-    print(printkb)    
-
-
-def print_keymap_list(kb):
-
-    printkm = []
-    for kbc in KBD_LIST:
 
 
 def print_keymap_list(kb):
