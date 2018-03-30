@@ -14,6 +14,7 @@ python3 prepr.py [KEYBOARD NAME] [CMD LINE OPTIONS]
 
 For example:
 python3 prepr.py clueboard/66 -r rev2
+python3 prepr.py k_type -m default
 
 Run python3 prepr.py -h for cmd line options
 
