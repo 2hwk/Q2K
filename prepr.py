@@ -129,9 +129,11 @@ def preproc_keymap(kbc):
     kb = kbc.get_name()+'/'
     km = kbc.get_keymap()+'/keymap.c'
     kblibs = list(kbc.get_libs())
-    if kbc.get_rev() != '':
+    rev = kbc.get_rev()
+    if rev != '':
         kblibs.append(rev)
-        rev = kbc.get_rev()+'/'
+        rev += '/'
+
     else:
         rev = ''
 
