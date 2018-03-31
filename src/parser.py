@@ -45,15 +45,14 @@ def read_config_header(data):
 
 def read_keymap(data):
     layer_list = []    
-    
     LBRAC, RBRAC,EQ, COMMA = map(pp.Suppress,"{}=,")
 
     integer = pp.Word(pp.nums)
     comment = pp.ZeroOrMore(pp.Suppress(pp.Group('#' + integer + pp.Word(pp.printables) + pp.Optional(integer))))
-    keycode = pp.Word(pp.alphas+'_', pp.alphanums+'_'+'('+')')
+    keycode = pp.Word(pp.alphanums+'_'+'('+')')
     layer_string = pp.Word(pp.printables) | pp.Word(pp.nums)
 
-    keycode_list = pp.Group(keycode + pp.ZeroOrMore(COMMA + keycode) + pp.Optional(COMMA))
+    keycode_list = pp.Group(pp.ZeroOrMore(keycode + pp.Optional(COMMA)))
     row = comment + LBRAC + keycode_list + RBRAC + comment
 
     layern = pp.Group( layer_string + EQ)
@@ -68,22 +67,32 @@ def read_keymap(data):
         if tokens.layer_name == '':
             curr_layer = keymap_layer(str(layer_index))
         else:
-            curr_layer = keymap_layer(tokens.layer_name[0]) 
+            curr_layer = keymap_layer(tokens.layer_name[0][1:-1]) 
 
         for row in tokens.layer:
+            buff = ''
+            for i, element in enumerate(row):
+                if ')' in element and '(' not in element:
+                    func = ''
+                    func = row[i-1]+','+row[i] 
+                    del row[i-1]
+                    i -= 1
+                    del row[i]
+                    row.insert(i, func)
+
             num_col = len(row)
             curr_layer.add_keymap_item(list(row))
         
         curr_layer.set_matrix_cols(num_col)
         layer_list.append(curr_layer)
-    """
+    
     for layer in layer_list:
         print(layer.get_name()) 
         print(layer.get_keymap())
-    """
+    
     if not layer_list:
-        print('Parsed and found no keymap')
-        print('Failed to parse keymap file')
+        print('*** Parsed and found no keymap')
+        print('*** Failed to parse keymap file')
         #raise RuntimeError('Failed to parse keymap file')
         exit()
     else:
@@ -145,7 +154,7 @@ def read_layout_header(s):
                         line = clean_split(line, ',')
                         for element in line:
                             if len(element) > 15:  
-                                print('Current file '+s+' failed conversion')
+                                print('**# Current file '+s+' failed conversion')
                                 return
                         curr_template.add_layout_line(line)
                     else:
@@ -161,7 +170,7 @@ def read_layout_header(s):
                             line[i] = re.sub('^[^##]*##', '', code)         # Remove chars before ##
                         for element in line:
                             if len(element) > 9:  
-                                print('Current file '+s+' failed conversion')
+                                print('*** Current file '+s+' failed conversion')
                                 return
                         curr_template.add_array_item(line)
                     else:
@@ -183,7 +192,7 @@ def read_layout_header(s):
                 try:
                     layout[i][j] = array.index(col)
                 except ValueError:
-                    print('Missing keycode key ['+col+'] in '+s)
+                    print('*** Missing keycode key ['+col+'] in '+s)
                     # Try to recover using a different keycode array
                     for y, t2 in enumerate(template_list):                    
                         array2 = t2.get_array()
@@ -198,8 +207,8 @@ def read_layout_header(s):
                         except ValueError:
                             continue
                     if layout[i][j] == col:
-                        print('Array key recovery failed')
-                        raise RuntimeError('missing macro variable in: '+s)
+                        print('*** Array key recovery failed')
+                        raise RuntimeError('Missing macro variable in: '+s)
 
                     #print("File: "+s)
         t.set_layout(layout)

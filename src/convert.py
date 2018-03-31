@@ -11,7 +11,6 @@ def convert_keymap(layers):
     for ln in layers:
         name = ln.get_name()
         l_list.append(name)
-    
     for l in layers:
         layer = l.get_keymap()
         for i, kc in enumerate(layer):
@@ -24,7 +23,6 @@ def convert_keymap(layers):
 
 def func(qmk_func, layer_list):
     # Currently only handles layer switching functions
-
     if qmk_func in qmk_to_keyp_func.keys():
         keyp_func = qmk_to_keyp_func[qmk_func]
     else:
@@ -124,15 +122,16 @@ def merge_layout_template(layers, templates, select=-1):
                 if ind < max_index:
                     layout[i][j] = keycode_array[ind]
                 elif layout_name != '!MATRIX LAYOUT':
-                    print('error has occured: invalid array value: '+str(ind))
-                    print('corrupt/incompatible layout template or keymap')
-                    print('trying again with default matrix layout')
+                    print('*** Invalid array value: '+str(ind))
+                    print('*** Corrupt/incompatible layout template or keymap')
+                    print('Trying again with default matrix layout...')
                     matrix_template = build_layout_from_keymap(layers, x)
                     merge_layout_template(layers, matrix_template)
                     exit()
                 else:
-                    print('error has occured: invalid array value: '+str(ind))
-                    print('fatal error: corrupt/incompatible keymap')
+                    print('*** Invalid array value: '+str(ind))
+                    print('*** Corrupt/incompatible keymap')
+                    print('Fatal Error occured, terminating...')
                     exit()
                     
         col_limit = l.get_matrix_cols()
@@ -148,8 +147,6 @@ def merge_layout_template(layers, templates, select=-1):
         for row in layout_template: #l.get_template()
             print(row)
         """
-    print('SUCCESS!')
-
 
 def convert_keyplus_matrix(matrix, col_limit):
 

@@ -98,12 +98,12 @@ def init_cache_info(kb_info_yaml):
                 print('Using cached kb_info.yaml')
 
         except FileNotFoundError:
-            print('Failed to load kb_info.yaml')
+            print('*** Failed to load kb_info.yaml')
             print('Generating new kb_info.yaml...')
             write_info(kb_info_yaml)
 
         except ImportError:
-            print('Failed to load kb_info.yaml')
+            print('*** Failed to load kb_info.yaml')
             print('Generating new kb_info.yaml...')
             write_info(kb_info_yaml)
     else:
@@ -165,15 +165,16 @@ def find_layout_header(kbc):
         kb_h += '.h'
 
         path = qdir+kbl+kb_h
-        
+        #data = preproc_header(kbc, path)
+        #matrix_layout = read_layout_header(data)
         matrix_layout = read_layout_header(path)
         if matrix_layout:
             revObj.set_templates(matrix_layout)
             return matrix_layout
         else:
             continue
-    print('keyboard layout header not found for '+kbc.get_name())
-    print('reverting to basic layout') 
+    print('*** Keyboard layout header not found for '+kbc.get_name())
+    print('*** Reverting to basic layout...') 
     return
 
 
@@ -197,8 +198,7 @@ def find_config_header(kbc):
         config_h = 'config.h'
 
         path = qdir+kbl+config_h
-        
-        data = preproc_header(kbc, path) 
+        data = preproc_header(kbc, path)
         matrix_pins = read_config_header(data)
         if matrix_pins:
             revObj.set_matrix_pins(matrix_pins[0], matrix_pins[1])
@@ -206,8 +206,8 @@ def find_config_header(kbc):
         else:
             continue
 
-    print('keyboard config.h header not found for '+kbc.get_name())
-    print('matrix row/col pins must be provided manually') 
+    print('*** Config.h header not found for '+kbc.get_name())
+    print('*** Matrix row/col pins must be provided manually!') 
     return
 
 def main():   
@@ -223,6 +223,7 @@ def main():
     parser.add_argument('-M', dest='listkeym', action='store_true',help='List all valid KEYMAPS for the current keyboard')
     parser.add_argument('-R', dest='listkeyr', action='store_true',help='List all valid REVISIONS for the current keyboard')
     parser.add_argument('-S', metavar='string', dest='searchkeyb', help='Search valid KEYBOARD inputs')
+    parser.add_argument('-P', dest='presult', action='store_true',help='Print result of keymap conversion to terminal')
     parser.add_argument('-c', metavar='keymap', type=int, default=-1, dest = 'choosemap', help= 'Select keymap template index')
     args = parser.parse_args()
 
@@ -254,10 +255,6 @@ def main():
     # Check cache/run preprocessor for keymap.c
     km_layers = preproc_read_keymap(current_kbc)
 
-    #####init_cache_keymap(current_kbc)
-    # Parse this keymap file and return raw layout data
-    ### km_layers = read_kb_keymap(current_kbc, data)
-    #####km_layers = read_kb_keymap(current_kbc)
     '''
     for l in km_layers:
        print(l.get_name()) 
@@ -289,15 +286,16 @@ def main():
     matrix = rev.get_matrix_pins()
     layers = rev.get_layout() 
     template = rev.get_templates()
-
-    print('ROW PINS')
-    print(matrix[0]) 
-    print('COL PINS')
-    print(matrix[1])
-    for layer in layers:
-        print(layer.get_name())
-        for row in layer.get_layout():
-            print(row)
-        for row in layer.get_template():
-            print(row)
+    if args.presult:
+        print('ROW PINS')
+        print(matrix[0]) 
+        print('COL PINS')
+        print(matrix[1])
+        for layer in layers:
+            print(layer.get_name())
+            for row in layer.get_layout():
+                print(row)
+            for row in layer.get_template():
+                print(row)
     print('SUCCESS!')
+

@@ -18,20 +18,34 @@ def preproc(kb, kblibs, arg_list):
         kbl += '/'
         path += kbl
         libs.append('-I'+path)
-    
     argv = cc + libs + arg_list
-    output = subprocess.check_output(argv)
-    return output
+    try:
+        output = subprocess.check_output(argv)
+        return output
+    except subprocess.CalledProcessError as e:
+        err_num = e.returncode
+        print(err_num)
+        if err_num == 1:
+            output = e.output
+            return output
+        else:
+            print('error')
+            return
 
 def preproc_header(kbc, path):
     qdir = QMK_DIR +'keyboards/'
 
     kb = kbc.get_name()
     kblibs = list(kbc.get_libs())
-    arg = [ '-dD', path ]
+    rev = kbc.get_rev() 
+    if rev != '':
+        kblibs.append(rev)
 
+    arg = [ '-D', 'QMK_KEYBOARD_CONFIG_H=\"config_common.h\"', '-dD', path ]
+    
     output = str(preproc(kb, kblibs, arg)).replace('\\n', ' ')
     return output
+
 
 def preproc_keymap(kbc):
     qdir = QMK_DIR +'keyboards/'

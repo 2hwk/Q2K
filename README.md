@@ -56,3 +56,5 @@ optional arguments:
 
 
 VERY alpha, not every keyboard is gaurenteed to work 100%. Lots of uncaught exceptions will be thrown
+
+Currently actually doesn't output a YAML file yet. :) (soon tm)
