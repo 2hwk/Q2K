@@ -55,9 +55,9 @@ def read_keymap(data):
     keycode_list = pp.Group(pp.ZeroOrMore(keycode + pp.Optional(COMMA)))
     row = comment + LBRAC + keycode_list + RBRAC + comment
 
-    layern = layer_string + EQ
+    layern = layer_string('layer_name') + EQ
     km_layer_data = comment + LBRAC + pp.OneOrMore(row + pp.Optional(COMMA)) + RBRAC + comment
-    km_layer = pp.Optional(layern('layer_name')) + comment + km_layer_data('layer') + pp.Optional(COMMA) + comment  
+    km_layer = pp.Optional(layern) + comment + km_layer_data('layer') + pp.Optional(COMMA) + comment  
 
     layer_list = []
     num_col = 0
@@ -67,6 +67,7 @@ def read_keymap(data):
         if tokens.layer_name == '':
             curr_layer = keymap_layer(str(layer_index))
         else:
+            print(tokens.layer_name)
             curr_layer = keymap_layer(tokens.layer_name[1:-1]) 
 
         for row in tokens.layer:
