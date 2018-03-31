@@ -17,155 +17,77 @@ def clean_split(li, ch):
             newli = []
     return newli
 
-#def read_config_header(s):
-
-def read_kb_keymap(kbc):
-
-    rev = kbc.get_rev()
-    revObj = kbc.get_rev_info(rev)
-    km_loc = revObj.get_output_keymap()
-
-    layer_list = read_keymap(km_loc)
-    revObj.set_layout(layer_list)
-
-    return layer_list
-
-def read_keymap(s):
-
-    layer_list = []    
-    try:       
-        with open(s, 'r') as f:
-            data = f.readlines()
-            new_data = []
-
-            for i, line in enumerate(data):
-               if line.startswith('#') == False:
-                   new_data.append(line)
-
-            data = ''.join(new_data)
-            data_list = []
-
-            LBRAC, RBRAC,EQ, COMMA = map(pp.Suppress,"{}=,")
-            keycode = pp.Word(pp.alphas+'_', pp.alphanums+'_'+'('+')')
-            headfunc_s = pp.Literal('const uint16_t')
-            headfunc_m = pp.Literal('PROGMEM')
-            headfunc_e = pp.Literal('keymaps[][MATRIX_ROWS][MATRIX_COLS]')
-            header = pp.Group(headfunc_s + pp.Optional(headfunc_m) + headfunc_e + EQ + LBRAC)
-
-            layer_string = pp.Word(pp.printables) | pp.Word(pp.nums)
-            layern = pp.Group( layer_string + EQ)
-
-            keycode_list = pp.Group(keycode + pp.ZeroOrMore(COMMA + keycode) + pp.Optional(COMMA))
-            row = LBRAC + keycode_list + RBRAC
-            keym_layer = LBRAC + pp.OneOrMore(row + pp.Optional(',')) + RBRAC
-
-            km_func = pp.Suppress(header) + pp.OneOrMore( pp.Optional(layern) + keym_layer + pp.Optional(COMMA) ) + RBRAC
-
-            for tokens, start, stop in km_func.scanString(data):
-                data_list = tokens
-
-    except FileNotFoundError:
-       print('File not found - '+s)
-       print('Parsing cannot continue without keymap, terminating')
-       sys.exit()
-
-    curr_layer = keymap_layer()
-    curr_layer_name = '0'
-    curr_keymap = []
-    layer_index = 0
-    col_len = 0
-
-    next_layer = False
-    layer_has_name = False
+def read_config_header(data):
+    matrix_pins = []
+    matrix_row_pins = []
+    matrix_col_pins = []
     
-    for row in data_list:
-        # Hit a comma, go to next row
-        if row == ',':
-            next_layer = False
-            continue
+    LBRAC, RBRAC, COMMA = map(pp.Suppress, "{},")
+    define_rows = pp.Suppress(pp.Literal('#define MATRIX_ROW_PINS'))
+    define_cols = pp.Suppress(pp.Literal('#define MATRIX_COL_PINS'))
+    pincode = pp.Word(pp.alphanums) | pp.Word(pp.nums)
+
+    array = LBRAC + pp.ZeroOrMore(pincode + pp.Optional(COMMA)) + RBRAC
+    matrix_rows = pp.Group(define_rows + LBRAC + pp.ZeroOrMore(pincode + pp.Optional(COMMA)) + RBRAC)
+    matrix_cols = pp.Group(define_cols + LBRAC + pp.ZeroOrMore(pincode + pp.Optional(COMMA)) + RBRAC)
+
+    for tokens, start, stop in matrix_rows.scanString(data):
+        matrix_row_pins = list(tokens[0])
+    for tokens, start, stop in matrix_cols.scanString(data):
+        matrix_col_pins = list(tokens[0])   
+
+    if matrix_row_pins and matrix_col_pins:
+        matrix_pins.append(matrix_row_pins)
+        matrix_pins.append(matrix_col_pins)
+
+    return matrix_pins
+
+
+def read_keymap(data):
+    layer_list = []    
+    
+    LBRAC, RBRAC,EQ, COMMA = map(pp.Suppress,"{}=,")
+
+    integer = pp.Word(pp.nums)
+    comment = pp.ZeroOrMore(pp.Suppress(pp.Group('#' + integer + pp.Word(pp.printables) + pp.Optional(integer))))
+    keycode = pp.Word(pp.alphas+'_', pp.alphanums+'_'+'('+')')
+    layer_string = pp.Word(pp.printables) | pp.Word(pp.nums)
+
+    keycode_list = pp.Group(keycode + pp.ZeroOrMore(COMMA + keycode) + pp.Optional(COMMA))
+    row = comment + LBRAC + keycode_list + RBRAC + comment
+
+    layern = pp.Group( layer_string + EQ)
+    km_layer_data = comment + LBRAC + pp.OneOrMore(row + pp.Optional(COMMA)) + RBRAC + comment
+    km_layer = pp.Optional(layern('layer_name')) + comment + km_layer_data('layer') + pp.Optional(COMMA) + comment  
+
+    layer_list = []
+    num_col = 0
+    layer_index = -1
+    for tokens, start, stop in km_layer.scanString(data):
+        layer_index += 1
+        if tokens.layer_name == '':
+            curr_layer = keymap_layer(str(layer_index))
+        else:
+            curr_layer = keymap_layer(tokens.layer_name[0]) 
+
+        for row in tokens.layer:
+            num_col = len(row)
+            curr_layer.add_keymap_item(list(row))
         
-        elif len(row) == 1 and len(row[0]) > 1 and row[0][0] == '[' and row[0][-1] == ']':
-             # is a layer name
-            if next_layer:
-                 curr_layer = keymap_layer(curr_layer_name)
-                 curr_layer.set_keymap(curr_keymap)
-                 curr_layer.set_matrix_cols(col_len)
-                 layer_list.append(curr_layer)
-                 curr_keymap = []
-            layer_has_name = True
-            next_layer = False
-            curr_layer_name = row[0][1:-1]
-            layer_index += 1
-            continue
-        # append to current keymap
-        elif next_layer == False:
-            curr_keymap = curr_keymap + list(row)
-            col_len = len(row)
-            next_layer = True
-        # exit and append keymap to layer list
-        elif next_layer == True:
-            layer_has_name = False
-            curr_layer = keymap_layer(curr_layer_name)
-            curr_layer.set_keymap(curr_keymap)
-            curr_layer.set_matrix_cols(col_len)
-            layer_list.append(curr_layer)
-            layer_index += 1
-            # ^ Previous Lines
-            curr_layer_name = str(layer_index)
-            curr_keymap = []
-            # < Current Line
-            curr_keymap = curr_keymap + list(row)
-            next_layer = True
-       
-    curr_layer = keymap_layer(curr_layer_name)
-    curr_layer.set_keymap(curr_keymap)
-    curr_layer.set_matrix_cols(col_len)
-    layer_list.append(curr_layer)
-
-    if len(layer_list) == 0 or layer_list is None:
-        print('Parsed and found no keymap')
-        raise RuntimeError('Failed to parse keymap file '+s)
-
-    layer_list = convert_keymap(layer_list)
+        curr_layer.set_matrix_cols(num_col)
+        layer_list.append(curr_layer)
     """
     for layer in layer_list:
         print(layer.get_name()) 
         print(layer.get_keymap())
     """
-    return layer_list
-
-def find_layout_header(kbc):
-
-    rev = kbc.get_rev()
-    revObj = kbc.get_rev_info(rev)
-    # qmk/keyboards/
-    kblibs = list(kbc.get_libs())
-    if rev != '':
-        kblibs.append(rev)
-    qdir = QMK_DIR +'keyboards/'
-
-    folders = []
-    path = ''
-    for kbl in kblibs:
-        path += kbl+'/'
-        folders.append(path)
-
-    for kbl in reversed(folders):
-        kbl_f = kbl.split('/')
-        kb_h = kbl_f[-2]        
-        kb_h += '.h'
-
-        path = qdir+kbl+kb_h
-        
-        m_l = read_layout_header(path)
-        if m_l is None or len(m_l) < 1:
-            continue
-        else:
-            revObj.set_templates(m_l)
-            return m_l
-    print('keyboard layout header not found for '+kbc.get_name())
-    print('reverting to basic layout') 
-    return
+    if not layer_list:
+        print('Parsed and found no keymap')
+        print('Failed to parse keymap file')
+        #raise RuntimeError('Failed to parse keymap file')
+        exit()
+    else:
+        return layer_list
 
 
 def read_layout_header(s):
@@ -177,7 +99,7 @@ def read_layout_header(s):
         with open(s, 'r') as f:
             for line in f:
                 line = re.sub('\s', '', line)
-                if layout_read == False and array_read == False:
+                if not layout_read and not array_read:
                     # ------- Find layout -------------
                     if line.startswith('#define') and line.endswith('(\\'): #define ___ (\ macro
                         line = line.replace('#define','')
@@ -195,7 +117,7 @@ def read_layout_header(s):
                     if line.endswith('(\\'):
                         array_read = True
                         continue
-                elif layout_read == True:
+                elif layout_read:
                     if line == '\\' or line.startswith('//') or (line.startswith('/*') and line.endswith('*/\\')):
                         continue
                     # If Layout ended: go to array
@@ -231,7 +153,7 @@ def read_layout_header(s):
                         print('Missing \ in file '+s)
                         #raise SyntaxError('Missing \ in file '+s)
                         break
-                elif array_read == True:
+                elif array_read:
                     if line.endswith('\\'):
                         line = re.sub('\\\|[(){}]', '', line)
                         line = clean_split(line, ',')

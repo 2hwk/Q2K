@@ -1,7 +1,6 @@
 KB_INFO = 'lib/cache/yaml/kb_info.yaml'
 LOCAL_INCLUDES = 'lib/'
 QMK_DIR = 'qmk/'
-OUTPUT_DIR = 'lib/out/'
 
 KBD_LIST = []
 

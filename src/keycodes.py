@@ -376,7 +376,27 @@ qmk_to_keyp = {
 }
 
 qmk_to_keyp_func = {
-    "MO("                :  "L",
+    "MO("                :  "l",
+    "TG("                :  "toggle_l",
+    "TT("                :  "l",            #Feature not fully implemented in K+
+    "OSL("               :  "sticky_l",
+    "DF("                :  "set_l",
+    "OSM(KC_LSFT)"       :  "sticky_lshift",
+    "OSM(KC_LSHIFT)"     :  "sticky_lshift",
+    "OSM(KC_LCTL)"       :  "sticky_lctrl",
+    "OSM(KC_LCTRL)"      :  "sticky_lctrl",
+    "OSM(KC_LALT)"       :  "sticky_lalt",
+    "OSM(KC_LGUI)"       :  "sticky_lgui",
+    "OSM(KC_LWIN)"       :  "sticky_lgui",
+    "OSM(KC_LCMD)"       :  "sticky_lgui",
+    "OSM(KC_RSFT)"       :  "sticky_rshift",
+    "OSM(KC_RSHIFT)"     :  "sticky_rshift",
+    "OSM(KC_RCTL)"       :  "sticky_rctrl",
+    "OSM(KC_RCTRL)"      :  "sticky_rctrl",
+    "OSM(KC_RALT)"       :  "sticky_ralt",
+    "OSM(KC_RGUI)"       :  "sticky_rgui",
+    "OSM(KC_RWIN)"       :  "sticky_rgui",
+    "OSM(KC_RCMD)"       :  "sticky_rgui", 
 }
 
 

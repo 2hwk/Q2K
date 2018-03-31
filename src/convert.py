@@ -24,19 +24,27 @@ def convert_keymap(layers):
 
 def func(qmk_func, layer_list):
     # Currently only handles layer switching functions
-    try:
-        q_index = qmk_func.index('(')+1
-        qfunc = qmk_func[:q_index]
-        layer_name = qmk_func[q_index:-1]
-        layer = str(layer_list.index(layer_name))
-        keyp_func = qmk_to_keyp_func[qfunc]+layer
-    except KeyError:
-        print('Invalid func: ['+qmk_func+'] - set to trns')
-        keyp_func = 'trns'
 
-    except ValueError:
-        print('Invalid func: ['+qmk_func+'] - set to trns')
-        keyp_func = 'trns'
+    if qmk_func in qmk_to_keyp_func.keys():
+        keyp_func = qmk_to_keyp_func[qmk_func]
+    else:
+
+        try:
+            brac_index = qmk_func.index('(')+1
+            qfunc = qmk_func[:brac_index]
+            func_target = qmk_func[brac_index:-1]
+            if func_target in layer_list:
+                layer = str(layer_list.index(func_target))
+                keyp_func = qmk_to_keyp_func[qfunc]+layer
+            else:
+                print('Invalid func: ['+qmk_func+'] - set to trns')
+                keyp_func = 'trns'
+        except KeyError:
+            print('Invalid func: ['+qmk_func+'] - set to trns')
+            keyp_func = 'trns'
+        except ValueError:
+            print('Invalid func: ['+qmk_func+'] - set to trns')
+            keyp_func = 'trns'
 
     return keyp_func
 
@@ -52,27 +60,27 @@ def keycode(qmk_kc):
     return keyp_kc
 
 
-def build_layout_from_keymap(layers):
+def build_layout_from_keymap(layers, layer_index=0):
     template_list = []
 
-    keymap = layers[0].get_keymap()
-    col_limit = layers[0].get_matrix_cols()
-    
+    keymap = layers[layer_index].get_keymap()
+    col_limit = layers[layer_index].get_matrix_cols()
     matrix = []
     keymap_len = len(keymap)
     for i in range(keymap_len):
         if i % col_limit == 0:
-            if i > col_limit:
+            if i >= col_limit:
                matrix.append(row)
             row = []
             row.append(i)
         else:
             row.append(i)
-    matrix_template = layout_template('MATRIX LAYOUT')
+    matrix.append(row)
+    matrix_template = layout_template('!MATRIX LAYOUT')
     matrix_template.set_layout(matrix)
 
     template_list.append(matrix_template)
-
+  
     return template_list            
 
 def merge_layout_template(layers, templates, select=-1):
@@ -104,8 +112,8 @@ def merge_layout_template(layers, templates, select=-1):
             else:
                 break
 
-    for l in layers:    
-    
+    for x, l in enumerate(layers):    
+        layout_name = templates[index].get_name()
         layout_template = templates[index].get_layout()
         layout = copy.deepcopy(layout_template)
         keycode_array = l.get_keymap()
@@ -115,26 +123,31 @@ def merge_layout_template(layers, templates, select=-1):
             for j, ind in enumerate(rows):
                 if ind < max_index:
                     layout[i][j] = keycode_array[ind]
+                elif layout_name != '!MATRIX LAYOUT':
+                    print('error has occured: invalid array value: '+str(ind))
+                    print('corrupt/incompatible layout template or keymap')
+                    print('trying again with default matrix layout')
+                    matrix_template = build_layout_from_keymap(layers, x)
+                    merge_layout_template(layers, matrix_template)
+                    exit()
                 else:
                     print('error has occured: invalid array value: '+str(ind))
-                    print('fatal error: corrupt/incompatible layout template or keymap')
-                    exit()                    
+                    print('fatal error: corrupt/incompatible keymap')
+                    exit()
+                    
         col_limit = l.get_matrix_cols()
         layout_template = convert_keyplus_matrix(layout_template, col_limit)
-
-        l.set_keymap(layout)
-        l.set_matrix(layout_template)
-
+          
+        l.set_layout(layout)
+        l.set_template(layout_template)
         """
         print(l.get_name())
-        layerprint = l.get_keymap()
-        
-        for row in layerprint:
+        for row in layout: #l.get_keymap()
             print(row)
 
-        for row in layout_template:
+        for row in layout_template: #l.get_template()
             print(row)
-       """
+        """
     print('SUCCESS!')
 
 

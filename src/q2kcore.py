@@ -8,6 +8,7 @@ from kb_global import *
 from parser import *
 from convert import *
 from cpp import *
+from infoyaml import *
 
 def print_keyboard_list():
 
@@ -76,8 +77,6 @@ def check_parse_argv(kb, km='default', rev=''):
                 sys.exit()
             # If KB matches, and KM and REV do not conflict, set values and return kb_info class
             kbc.set_rev(rev)
-            #if rev != '':
-                #kbc.add_lib(rev)
             kbc.set_keymap(km)
             return kbc
         else:
@@ -96,7 +95,7 @@ def init_cache_info(kb_info_yaml):
         try:
             with open(kb_info_yaml, 'r') as f:
                 KBD_LIST = yaml.load(f)
-                print('Using Cached kb_info.yaml')
+                print('Using cached kb_info.yaml')
 
         except FileNotFoundError:
             print('Failed to load kb_info.yaml')
@@ -117,7 +116,6 @@ def init_cache_keymap(kbc):
     km = kbc.get_keymap()+'/keymap.c'
     rev = kbc.get_rev()
     revObj = kbc.get_rev_info(rev)
-
     if rev == '':
         output = OUTPUT_DIR+kb+km
     else:
@@ -133,9 +131,86 @@ def init_cache_keymap(kbc):
     revObj.set_output_keymap(output)
     #return output
 
+#def init_configh(kbc):
 
-def main():
+def preproc_read_keymap(kbc):
+    rev = kbc.get_rev()
+    revObj = kbc.get_rev_info(rev)
 
+    data = preproc_keymap(kbc)
+    layer_list = read_keymap(data)
+    revObj.set_layout(layer_list)
+
+    return layer_list
+
+def find_layout_header(kbc):
+
+    rev = kbc.get_rev()
+    revObj = kbc.get_rev_info(rev)
+    # qmk/keyboards/
+    kblibs = list(kbc.get_libs())
+    if rev != '':
+        kblibs.append(rev)
+    qdir = QMK_DIR +'keyboards/'
+
+    folders = []
+    path = ''
+    for kbl in kblibs:
+        path += kbl+'/'
+        folders.append(path)
+
+    for kbl in reversed(folders):
+        kbl_f = kbl.split('/')
+        kb_h = kbl_f[-2]        
+        kb_h += '.h'
+
+        path = qdir+kbl+kb_h
+        
+        matrix_layout = read_layout_header(path)
+        if matrix_layout:
+            revObj.set_templates(matrix_layout)
+            return matrix_layout
+        else:
+            continue
+    print('keyboard layout header not found for '+kbc.get_name())
+    print('reverting to basic layout') 
+    return
+
+
+def find_config_header(kbc):
+    rev = kbc.get_rev()
+    revObj = kbc.get_rev_info(rev)
+    kblibs = list(kbc.get_libs())
+    if rev != '':
+        kblibs.append(rev)
+
+    qdir = QMK_DIR +'keyboards/'
+    folders = []
+    path = ''
+
+    for kbl in kblibs:
+        path += kbl+'/'
+        folders.append(path)
+
+    for kbl in reversed(folders):
+        kbl_f = kbl.split('/')     
+        config_h = 'config.h'
+
+        path = qdir+kbl+config_h
+        
+        data = preproc_header(kbc, path) 
+        matrix_pins = read_config_header(data)
+        if matrix_pins:
+            revObj.set_matrix_pins(matrix_pins[0], matrix_pins[1])
+            return matrix_pins
+        else:
+            continue
+
+    print('keyboard config.h header not found for '+kbc.get_name())
+    print('matrix row/col pins must be provided manually') 
+    return
+
+def main():   
     # Init kb_info file from cache
     init_cache_info(KB_INFO)
     # Read ARGV input from terminaL
@@ -169,19 +244,20 @@ def main():
         print("Searching...")
         search_keyboard_list(args.searchkeyb)
         sys.exit()
-    
+     
     # Check the cmd line arguments
     current_kbc = check_parse_argv(args.keyboard, args.keymap, args.rev)
 
-    # Check config.h for matrix pinout
-
+    # Pass config.h through CPP for matrix pinout
+    #### data = init_configh(current_kbc)
+    find_config_header(current_kbc)
     # Check cache/run preprocessor for keymap.c
-    init_cache_keymap(current_kbc)
-    #km_loc = init_cache_keymap(current_kbc)
-    # Parse this keymap file and return raw layout data
-    km_layers = read_kb_keymap(current_kbc)
-    #km_layers = read_keymap(km_loc)
+    km_layers = preproc_read_keymap(current_kbc)
 
+    #####init_cache_keymap(current_kbc)
+    # Parse this keymap file and return raw layout data
+    ### km_layers = read_kb_keymap(current_kbc, data)
+    #####km_layers = read_kb_keymap(current_kbc)
     '''
     for l in km_layers:
        print(l.get_name()) 
@@ -189,16 +265,39 @@ def main():
     '''
     # Find layout templates in <keyboard>.h
     km_template = find_layout_header(current_kbc)
-    # TO DO: Needs to have an error message!
+        # TO DO: Needs to have an error message!
+        # Merge layout templates + arrays from <keyboard>.h with matrix from keymap.c
+        # Recreate the associated functions with pyparsing
+        # USE THE GCC PREPROCESSOR TO PROCESS MACROS with -dM
+
+    # Convert extracted keymap.c data to keyplus format
+    km_layers = convert_keymap(km_layers)
     # Merge layout templates + arrays from <keyboard>.h with matrix from keymap.c
-    # Recreate the associated functions with pyparsing
-    # USE THE GCC PREPROCESSOR TO PROCESS MACROS with -dM
-    if km_template is None or len(km_template) == 0:
+
+    if not km_template:
         km_template = build_layout_from_keymap(km_layers)
     if args.choosemap >= 0:
         merge_layout_template(km_layers, km_template, args.choosemap)
     else:
         merge_layout_template(km_layers, km_template)
-    # needs a version for failure at the <keyboard>.h reading stage
+
     if args.dumpyaml:
         dump_info(KB_INFO)
+
+    rev_n = current_kbc.get_rev()
+    rev = current_kbc.get_rev_info(rev_n)
+    matrix = rev.get_matrix_pins()
+    layers = rev.get_layout() 
+    template = rev.get_templates()
+
+    print('ROW PINS')
+    print(matrix[0]) 
+    print('COL PINS')
+    print(matrix[1])
+    for layer in layers:
+        print(layer.get_name())
+        for row in layer.get_layout():
+            print(row)
+        for row in layer.get_template():
+            print(row)
+    print('SUCCESS!')

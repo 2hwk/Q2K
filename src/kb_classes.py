@@ -87,9 +87,9 @@ class rev_info:
     def set_templates(self, temp_list):
         self.build_templates = temp_list
 
-    def set_matrix_pins(self, c, r):
-        self.build_m_col_pins = c
+    def set_matrix_pins(self, r, c):
         self.build_m_row_pins = r
+        self.build_m_col_pins = c
 
     def set_output_keymap(self, filepath):
         self.output_keymap = filepath
@@ -104,13 +104,13 @@ class rev_info:
         return self.build_layout
 
     def get_templates(self):
-        return get_templates
+        return self.build_templates
 
-    def get_matrix_row_pins(self):
-        return self.m_row_pins
-
-    def get_matrix_col_pins(self):
-        return self.m_col_pins
+    def get_matrix_pins(self):
+        matrix = []
+        matrix.append(self.build_m_row_pins)
+        matrix.append(self.build_m_col_pins)
+        return matrix
 
     def get_output_keymap(self):
         return self.output_keymap
@@ -149,10 +149,11 @@ class layout_template:
 class keymap_layer:
 
     def __init__(self, n=''):
-        self.layer_name = n
         self.keymap = []
+        self.layer_name = n
 
-        self.matrix = []
+        self.layout = []
+        self.template = []
         self.matrix_cols = 0
 
     def set_keymap(self, k):
@@ -161,8 +162,11 @@ class keymap_layer:
     def set_matrix_cols(self, c):
         self.matrix_cols = c
     
-    def set_matrix(self, m):
-        self.matrix = m
+    def set_template(self, m):
+        self.template = m
+
+    def set_layout(self, l):
+        self.layout = l
 
     def add_keymap_item(self, l):
         self.keymap = self.keymap+l
@@ -173,8 +177,11 @@ class keymap_layer:
     def get_keymap(self):
         return self.keymap
 
-    def get_matrix(self):
-        return self.matrix
+    def get_layout(self):
+        return self.layout
+
+    def get_template(self):
+        return self.template
 
     def get_matrix_cols(self):
         return self.matrix_cols
