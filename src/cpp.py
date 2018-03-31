@@ -19,6 +19,7 @@ def preproc(kb, kblibs, arg_list):
         path += kbl
         libs.append('-I'+path)
     argv = cc + libs + arg_list
+    #print(' '.join(argv))
     try:
         output = subprocess.check_output(argv)
         return output

@@ -28,13 +28,13 @@ def read_config_header(data):
     pincode = pp.Word(pp.alphanums) | pp.Word(pp.nums)
 
     array = LBRAC + pp.ZeroOrMore(pincode + pp.Optional(COMMA)) + RBRAC
-    matrix_rows = pp.Group(define_rows + LBRAC + pp.ZeroOrMore(pincode + pp.Optional(COMMA)) + RBRAC)
-    matrix_cols = pp.Group(define_cols + LBRAC + pp.ZeroOrMore(pincode + pp.Optional(COMMA)) + RBRAC)
+    matrix_rows = define_rows + LBRAC + pp.ZeroOrMore(pincode + pp.Optional(COMMA)) + RBRAC
+    matrix_cols = define_cols + LBRAC + pp.ZeroOrMore(pincode + pp.Optional(COMMA)) + RBRAC
 
     for tokens, start, stop in matrix_rows.scanString(data):
-        matrix_row_pins = list(tokens[0])
+        matrix_row_pins = list(tokens)
     for tokens, start, stop in matrix_cols.scanString(data):
-        matrix_col_pins = list(tokens[0])   
+        matrix_col_pins = list(tokens)   
 
     if matrix_row_pins and matrix_col_pins:
         matrix_pins.append(matrix_row_pins)
@@ -55,7 +55,7 @@ def read_keymap(data):
     keycode_list = pp.Group(pp.ZeroOrMore(keycode + pp.Optional(COMMA)))
     row = comment + LBRAC + keycode_list + RBRAC + comment
 
-    layern = pp.Group( layer_string + EQ)
+    layern = layer_string + EQ
     km_layer_data = comment + LBRAC + pp.OneOrMore(row + pp.Optional(COMMA)) + RBRAC + comment
     km_layer = pp.Optional(layern('layer_name')) + comment + km_layer_data('layer') + pp.Optional(COMMA) + comment  
 
@@ -67,7 +67,7 @@ def read_keymap(data):
         if tokens.layer_name == '':
             curr_layer = keymap_layer(str(layer_index))
         else:
-            curr_layer = keymap_layer(tokens.layer_name[0][1:-1]) 
+            curr_layer = keymap_layer(tokens.layer_name[1:-1]) 
 
         for row in tokens.layer:
             buff = ''
@@ -85,19 +85,19 @@ def read_keymap(data):
         
         curr_layer.set_matrix_cols(num_col)
         layer_list.append(curr_layer)
-    
+    """
     for layer in layer_list:
         print(layer.get_name()) 
         print(layer.get_keymap())
-    
+    """
     if not layer_list:
+
         print('*** Parsed and found no keymap')
         print('*** Failed to parse keymap file')
         #raise RuntimeError('Failed to parse keymap file')
         exit()
     else:
         return layer_list
-
 
 def read_layout_header(s):
     # Maybe not the most robust, can be improved
@@ -106,81 +106,83 @@ def read_layout_header(s):
     template_list = []
     try:
         with open(s, 'r') as f:
-            for line in f:
-                line = re.sub('\s', '', line)
-                if not layout_read and not array_read:
-                    # ------- Find layout -------------
-                    if line.startswith('#define') and line.endswith('(\\'): #define ___ (\ macro
-                        line = line.replace('#define','')
-                        layout_name = line[:-2]                # Strip (\, save as curr layout name
-                        curr_template = layout_template(layout_name)
-                        layout_read = True
-                        continue
-                    # Array Start (case 2) cont.
-                    # ) \ 
-                    # { \ <- here 
-                    # < array >
-                    if line.startswith('{\\'):
-                        array_read = True
-                        continue
-                    if line.endswith('(\\'):
-                        array_read = True
-                        continue
-                elif layout_read:
-                    if line == '\\' or line.startswith('//') or (line.startswith('/*') and line.endswith('*/\\')):
-                        continue
-                    # If Layout ended: go to array
-                    if line.startswith(')\\') or line.endswith(')\\'):
-                        layout_read = False
-                        # Array Start (case 2)
-                        # ) \ <- here
-                        # { \ 
-                        # < array >
-                        template_list.append(curr_template)
-                        continue
-                    elif line.startswith('){\\'):
-                        layout_read = False
-                        # Array Start (case 1)
-                        # ) { \ <- here
-                        # < array >
-                        # array started, so end layout reading and push to template_list
-                        template_list.append(curr_template)
-                        # ----
-                        array_read = True
-                        continue
-                    # else layout has not ended
-                    elif line.endswith('\\'):
-                        line = line.replace('\\','')
-                        line = clean_split(line, ',')
-                        for element in line:
-                            if len(element) > 15:  
-                                print('**# Current file '+s+' failed conversion')
-                                return
-                        curr_template.add_layout_line(line)
-                    else:
-                        # Syntax error in file
-                        print('Missing \ in file '+s)
-                        #raise SyntaxError('Missing \ in file '+s)
-                        break
-                elif array_read:
-                    if line.endswith('\\'):
-                        line = re.sub('\\\|[(){}]', '', line)
-                        line = clean_split(line, ',')
-                        for i, code in enumerate(line):
-                            line[i] = re.sub('^[^##]*##', '', code)         # Remove chars before ##
-                        for element in line:
-                            if len(element) > 9:  
-                                print('*** Current file '+s+' failed conversion')
-                                return
-                        curr_template.add_array_item(line)
-                    else:
-                        array_read = False
-                #print(line)
+            lines = f.readlines()
+
     except FileNotFoundError:
         #print('File not found - '+s)
-        list = []
-        return list
+        return
 
+    for line in lines:
+        line = re.sub('\s', '', line)
+        line = re.sub(r"(\".*?\"|\'.*?\')|(/\*.*?\*/|//[^\r\n]*$)", '', line)
+        if not layout_read and not array_read:
+            # ------- Find layout -------------
+            if line.startswith('#define') and line.endswith('(\\'): #define ___ (\ macro
+                line = line.replace('#define','')
+                layout_name = line[:-2]                # Strip (\, save as curr layout name
+                curr_template = layout_template(layout_name)
+                layout_read = True
+                continue
+            # Array Start (case 2) cont.
+            # ) \ 
+            # { \ <- here 
+            # < array >
+            if line.startswith('{\\'):
+                array_read = True
+                continue
+            if line.endswith('(\\'):
+                array_read = True
+                continue
+        elif layout_read:
+            if line == '\\' or line.startswith('//') or (line.startswith('/*') and line.endswith('*/\\')):
+                continue
+            # If Layout ended: go to array
+            if line.startswith(')\\') or line.endswith(')\\'):
+                layout_read = False
+                # Array Start (case 2)
+                # ) \ <- here
+                # { \ 
+                # < array >
+                template_list.append(curr_template)
+                continue
+            elif line.startswith('){\\'):
+                layout_read = False
+                # Array Start (case 1)
+                # ) { \ <- here
+                # < array >
+                # array started, so end layout reading and push to template_list
+                template_list.append(curr_template)
+                # ----
+                array_read = True
+                continue
+            # else layout has not ended
+            elif line.endswith('\\'):
+                line = line.replace('\\','')
+                line = clean_split(line, ',')
+                for element in line:
+                    if len(element) > 15:  
+                        print('**# Current file '+s+' failed conversion')
+                        return
+                curr_template.add_layout_line(line)
+            else:
+                # Syntax error in file
+                print('Missing \ in file '+s)
+                #raise SyntaxError('Missing \ in file '+s)
+                break
+        elif array_read:
+            if line.endswith('\\'):
+                line = re.sub('\\\|[(){}]', '', line)
+                line = clean_split(line, ',')
+                for i, code in enumerate(line):
+                    line[i] = re.sub('^[^##]*##', '', code)         # Remove chars before ##
+                for element in line:
+                    if len(element) > 9:  
+                        print('*** Current file '+s+' failed conversion')
+                        return
+                curr_template.add_array_item(line)
+            else:
+                array_read = False
+        #print(line)
 
     # translate macro k vars to array indices
     for x, t in enumerate(template_list):
@@ -208,7 +210,8 @@ def read_layout_header(s):
                             continue
                     if layout[i][j] == col:
                         print('*** Array key recovery failed')
-                        raise RuntimeError('Missing macro variable in: '+s)
+                        print('*** Missing macro variable in: '+s)
+                        exit(1)
 
                     #print("File: "+s)
         t.set_layout(layout)
