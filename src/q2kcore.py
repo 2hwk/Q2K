@@ -8,7 +8,7 @@ from kb_global import *
 from parser import *
 from convert import *
 from cpp import *
-from infoyaml import *
+from outputyaml import *
 
 def print_keyboard_list():
 
@@ -281,22 +281,14 @@ def main():
     if args.dumpyaml:
         dump_info(KB_INFO)
 
+    name = current_kbc.get_name()
     rev_n = current_kbc.get_rev()
     rev = current_kbc.get_rev_info(rev_n)
     matrix = rev.get_matrix_pins()
     layers = rev.get_layout() 
-    template = rev.get_templates()
     if args.presult:
-        print('ROW PINS')
-        print(matrix[0]) 
-        print('COL PINS')
-        print(matrix[1])
-        for layer in layers:
-            print(layer.get_name())
-            for row in layer.get_layout():
-                print(row)
-            for row in layer.get_template():
-                print(row)
+        create_keyplus_yaml(current_kbc, True)
+    else:
+        create_keyplus_yaml(current_kbc)
 
     print('SUCCESS!')
-

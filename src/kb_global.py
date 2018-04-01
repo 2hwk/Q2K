@@ -1,6 +1,7 @@
 KB_INFO = 'lib/cache/yaml/kb_info.yaml'
 LOCAL_INCLUDES = 'lib/'
 QMK_DIR = 'qmk/'
+OUT_DIR = ''
 
 KBD_LIST = []
 
@@ -8,4 +9,3 @@ KBD_LIST = []
 #V_USB = [ "bfake", "bmini", "jj40", "mt40", "pearl", "ps2avrGB", "ymd96" ]
 
 #QMK_DIR = '/mnt/c/Users/Evan/Documents/qmk/qmk_firmware-master/'
-
