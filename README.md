@@ -78,15 +78,15 @@ This script first pulls matrix col/row pins from config.h, keycode data from key
 
 There are several inherent limitations with Q2K that you should be aware of. 
 
-Firstly, keyplus does NOT support the wide range of microcontrollers, functions and custom firmware functions that QMK supports. This is due to a range of reasons, such as features being planned for inclusion but still undergoing development to a ideological desire to stick to a more simple and streamlined firmware focused on wireless support. 
+Firstly, keyplus does NOT support the wide range of microcontrollers, functions and custom firmware functions that QMK supports. This is due to a range of reasons, such as features being planned for inclusion but still undergoing development, to technical limitations derived from keyplus's focus on xmega development (and features being crippled on the older atmega series controllers as a result). In general if you are after advanced layer switching and custom function support, I would say QMK is still the way to go for now.
 
-As such, when QMK-exclusive functions are defined in keymaps, an error will be displayed in the console, and the relevant keycode will be transcribed as a blank 'trns' instead. Converting keyboards with an incompatible microcontroller will prompt an incompatability warning in the terminal. (not actually implemented yet)
- 
-Secondly, QMK has a very loose and not well defined folder structure. It is natural then that as more boards are added to the QMK directory that some boards may have a non-standard enough folder structures to break this script in various ways, and that config.h and keyboard.h headers may be missed.
+If a QMK-exclusive function which is not supported by keyplus is defined in a keymap, an error will be displayed in the console, and the relevant keycode will be transcribed as a blank 'trns' instead, which is displayed in the console. Additionally converting keyboards with an incompatible microcontroller or bootloader will prompt an incompatability warning in the terminal. (partially implemented).
 
-A failure to read matrix column and pin data from config.h a fairly common problem, which is a fairly trivial but annoying manual fix. In some cases, this matrix row/col pin information is not contained in config.h at all and may need to be pulled from one of many possibly locations, including but not limited to keymap.c, matrix.c, matrix.h, <keyboard>.h, etc, where often board makers will list row/pinout information within either comments or physical code.
+Secondly, QMK has a very loose and not well defined folder structure, and does not really impose many rules or guidelines on formatting. It is natural then that as more boards are added to the QMK directory that some boards may have a non-standard enough folder structures/keymap formatting to break this script in various ways, and that config.h and keyboard.h headers may be missed. I'd like to think my code is as robust as it possibly could be to guard against this, but I feel that failure on this front is kind of inevitable.
 
-Missing keyboard.h information whilst also non-fatal and less common than missing config.h data, will result in a compromised layout yaml with only a basic layout template that follows the keyboard matrix exactly. This should still work and function but the output won't be as readable as intended. 
+A failure to read matrix column and pin data from config.h a fairly common problem, which is a fairly trivial but annoying manual fix. In some cases, this matrix row/col pin information is not contained in config.h at all and may need to be pulled from one of many possible locations, including but not limited to keymap.c, matrix.c, matrix.h, keyboard.h, etc, where often board makers will list row/pinout information within either comments or physical code. When this occurs, a warning will be printed to the console.
+
+Missing keyboard.h information whilst also non-fatal and less common than missing config.h data, will result in a compromised layout yaml with only a basic layout template that follows the keyboard matrix exactly. This should still work and function but the output won't be as readable as intended. A warning will be printed to the console when this occurs.
 
 On the other hand, a failure to read a keymap.c file will always result in a fatal termination. In this case, try converting a different keymap.c file for the same board, as particular keymaps may have unique #define declarations that can throw the script off.
 
@@ -95,3 +95,11 @@ Inevitably as QMK evolves over time, due to the above reasons and more, this scr
 ## Other Notes
 
 tl;dr VERY alpha, not gaurenteed to work 100% for every keyboard with QMK support. Lots of caught and uncaught exceptions will be thrown. Flashing firmware always has an element of risk and I am not responsible if your keyboard soft or hard bricks itself. 
+
+## Future Development
+
+As for now, development is on hiatus whilst the 32u4 branch of keyplus is further developed (soon tm). Future plans include outputting to kbfirmware json layout for use with kbfirmware based GUI interfaces, developing a nicer GUI and front end, and possibly reading off qmk.config .json data as well.
+
+## Credit
+
+Credit to Jack Humbert (QMK Firmware) and _spindle/ahtn (keyplus). I'm just riding on their coat tails really. 
