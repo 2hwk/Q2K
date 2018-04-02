@@ -5,10 +5,10 @@
 
 from pkg_resources import Requirement, resource_filename
 
-local_libs = resource_filename(Requirement.parse("q2k"),"lib")
+local_libs = resource_filename(Requirement.parse("q2k"),"q2k/lib/")
 
 KB_INFO = 'cache/kb_info.yaml'
-LOCAL_INCLUDES = local_libs
+LOCAL_INCLUDES = local_libs+'/'
 QMK_DIR = ''
 OUT_DIR = 'keyplus_out/'
 
