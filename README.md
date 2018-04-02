@@ -7,26 +7,35 @@ For parsing keymaps from QMK Firmware style keymap.c files to Keyplus YAML forma
 
 ## Requirements
 
-Requires: pip python3 pyyaml pyparsing avr-gcc
+Requires: 
+
+`pip` `python3` `pyyaml` `pyparsing` `avr-gcc`
 
 Tested on bash on Windows 10 and Ubuntu Linux
 
 
 ## Setup
 
-pip install q2k
+`sudo pip install q2k`
 
-cd into your local qmk directory (you only really need the <qmk root>/keyboards/ folder)
+`cd` into your local qmk directory (you only really need the <qmk root>/keyboards/ folder)
 
-Output YAML file is in /keyplus_out
+output YAML file is in /keyplus_out
 
 ## Run
 Run with:
-q2k [KEYBOARD NAME] [CMD LINE OPTIONS]
+`q2k [KEYBOARD NAME] [CMD LINE OPTIONS]`
+
+output YAML file is in /keyplus_out
+
 
 For example:
+```
 q2k clueboard/66 -r rev2
+```
+```
 q2k k_type -m default
+```
 
 Run with -h for cmd line options
 
