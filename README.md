@@ -36,35 +36,28 @@ q2k k_type -m default => /keyplus_out/k_type__default.yaml
 ``q2k -h`` provides a comprehensive list of accepted opts.
 
 ## Commands
+
+```
 Usage: q2k [KEYBOARD] [-h] [-m keymap] [-r ver] [-L] [-M] [-R] [-S string] [-c keymap] 
 
 positional arguments:
 
   KEYBOARD    The name of the keyboard whose keymap you wish to convert
 
-  
 optional arguments:
 
   -h, --help  show this help message and exit
-
   -m keymap   The keymap folder to reference - default is /default/
-
   -r ver      Revision of layout - default is n/a
-
   -d          Append results to cache/kb_info.yaml file. For debugging, may cause
               performance loss
-
   -L          List all valid KEYBOARD inputs
-
   -M          List all valid KEYMAPS for the current keyboard
-
   -R          List all valid REVISIONS for the current keyboard
-
   -S string   Search valid KEYBOARD inputs
-
   -P          Print result of keymap conversion to terminal
-
   -c layout   Select keymap template index. (Skips prompt for keymap selection)
+```
 
 ## Understanding QMK's Keymap/Layout Structure - How this works
 
