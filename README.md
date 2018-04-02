@@ -1,6 +1,6 @@
 ## Description
 
-Q2K Key Map parSer ver. 0.0.6969 (who knows) by 2Cas (c) 2018
+Q2K Key Map parSer ver. 0.0.90 alpha by 2Cas (c) 2018
 
 For parsing keymaps from QMK Firmware style keymap.c files to Keyplus YAML format
 
@@ -86,18 +86,14 @@ Secondly, QMK has what we will call an INTERESTING folder structure which means 
 A failure to read matrix column and pin data from config.h a fairly common problem, which is thankfully a fairly trivial but annoying manual fix. In some cases, this information is not contained in config.h at all.
  and may need to be pulled from one of many possibly locations, including but not limited to keymap.c, matrix.c, matrix.h, <keyboard>.h, etc, where often board makers will list row/pinout information within either comments or physical code.
 
-
 Missing <keyboard>.h information whilst also non-fatal and less common than missing config.h data, will result in a compromised layout yaml. This should still work and function but the output won't be as readable as intended. 
 
 On the other hand, a failure to read a keymap.c file will always result in a fatal termination. In this case, trying a different, more vanilla keymap.c file for the same board will work. 
 
-As QMK is constantly evolving over time, this script will become more and more broken than it already is (as maintenace of this script will definitely wane under my ownership). The last version/commit of QMK that has been verified to be (mostly) working will [always be linked here](https://github.com/qmk/qmk_firmware/tree/a09a042b8fe6a0369a7c479168492125efa24e59) in the worst case that it totally borks. 
+As QMK is constantly evolving over time, this script will become more and more broken than it already is (as maintenace of this script will definitely fall behind). The last version/commit of QMK that has been verified to be (mostly) working will [always be linked here](https://github.com/qmk/qmk_firmware/tree/a09a042b8fe6a0369a7c479168492125efa24e59) in the worst case that it totally borks. 
 
 ## Other Notes
 
+tl;dr VERY alpha, not gaurenteed to work 100% for every keyboard with QMK support. Lots of caught and uncaught exceptions will be thrown.
 
-VERY alpha, not every keyboard is gaurenteed to work 100%. Lots of caught and uncaught exceptions will be thrown.
-
-Matrix layout in a small but substantial number of boards is NOT stored in config.h and will not be captured as such by this script. You will have to pull this manually \ from one of many possibly locations, including but not limited to keymap.c, matrix.c, matrix.h, <keyboard>.h, etc. 
-
-Currently actually doesn't output a YAML file yet. :) (soon tm)
+Matrix layout in a small but substantial number of boards is NOT stored in config.h and will not be captured as such by this script. You will have to pull this manually \ from one of many possibly locations, including but not limited to keymap.c, matrix.c, matrix.h, <keyboard>.h, etc.

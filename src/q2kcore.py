@@ -3,7 +3,7 @@
 import sys, os, argparse
 
 from kb_classes import *
-from kb_global import * 
+from kb_global import KBD_LIST, KB_INFO, MCU_COMPAT
 
 from parser import *
 from convert import *
@@ -110,28 +110,88 @@ def init_cache_info(kb_info_yaml):
             print('Generating kb_info.yaml...')
             write_info(kb_info_yaml)
 
-def init_cache_keymap(kbc):
 
-    kb = kbc.get_name()+'/'
-    km = kbc.get_keymap()+'/keymap.c'
+def find_rules_mk(kbc):
     rev = kbc.get_rev()
     revObj = kbc.get_rev_info(rev)
-    if rev == '':
-        output = OUTPUT_DIR+kb+km
-    else:
-        rev += '/'
-        output = OUTPUT_DIR+kb+rev+km
+    kblibs = list(kbc.get_libs())
+    if rev != '':
+        kblibs.append(rev)
 
-    if os.path.isfile(output):
-        print('Using cached '+km+' file')  
-    else:  
-        print('Generating '+km+'...')
-        preproc_keymap(kbc)
+    qdir = QMK_DIR +'keyboards/'
+    folders = []
+    path = ''
 
-    revObj.set_output_keymap(output)
-    #return output
+    for kbl in kblibs:
+        path += kbl+'/'
+        folders.append(path)
 
-#def init_configh(kbc):
+    for kbl in reversed(folders):
+        kbl_f = kbl.split('/')     
+        rules_mk = 'rules.mk'
+
+        path = qdir+kbl+rules_mk
+        mcu_list = read_rules_mk(path)
+        if mcu_list:
+            revObj.set_mcu_list(mcu_list)
+            return mcu_list
+        else:
+            continue
+
+    print('*** Rules.mk not found for '+kbc.get_name())
+    return
+
+def check_mcu_list(kbc):
+    kb = kbc.get_name()
+    rev = kbc.get_rev()
+    revObj = kbc.get_rev_info(rev)
+    mcu_list = revObj.get_mcu_list()
+
+    for mcu in mcu_list:
+        if mcu in MCU_COMPAT:
+            continue
+        else:
+            print('* WARNING: possibly incompatability detected\n* MCU type: '+mcu+' in '+kb+'/'+rev+' rules.mk\n* Currently, keyplus supports only boards with the following microcontrollers:')
+            print('* '+str(MCU_COMPAT))
+            print('* If your board has a MCU on this list then ignore this warning as a false positive.\n* Else layout files produced may not work with keyplus until support for your board\'s mcu is added.\n* Press [ENTER] to continue')
+            input()
+            return
+    print('No MCU incompatability detected')
+
+
+def find_config_header(kbc):
+    rev = kbc.get_rev()
+    revObj = kbc.get_rev_info(rev)
+    kblibs = list(kbc.get_libs())
+    if rev != '':
+        kblibs.append(rev)
+
+    qdir = QMK_DIR +'keyboards/'
+    folders = []
+    path = ''
+
+    for kbl in kblibs:
+        path += kbl+'/'
+        folders.append(path)
+
+    for kbl in reversed(folders):
+        kbl_f = kbl.split('/')     
+        config_h = 'config.h'
+
+        path = qdir+kbl+config_h
+        data = preproc_header(kbc, path)
+        matrix_pins = read_config_header(data)
+        if matrix_pins:
+            revObj.set_matrix_pins(matrix_pins[0], matrix_pins[1])
+            print('Matrix pinout data found')
+            return matrix_pins
+        else:
+            continue
+
+    print('*** Config.h header not found for '+kbc.get_name())
+    print('*** Matrix row/col pins must be provided manually!') 
+    return
+
 
 def preproc_read_keymap(kbc):
     rev = kbc.get_rev()
@@ -142,6 +202,7 @@ def preproc_read_keymap(kbc):
     revObj.set_layout(layer_list)
 
     return layer_list
+
 
 def find_layout_header(kbc):
 
@@ -170,6 +231,7 @@ def find_layout_header(kbc):
         matrix_layout = read_layout_header(path)
         if matrix_layout:
             revObj.set_templates(matrix_layout)
+            print('Layouts found')
             return matrix_layout
         else:
             continue
@@ -177,38 +239,6 @@ def find_layout_header(kbc):
     print('*** Reverting to basic layout...') 
     return
 
-
-def find_config_header(kbc):
-    rev = kbc.get_rev()
-    revObj = kbc.get_rev_info(rev)
-    kblibs = list(kbc.get_libs())
-    if rev != '':
-        kblibs.append(rev)
-
-    qdir = QMK_DIR +'keyboards/'
-    folders = []
-    path = ''
-
-    for kbl in kblibs:
-        path += kbl+'/'
-        folders.append(path)
-
-    for kbl in reversed(folders):
-        kbl_f = kbl.split('/')     
-        config_h = 'config.h'
-
-        path = qdir+kbl+config_h
-        data = preproc_header(kbc, path)
-        matrix_pins = read_config_header(data)
-        if matrix_pins:
-            revObj.set_matrix_pins(matrix_pins[0], matrix_pins[1])
-            return matrix_pins
-        else:
-            continue
-
-    print('*** Config.h header not found for '+kbc.get_name())
-    print('*** Matrix row/col pins must be provided manually!') 
-    return
 
 def main():   
     # Init kb_info file from cache
@@ -224,7 +254,7 @@ def main():
     parser.add_argument('-R', dest='listkeyr', action='store_true',help='List all valid REVISIONS for the current keyboard')
     parser.add_argument('-S', metavar='string', dest='searchkeyb', help='Search valid KEYBOARD inputs')
     parser.add_argument('-P', dest='presult', action='store_true',help='Print result of keymap conversion to terminal')
-    parser.add_argument('-c', metavar='keymap', type=int, default=-1, dest = 'choosemap', help= 'Select keymap template index')
+    parser.add_argument('-c', metavar='layout', type=int, default=-1, dest = 'choosemap', help= 'Select keymap template index')
     args = parser.parse_args()
 
     if args.listkeyb:
@@ -248,9 +278,10 @@ def main():
      
     # Check the cmd line arguments
     current_kbc = check_parse_argv(args.keyboard, args.keymap, args.rev)
-
+    # Find and check MCU type
+    mcu_list = find_rules_mk(current_kbc)
+    check_mcu_list(current_kbc)
     # Pass config.h through CPP for matrix pinout
-    #### data = init_configh(current_kbc)
     find_config_header(current_kbc)
     # Check cache/run preprocessor for keymap.c
     km_layers = preproc_read_keymap(current_kbc)
@@ -263,20 +294,14 @@ def main():
     # Find layout templates in <keyboard>.h
     km_template = find_layout_header(current_kbc)
         # TO DO: Needs to have an error message!
-        # Merge layout templates + arrays from <keyboard>.h with matrix from keymap.c
-        # Recreate the associated functions with pyparsing
-        # USE THE GCC PREPROCESSOR TO PROCESS MACROS with -dM
-
     # Convert extracted keymap.c data to keyplus format
     km_layers = convert_keymap(km_layers)
-    # Merge layout templates + arrays from <keyboard>.h with matrix from keymap.c
 
+    # Merge layout templates + arrays from <keyboard>.h with matrix from keymap.c
     if not km_template:
         km_template = build_layout_from_keymap(km_layers)
-    if args.choosemap >= 0:
-        merge_layout_template(km_layers, km_template, args.choosemap)
-    else:
-        merge_layout_template(km_layers, km_template)
+
+    merge_layout_template(km_layers, km_template, args.choosemap)
 
     if args.dumpyaml:
         dump_info(KB_INFO)

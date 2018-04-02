@@ -3,7 +3,7 @@
 import copy
 
 from kb_classes import *
-from keycodes import *
+from kb_global import qmk_to_keyp_func, qmk_to_keyp
 
 def convert_keymap(layers):
 

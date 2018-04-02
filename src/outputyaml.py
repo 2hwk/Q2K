@@ -1,67 +1,82 @@
-import yaml, glob, os, errno
+import yaml, glob, os, errno, pathlib
 
 from kb_classes import *
-from kb_global import *
-from keycodes import keyplus_yaml_template
+from kb_global import QMK_DIR, OUT_DIR, KBD_LIST, KB_INFO, keyplus_yaml_template
+
+
+def special_file_dir(string):
+    
+    special_dir = ['handwired', 'converter', 'clueboard', 'lfkeyboards'] # Currently only lfkeyboards causes any issues, however it is good to be verbose here
+    if string in special_dir:
+        return True
+    else:
+        return False
 
 def write_info(kb_info_yaml):
-    # Parse Keyboard Names With Revisions First    
-    for fn in glob.glob(QMK_DIR+'keyboards/**/rev*/.', recursive=True):
-        fullpath = fn[:-2]
-        kbname_w_rev = fullpath.replace(QMK_DIR+'keyboards/','')
+    templist = []
+    keymaplist = []
 
-        folders = kbname_w_rev.split('/')     
-        rev = folders[-1]
-        kbname = '/'.join(folders[:-1])
-        kblibs = []
-        for f in folders[:-1]:
-            kblibs.append(f)
+    for fn in glob.glob(QMK_DIR+'keyboards/**/rules.mk', recursive=True):
+        fn = fn[:-9]
+        templist.append(fn)
 
-        for kbc in KBD_LIST:
-            if kbc.get_name() == kbname:
-                kbc.add_rev_list(rev)
-                break
-        else:
-            # New kb_info class
-            kbclass = kb_info(kbname)
-            kbclass.set_libs(kblibs)
-            kbclass.add_rev_list(rev)
-            KBD_LIST.append(kbclass)
-
-    # Then do the rest (together with keymaps)
     for fn in glob.glob(QMK_DIR+'keyboards/**/keymaps/**/keymap.c', recursive=True):
-        fullpath = fn[:-9]
-        keyboard_w_keymap = fullpath.replace(QMK_DIR+'keyboards/','')
+        fn = fn[:-9]
+        if fn in templist:
+            templist.remove(fn)
+        fn = fn.replace(QMK_DIR+'keyboards/', '')
+        keymaplist.append(fn)
 
-        arg = keyboard_w_keymap.split('/keymaps/')
-        kbname = arg[0]
-        checkname = arg[0].split('/')
-        if len(checkname) > 1:
-            for i, folder in enumerate(checkname):
-                if folder[:3] == 'rev':
-                    kbnameL = []
-                    for f in checkname[:i]:
-                        kbnameL.append(f)
-                    kbname= '/'.join(kbnameL)
+    for child in templist:
+        p_path = str(pathlib.Path(child).parent)
+        p_name = p_path.replace(QMK_DIR+'keyboards/', '')
 
-        kbmap = arg[1]
-        folders = kbname.split('/')
-        kblibs = []
-        #path = ''
-        for f in folders:
-            kblibs.append(f)
-            
-        for kbc in KBD_LIST:
-            if kbc.get_name() == kbname:
-                kbc.add_keymap_list(kbmap)
-                break
+        if p_path not in templist and not special_file_dir(p_name):
+            name = child.replace(QMK_DIR+'keyboards/', '')
+            # If in special dir list, then is part of the directory not keyboard
+            if not special_file_dir(name):
+               # This is a keyboard, not revision
+               kb_obj = kb_info(name)
+               kblibs = name.split('/')
+               kb_obj.set_libs(kblibs) 
+               KBD_LIST.append(kb_obj)   
+        elif special_file_dir(p_name):
+            name = child.replace(QMK_DIR+'keyboards/', '')
+            # This is a keyboard, not revision
+            kb_obj = kb_info(name)
+            kblibs = name.split('/')
+            kb_obj.set_libs(kblibs)
+            KBD_LIST.append(kb_obj)
         else:
-            # New kb_info class
-            kbclass = kb_info(kbname)
-            kbclass.add_keymap_list(kbmap)
-            kbclass.add_rev_list('n/a', True)
-            kbclass.set_libs(kblibs)
-            KBD_LIST.append(kbclass)
+            # This is a 'revision' of an existing keyboard
+            rev = child.replace(p_path+'/', '')
+            for kb_obj in KBD_LIST:
+                if kb_obj.get_name() == p_name:
+                    kb_obj.add_rev_list(rev)
+                    break
+
+    for kb_obj in KBD_LIST:
+        if not kb_obj.get_rev_list():
+            kb_obj.add_rev_list('n/a', True)
+
+    for km_path in keymaplist:
+        info_list = km_path.split('/keymaps/')
+        kb_name = info_list[0]
+        km_name = info_list[-1]
+        namelist = kb_name.split('/')
+        match = False
+        for i in range(0, len(namelist)):
+            if i > 0: 
+                kb_name = '/'.join(namelist)
+
+            for kb_obj in KBD_LIST:
+                if kb_obj.get_name() == kb_name:
+                    kb_obj.add_keymap_list(km_name)
+                    match = True
+                    break
+            if match:
+                break
+            namelist.pop()
 
     # Dump KBD_LIST to text file for faster processing in future
     dump_info(kb_info_yaml)
@@ -93,6 +108,7 @@ def create_keyplus_yaml(kbc, printout=False):
 
     template_matrix = layers[0].get_template()
     name = '"'+kb_n+'_'+rev_n+'"'
+    keymap = '"'+keymap_n+'"'
     if matrix:
         rows = str(matrix[0])
         cols = str(matrix[1])
@@ -111,15 +127,19 @@ def create_keyplus_yaml(kbc, printout=False):
     for i, layer in enumerate(layers):
         layout += '      [ # layer '+str(i)+'\n        ['
         for row in layer.get_layout():
-            layout += '\n        '
+            layout += '\n          '
             for keycode in row:
+               if len(keycode) < 4:
+                   repeat = 4 - len(keycode)
+                   for i in (range(repeat)):
+                       keycode+=' '
                layout += keycode+', '
         layout +='\n        ]\n      ],\n'
 
     # Load Template
     output_yaml_info = keyplus_yaml_template
     output_yaml_info = output_yaml_info.replace('<KB_NAME>', name)
-    output_yaml_info = output_yaml_info.replace('<LAYOUT_NAME>', keymap_n)                              
+    output_yaml_info = output_yaml_info.replace('<LAYOUT_NAME>', keymap)                              
     output_yaml_info = output_yaml_info.replace('<ROWS>', rows)                                 
     output_yaml_info = output_yaml_info.replace('<COLS>', cols)
     output_yaml_info = output_yaml_info.replace('<MATRIX_MAP>', template)
@@ -129,7 +149,6 @@ def create_keyplus_yaml(kbc, printout=False):
     path_list = kblibs + [ rev_n, keymap_n]
     output_path = '_'.join(path_list)
     output_yaml = OUT_DIR+output_path+'.yaml'
-
     if not os.path.exists(OUT_DIR):
         try:
             os.makedirs(OUT_DIR)
@@ -142,8 +161,3 @@ def create_keyplus_yaml(kbc, printout=False):
 
     if printout:
         print(output_yaml_info)
-    
-
-
-
-

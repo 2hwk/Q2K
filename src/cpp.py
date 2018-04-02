@@ -3,7 +3,7 @@
 import os, errno, subprocess
 
 from kb_classes import *
-from kb_global import *
+from kb_global import QMK_DIR, LOCAL_INCLUDES
 
 def preproc(kb, kblibs, arg_list):
     qdir = QMK_DIR + 'keyboards/'
@@ -25,12 +25,12 @@ def preproc(kb, kblibs, arg_list):
         return output
     except subprocess.CalledProcessError as e:
         err_num = e.returncode
-        print(err_num)
         if err_num == 1:
+            print(err_num)
             output = e.output
             return output
         else:
-            print('error')
+            print('*** Fatal compilation error')
             return
 
 def preproc_header(kbc, path):
@@ -39,7 +39,7 @@ def preproc_header(kbc, path):
     kb = kbc.get_name()
     kblibs = list(kbc.get_libs())
     rev = kbc.get_rev() 
-    if rev != '':
+    if rev:
         kblibs.append(rev)
 
     arg = [ '-D', 'QMK_KEYBOARD_CONFIG_H=\"config_common.h\"', '-dD', path ]

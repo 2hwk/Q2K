@@ -1,10 +1,8 @@
 # Q2K Keyboard Map parSer
-import re
-import copy
+import re, copy
 import pyparsing as pp
 
 from kb_classes import *
-from kb_global import *
 
 def clean_split(line, char):
 
@@ -15,8 +13,33 @@ def clean_split(line, char):
             newline = []
     return newline
 
+
+def read_rules_mk(path):
+    mcu_list = []
+    try:
+        with open(path, 'r') as f:
+            data = str(f.read())
+    except FileNotFoundError:
+        print('*** Rules.mk not found in '+path)
+        print('Trying a different path...')
+        return
+    
+    EQUALS = pp.Suppress('=')
+    mcu_tag = pp.Suppress(pp.Literal('MCU'))
+    mcu_type = pp.Word(pp.alphanums+'_')
+
+    mcu = mcu_tag + EQUALS + mcu_type('mcu')
+    mcu.ignore('#'+pp.restOfLine)
+
+    for tokens, start, end in mcu.scanString(data):
+        mcu_list.append(tokens.mcu)
+    
+    return mcu_list
+
+
 def read_config_header(data):
 
+    data = str(data)
     matrix_pins = []
     matrix_row_pins = []
     matrix_col_pins = []
@@ -100,13 +123,14 @@ def read_keymap(data):
     else:
         return layer_list
 
-def read_layout_header(s):
+def read_layout_header(path):
+
     template_list = []
     try:
-        with open(s, 'r') as f:
-            data = f.read()
+        with open(path, 'r') as f:
+            data = str(f.read())
     except FileNotFoundError:
-        print('*** Layout header not found in '+s)
+        print('*** Layout header not found in '+path)
         print('Trying a different path...')
         return
     
@@ -167,8 +191,6 @@ def read_layout_header(s):
                         print('*** Array key recovery failed')
                         print('*** Missing macro variable in: '+s)
                         exit(1)
-
-                    #print("File: "+s)
         t.set_layout(layout)
 
     """

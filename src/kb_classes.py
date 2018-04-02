@@ -32,7 +32,7 @@ class kb_info:
     def add_lib(self, lib):
         self._klibs.append(lib)
         print(lib)
-
+        
     def get_name(self):
         return self._kbname
 
@@ -76,10 +76,10 @@ class rev_info:
         self.build_templates = []
 
         self.mcuL = []
-        self.output_keymap = ''
+        #self.output_keymap = ''
 
-    def add_mcu_list(self, mcu):
-        self.mcuL.append(mcu)
+    def set_mcu_list(self, mcu):
+        self.mcuL = mcu
 
     def set_layout(self, lot_list):
         self.build_layout = lot_list
@@ -112,8 +112,8 @@ class rev_info:
         matrix.append(self.build_m_col_pins)
         return matrix
 
-    def get_output_keymap(self):
-        return self.output_keymap
+    #def get_output_keymap(self):
+        #return self.output_keymap
 
 
 # A class for linking matrices in <keyboard>.h with (preprocessed) keymap.c layouts
