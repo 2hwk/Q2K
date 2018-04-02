@@ -1,4 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# Copyright 2018 2Cas
+# Licensed under the MIT license (http://opensource.org/licenses/MIT)
+
 # A class for listing keyboards and QMK folder structure associated with keyboards (can be dumped and loaded to yaml)
+
 class kb_info:
 
     def __init__(self, n=''):

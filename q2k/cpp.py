@@ -1,9 +1,12 @@
-# Q2K Keyboard Map parSer
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# Copyright 2018 2Cas
+# Licensed under the MIT license (http://opensource.org/licenses/MIT)
 
 import os, errno, subprocess
 
-from kb_classes import *
-from kb_global import QMK_DIR, LOCAL_INCLUDES
+from q2k.classes import *
+from q2k.globals import QMK_DIR, LOCAL_INCLUDES
 
 def preproc(kb, kblibs, arg_list):
     qdir = QMK_DIR + 'keyboards/'

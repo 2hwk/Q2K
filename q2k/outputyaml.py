@@ -1,7 +1,12 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# Copyright 2018 2Cas
+# Licensed under the MIT license (http://opensource.org/licenses/MIT)
+
 import yaml, glob, os, errno, pathlib
 
-from kb_classes import *
-from kb_global import QMK_DIR, OUT_DIR, KBD_LIST, KB_INFO, keyplus_yaml_template
+from q2k.classes import *
+from q2k.globals import QMK_DIR, OUT_DIR, KBD_LIST, KB_INFO, keyplus_yaml_template
 
 
 def special_file_dir(string):
@@ -78,8 +83,11 @@ def write_info(kb_info_yaml):
                 break
             namelist.pop()
 
-    # Dump KBD_LIST to text file for faster processing in future
-    dump_info(kb_info_yaml)
+    if KBD_LIST:
+        # Dump KBD_LIST to text file for faster processing in future
+        dump_info(kb_info_yaml)
+    else:
+        print('*** No keyboard information found\n*** Check if current directory: '+QMK_DIR+' is a qmk root directory?')
 
 def dump_info(kb_info_yaml):
 

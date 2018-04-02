@@ -1,8 +1,12 @@
-# Q2K Keyboard Map parSer
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# Copyright 2018 2Cas
+# Licensed under the MIT license (http://opensource.org/licenses/MIT)
+
 import re, copy
 import pyparsing as pp
 
-from kb_classes import *
+from q2k.classes import *
 
 def clean_split(line, char):
 
@@ -173,7 +177,7 @@ def read_layout_header(path):
                 try:
                     layout[i][j] = array.index(col)
                 except ValueError:
-                    print('*** Missing keycode key ['+col+'] in '+s)
+                    print('*** Missing keycode key ['+col+'] in '+path)
                     # Try to recover using a different keycode array
                     for y, t2 in enumerate(template_list):                    
                         array2 = t2.get_array()
@@ -189,7 +193,7 @@ def read_layout_header(path):
                             continue
                     if layout[i][j] == col:
                         print('*** Array key recovery failed')
-                        print('*** Missing macro variable in: '+s)
+                        print('*** Missing macro variable in: '+path)
                         exit(1)
         t.set_layout(layout)
 

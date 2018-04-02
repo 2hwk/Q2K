@@ -1,14 +1,17 @@
-# Q2K Keyboard Map parSer
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# Copyright 2018 2Cas
+# Licensed under the MIT license (http://opensource.org/licenses/MIT)
 
-import sys, os, argparse
+import sys, os, argparse, yaml
 
-from kb_classes import *
-from kb_global import KBD_LIST, KB_INFO, MCU_COMPAT
+from q2k.classes import *
+from q2k.globals import KBD_LIST, KB_INFO, MCU_COMPAT
 
-from parser import *
-from convert import *
-from cpp import *
-from outputyaml import *
+from q2k.parser import *
+from q2k.convert import *
+from q2k.cpp import *
+from q2k.outputyaml import *
 
 def print_keyboard_list():
 

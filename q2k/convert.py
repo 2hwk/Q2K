@@ -1,9 +1,12 @@
-# Q2K Keyboard Map parSer
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# Copyright 2018 2Cas
+# Licensed under the MIT license (http://opensource.org/licenses/MIT)
 
 import copy
 
-from kb_classes import *
-from kb_global import qmk_to_keyp_func, qmk_to_keyp
+from q2k.classes import *
+from q2k.globals import qmk_to_keyp_func, qmk_to_keyp
 
 def convert_keymap(layers):
 

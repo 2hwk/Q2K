@@ -1,7 +1,16 @@
-KB_INFO = 'lib/cache/yaml/kb_info.yaml'
-LOCAL_INCLUDES = 'lib/'
-QMK_DIR = 'qmk/'
-OUT_DIR = 'out/'
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# Copyright 2018 2Cas
+# Licensed under the MIT license (http://opensource.org/licenses/MIT)
+
+from pkg_resources import Requirement, resource_filename
+
+local_libs = resource_filename(Requirement.parse("q2k"),"lib")
+
+KB_INFO = 'cache/kb_info.yaml'
+LOCAL_INCLUDES = local_libs
+QMK_DIR = ''
+OUT_DIR = 'keyplus_out/'
 
 KBD_LIST = []
 
