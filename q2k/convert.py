@@ -6,6 +6,8 @@
 import copy
 
 from q2k.classes import *
+from q2k.console import *
+
 from q2k.globals import qmk_to_keyp_func, qmk_to_keyp
 
 def convert_keymap(layers):
@@ -38,13 +40,13 @@ def func(qmk_func, layer_list):
                 layer = str(layer_list.index(func_target))
                 keyp_func = qmk_to_keyp_func[qfunc]+layer
             else:
-                print('Invalid func: ['+qmk_func+'] - set to trns')
+                bad_kc_out('FN','['+qmk_func+'] - set to trns')
                 keyp_func = 'trns'
         except KeyError:
-            print('Invalid func: ['+qmk_func+'] - set to trns')
+            bad_kc_out('FN','['+qmk_func+'] - set to trns')
             keyp_func = 'trns'
         except ValueError:
-            print('Invalid func: ['+qmk_func+'] - set to trns')
+            bad_kc_out('FN','['+qmk_func+'] - set to trns')
             keyp_func = 'trns'
 
     return keyp_func
@@ -55,8 +57,7 @@ def keycode(qmk_kc):
     try:
         keyp_kc = qmk_to_keyp[qmk_kc]
     except KeyError:
-        print('Invalid kc: ['+qmk_kc+'] - set to trns')
-        #keyp_kc = '____'
+        bad_kc_out('KC','['+qmk_kc+'] - set to trns')
         keyp_kc = 'trns'
     return keyp_kc
 
@@ -88,7 +89,6 @@ def merge_layout_template(layers, templates, select=-1):
 
     if select >= 0:
         index = select
-
     if templates is None or len(templates) == 0:
         temp = build_layout_from_keymap(layers)
         merge_layout_template(layers, temp)
@@ -104,15 +104,15 @@ def merge_layout_template(layers, templates, select=-1):
             try:
                 index = int(input())
             except ValueError:
-                print('err: Enter valid template number')
+                error_out(['Enter valid template number'])
                 continue
 
             if index >= len(templates) or index < 0:
-                print('err: Enter valid template number')
+                error_out(['Enter valid template number'])
                 continue
             else:
                 break
-
+    note_out(['Building with template: '+templates[index].get_name()])
     for x, l in enumerate(layers):    
         layout_name = templates[index].get_name()
         layout_template = templates[index].get_layout()
@@ -125,16 +125,15 @@ def merge_layout_template(layers, templates, select=-1):
                 if ind < max_index:
                     layout[i][j] = keycode_array[ind]
                 elif layout_name != '!MATRIX LAYOUT':
-                    print('*** Invalid array value: '+str(ind))
-                    print('*** Corrupt/incompatible layout template or keymap')
-                    print('Trying again with default matrix layout...')
+                    warning_out(['Corrupt/incompatible layout template or keymap', 
+                        'Invalid array value: '+str(ind),
+                        'Trying again with default matrix layout...'])
                     matrix_template = build_layout_from_keymap(layers, x)
                     merge_layout_template(layers, matrix_template)
                     exit()
                 else:
-                    print('*** Invalid array value: '+str(ind))
-                    print('*** Corrupt/incompatible keymap')
-                    print('Fatal Error occured, terminating...')
+                    error_out(['Corrupt/incompatible keymap',
+                        'Invalid array value: '+str(ind)])
                     exit()
                     
         col_limit = l.get_matrix_cols()
@@ -142,6 +141,7 @@ def merge_layout_template(layers, templates, select=-1):
           
         l.set_layout(layout)
         l.set_template(layout_template)
+        note_out(['Layer '+l.get_name()])
         """
         print(l.get_name())
         for row in layout: #l.get_keymap()

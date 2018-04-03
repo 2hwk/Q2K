@@ -7,6 +7,7 @@ import re, copy
 import pyparsing as pp
 
 from q2k.classes import *
+from q2k.console import error_out, warning_out, note_out
 
 def clean_split(line, char):
 
@@ -24,8 +25,8 @@ def read_rules_mk(path):
         with open(path, 'r') as f:
             data = str(f.read())
     except FileNotFoundError:
-        print('*** Rules.mk not found in '+path)
-        print('Trying a different path...')
+        warning_out(['Rules.mk not found in '+path,
+            'Trying a different path...'])
         return
     
     EQUALS = pp.Suppress('=')
@@ -120,9 +121,8 @@ def read_keymap(data):
     """
     if not layer_list:
 
-        print('*** Parsed and found no keymap')
-        print('*** Failed to parse keymap file')
-        #raise RuntimeError('Failed to parse keymap file')
+        error_out(['Parsed and found no keymap',
+            'Failed to parse keymap file'])
         exit()
     else:
         return layer_list
@@ -134,8 +134,8 @@ def read_layout_header(path):
         with open(path, 'r') as f:
             data = str(f.read())
     except FileNotFoundError:
-        print('*** Layout header not found in '+path)
-        print('Trying a different path...')
+        warning_out(['Layout header not found in '+path,
+            'Trying a different path...'])
         return
     
     LPAREN, RPAREN, LBRAC, RBRAC, COMMA = map(pp.Suppress, "(){},")
@@ -171,13 +171,12 @@ def read_layout_header(path):
     for x, t in enumerate(template_list):
         layout = t.get_layout()
         array = t.get_array()
-        #print(k.get_name())
         for i, row in enumerate(layout):
             for j, col in enumerate(row):
                 try:
                     layout[i][j] = array.index(col)
                 except ValueError:
-                    print('*** Missing keycode key ['+col+'] in '+path)
+                    warning_out(['Missing macro variable ['+col+'] in '+path])
                     # Try to recover using a different keycode array
                     for y, t2 in enumerate(template_list):                    
                         array2 = t2.get_array()
@@ -187,14 +186,14 @@ def read_layout_header(path):
                             index = array2.index(col)
                             layout[i][j] = index
                             array[index] = col                            
-                            print('Array key recovery succeeded!')
+                            warning_out(['Macro variable recovery succeeded'])
                             break
                         except ValueError:
                             continue
                     if layout[i][j] == col:
-                        print('*** Array key recovery failed')
-                        print('*** Missing macro variable in: '+path)
-                        exit(1)
+                        error_out(['Array key recovery failed',
+                            'Missing macro variable in: '+path])
+                        exit()
         t.set_layout(layout)
 
     """

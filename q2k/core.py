@@ -12,6 +12,7 @@ from q2k.parser import *
 from q2k.convert import *
 from q2k.cpp import *
 from q2k.outputyaml import *
+from q2k.console import error_out, warning_out, note_out
 
 def print_keyboard_list():
 
@@ -61,23 +62,23 @@ def check_parse_argv(kb, km='default', rev=''):
         if kbc.get_name() == kb:
             # Check Keymap
             if km not in kbc.get_keymap_list():
-                print('*** Invalid Keymap - '+km)
-                print('Valid Keymaps:')
+                warning_out(['Invalid Keymap - '+km,
+                    'Valid Keymaps:'])
                 print_keymap_list(kb)
-                sys.exit()
+                exit()
             # Check Revision
             # Case 1: Have Revisions
             if len(kbc.get_rev_list()) != 0 and rev not in kbc.get_rev_list():
-                print('*** Invalid Revision - '+rev)
-                print('Valid Revisions:')
+                error_out(['Invalid Revision - '+rev,
+                    'Valid Revisions:'])
                 print_revision_list(kb)
-                sys.exit()
+                exit()
             # Case 2: No Revisions
             elif len(kbc.get_rev_list()) == 0 and rev != '':
-                print('*** Invalid Revision - '+rev)
-                print('Valid Revisions:')
+                error_out(['Invalid Revision - '+rev,
+                    'Valid Revisions:'])
                 print_revision_list(kb)
-                sys.exit()
+                exit()
             # If KB matches, and KM and REV do not conflict, set values and return kb_info class
             kbc.set_rev(rev)
             kbc.set_keymap(km)
@@ -86,10 +87,10 @@ def check_parse_argv(kb, km='default', rev=''):
             continue
     
     # If we finish loop with no matches, keyboard name must be invalid
-    print('*** Invalid Keyboard Name - '+kb)
-    print('Valid Names:')
+    error_out(['Invalid Keyboard Name - '+kb,
+        'Valid Names:'])
     print_keyboard_list()
-    sys.exit()
+    exit()
 
 def init_cache_info(kb_info_yaml):
 
@@ -98,20 +99,20 @@ def init_cache_info(kb_info_yaml):
         try:
             with open(kb_info_yaml, 'r') as f:
                 KBD_LIST = yaml.load(f)
-                print('Using cached kb_info.yaml')
+                note_out(['Using cached kb_info.yaml @ '+KB_INFO])
 
         except FileNotFoundError:
-            print('*** Failed to load kb_info.yaml')
-            print('Generating new kb_info.yaml...')
+            warning_out(['Failed to load kb_info.yaml',
+                'Generating new kb_info.yaml...'])
             write_info(kb_info_yaml)
 
         except ImportError:
-            print('*** Failed to load kb_info.yaml')
-            print('Generating new kb_info.yaml...')
+            warning_out(['Failed to load kb_info.yaml',
+                'Generating new kb_info.yaml...'])
             write_info(kb_info_yaml)
     else:
-            print('Generating kb_info.yaml...')
             write_info(kb_info_yaml)
+            note_out(['New kb_info.yaml successfully generated', 'Location: '+KB_INFO])
 
 
 def find_rules_mk(kbc):
@@ -130,7 +131,6 @@ def find_rules_mk(kbc):
         folders.append(path)
 
     for kbl in reversed(folders):
-        kbl_f = kbl.split('/')     
         rules_mk = 'rules.mk'
 
         path = qdir+kbl+rules_mk
@@ -141,7 +141,7 @@ def find_rules_mk(kbc):
         else:
             continue
 
-    print('*** Rules.mk not found for '+kbc.get_name())
+    warning_out(['Rules.mk not found for '+kbc.get_name()])
     return
 
 def check_mcu_list(kbc):
@@ -154,12 +154,17 @@ def check_mcu_list(kbc):
         if mcu in MCU_COMPAT:
             continue
         else:
-            print('* WARNING: possibly incompatability detected\n* MCU type: '+mcu+' in '+kb+'/'+rev+' rules.mk\n* Currently, keyplus supports only boards with the following microcontrollers:')
-            print('* '+str(MCU_COMPAT))
-            print('* If your board has a MCU on this list then ignore this warning as a false positive.\n* Else layout files produced may not work with keyplus until support for your board\'s mcu is added.\n* Press [ENTER] to continue')
+            warning_out(
+                ['Possible MCU incompatability detected', 
+                'MCU type: '+mcu+' in '+kb+'/'+rev+' rules.mk', 
+                'Currently, keyplus supports only boards with the following microcontrollers:',
+                str(MCU_COMPAT),
+                'If your board has a MCU on this list then ignore this warning as a false positive',
+                'Else layout files produced may not work with keyplus until your board\'s mcu is supported',
+                'Press [ENTER] to continue'])
             input()
             return
-    print('No MCU incompatability detected')
+    note_out(['No MCU incompatability detected'])
 
 
 def find_config_header(kbc):
@@ -178,7 +183,6 @@ def find_config_header(kbc):
         folders.append(path)
 
     for kbl in reversed(folders):
-        kbl_f = kbl.split('/')     
         config_h = 'config.h'
 
         path = qdir+kbl+config_h
@@ -186,13 +190,13 @@ def find_config_header(kbc):
         matrix_pins = read_config_header(data)
         if matrix_pins:
             revObj.set_matrix_pins(matrix_pins[0], matrix_pins[1])
-            print('Matrix pinout data found')
+            note_out(['Matrix pinout data found @ '+path])
             return matrix_pins
         else:
             continue
 
-    print('*** Config.h header not found for '+kbc.get_name())
-    print('*** Matrix row/col pins must be provided manually!') 
+    warning_out(['Config.h header not found for '+kbc.get_name(),
+        'Matrix row/col pins must be provided manually!']) 
     return
 
 
@@ -234,12 +238,11 @@ def find_layout_header(kbc):
         matrix_layout = read_layout_header(path)
         if matrix_layout:
             revObj.set_templates(matrix_layout)
-            print('Layouts found')
+            note_out(['Layout header found @ '+path])
             return matrix_layout
         else:
             continue
-    print('*** Keyboard layout header not found for '+kbc.get_name())
-    print('*** Reverting to basic layout...') 
+    warning_out(['Keyboard layout header not found for '+kbc.get_name(), 'Reverting to basic layout...']) 
     return
 
 
@@ -265,17 +268,17 @@ def main():
         sys.exit()
 
     if args.listkeym:
-        print("Listing keymaps for "+args.keyboard+"...")
+        note_out(['Listing keymaps for '+args.keyboard+'...'])
         print_keymap_list(args.keyboard)
         sys.exit()
 
     if args.listkeyr:
-        print("Listing revisions for "+args.keyboard+"...")
+        note_out(['Listing revisions for '+args.keyboard+'...'])
         print_revision_list(args.keyboard)
         sys.exit()
 
     if args.searchkeyb:
-        print("Searching...")
+        note_out(['Searching...'])
         search_keyboard_list(args.searchkeyb)
         sys.exit()
      
@@ -296,7 +299,6 @@ def main():
     '''
     # Find layout templates in <keyboard>.h
     km_template = find_layout_header(current_kbc)
-        # TO DO: Needs to have an error message!
     # Convert extracted keymap.c data to keyplus format
     km_layers = convert_keymap(km_layers)
 
@@ -305,18 +307,12 @@ def main():
         km_template = build_layout_from_keymap(km_layers)
 
     merge_layout_template(km_layers, km_template, args.choosemap)
+    note_out(['Conversion succeeded, piping output'])
 
     if args.dumpyaml:
         dump_info(KB_INFO)
 
-    name = current_kbc.get_name()
-    rev_n = current_kbc.get_rev()
-    rev = current_kbc.get_rev_info(rev_n)
-    matrix = rev.get_matrix_pins()
-    layers = rev.get_layout() 
     if args.presult:
         create_keyplus_yaml(current_kbc, True)
     else:
         create_keyplus_yaml(current_kbc)
-
-    print('SUCCESS!')

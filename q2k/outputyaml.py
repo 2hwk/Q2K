@@ -6,6 +6,7 @@
 import yaml, glob, os, errno, pathlib
 
 from q2k.classes import *
+from q2k.console import note_out, error_out
 from q2k.globals import QMK_DIR, OUT_DIR, KBD_LIST, KB_INFO, keyplus_yaml_template
 
 
@@ -87,7 +88,8 @@ def write_info(kb_info_yaml):
         # Dump KBD_LIST to text file for faster processing in future
         dump_info(kb_info_yaml)
     else:
-        print('*** No keyboard information found\n*** Check if current directory: '+QMK_DIR+' is a qmk root directory?')
+        error_out(['No keyboard information found', 'Is current directory a qmk root directory?', 'cd <qmk_dir>'])
+        exit()
 
 def dump_info(kb_info_yaml):
 
@@ -98,10 +100,11 @@ def dump_info(kb_info_yaml):
         except OSError as e:
             if e.errno != errno.EEXIST and os.path.isdir(kb_info_path):
                 raise
-
-    with open(kb_info_yaml, 'w') as f:
-        yaml.dump(KBD_LIST, f)
-    #print(yaml.dump(KBD_LIST))
+    try:
+        with open(kb_info_yaml, 'w') as f:
+            yaml.dump(KBD_LIST, f)
+    except:
+        error_out(['Failed to create '+kb_info_yaml])
 
 def create_keyplus_yaml(kbc, printout=False):
 
@@ -163,9 +166,14 @@ def create_keyplus_yaml(kbc, printout=False):
         except OSError as e:
             if e.errno != errno.EEXIST and os.path.isdir(output_path):
                 raise
-
-    with open(output_yaml, 'w') as f:
-        f.write(output_yaml_info)
+    try:
+        with open(output_yaml, 'w') as f:
+            f.write(output_yaml_info)
+    except:
+        error_out(['Failed to pipe output to '+output_yaml()])
+        exit()
 
     if printout:
         print(output_yaml_info)
+
+    note_out(['SUCCESS! Output is in: '+output_yaml])

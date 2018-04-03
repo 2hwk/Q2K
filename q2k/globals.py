@@ -5,22 +5,20 @@
 
 from pkg_resources import Requirement, resource_filename
 
-local_libs = resource_filename(Requirement.parse("q2k"),"q2k/lib/")
-
-KB_INFO = 'cache/kb_info.yaml'
-LOCAL_INCLUDES = local_libs+'/'
-QMK_DIR = ''
-OUT_DIR = 'keyplus_out/'
+#----------------------------------------------
+#MODIFY these to suit your liking BEFORE running pip install
+KB_INFO = 'cache/kb_info.yaml'   # cached kb_info yaml
+QMK_DIR = ''                     # QMK directory location
+OUT_DIR = 'keyplus_out/'         # Default out directory
+#----------------------------------------------
 
 KBD_LIST = []
+MCU_COMPAT = ['atmega8u2', 'atmega16u2', 'atmega32u2', 'atmega32u4', 'atmega32u6', 'at90usb646', 'at90usb646', 'at90usb647', 'at90usb1286', 'at90usb1287']
+local_libs = resource_filename(Requirement.parse("q2k"),"q2k/lib/")
+LOCAL_INCLUDES = local_libs+'/'
 
-#N_MCU = [ "chibios_test", "ergodox_infinity", "handwired/magiforce61", "handwired/MS_sculpt_mobile", "infinity60", "jm60", "k_type", "kinesis", "lfkeyboards/smk65", "lfkeyboards/lfk87", "mechmini/v1", "subatomic", "tkc1800", "uk78", "vision_division", "whitefox"]
-#V_USB = [ "bfake", "bmini", "jj40", "mt40", "pearl", "ps2avrGB", "ymd96" ]
-
-MCU_COMPAT = ['atmega32u4', 'atmega32u2']
-
-#QMK_DIR = '/mnt/c/Users/Evan/Documents/qmk/qmk_firmware-master/'
-
+# QMK -> Keyplus Keycode Mapping
+# for keycodes only, functions are in qmk_to_keyp_func
 qmk_to_keyp = {
     "KC_NO"                 :  " no ", #- giorgio, 2018
     "KC_TRNS"               :  "____",
@@ -396,6 +394,7 @@ qmk_to_keyp = {
     "KC_SYSTEM_WAKE"        :  "system_wake",              # Wake
 }
 
+# QMK -> Keyplus functions
 qmk_to_keyp_func = {
     "MO("                :  " l",
     "TG("                :  "toggle_l",
