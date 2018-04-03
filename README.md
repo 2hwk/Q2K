@@ -9,13 +9,14 @@ For parsing keymaps from QMK Firmware style keymap.c files to Keyplus YAML forma
 
 ## Requirements
 
-Requires: `pip` `python3` `pyyaml` `pyparsing` `avr-gcc`
+Requires: `python3-pip` `avr-gcc` 
+          `pyyaml` `pyparsing` `termcolor`
 
 Tested on bash on Windows 10 and Ubuntu Linux
 
 ## Setup
 
-First, install the required dependencies, then run
+Install the required dependencies, then run
 
 `sudo pip install q2k`
 
@@ -104,4 +105,4 @@ Ideally Q2K will be a fully fledged utility which will serve both the keyplus an
 
 ## Credit
 
-Credit to Jack Humbert (QMK Firmware) and _spindle/ahtn (keyplus). I'm just riding on their coat tails really. 
+Credit to Jack Humbert (QMK Firmware) and _spindle/ahtn (keyplus), without which this would not be possible. I'm just riding on their coat tails really. 
