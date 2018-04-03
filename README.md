@@ -103,6 +103,10 @@ As for now, development is on hiatus whilst the 32u4 branch of keyplus is furthe
 
 Ideally Q2K will be a fully fledged utility which will serve both the keyplus and QMK community.
 
+## License
+
+Distributed under the OSI: MIT License.
+
 ## Credit
 
 Credit to Jack Humbert (QMK Firmware) and _spindle/ahtn (keyplus), without which this would not be possible. I'm just riding on their coat tails really. 
