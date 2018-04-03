@@ -30,15 +30,15 @@ def write_info(kb_info_yaml):
         fn = fn[:-9]
         if fn in templist:
             templist.remove(fn)
-        fn = fn.replace(QMK_DIR+'keyboards/', '')
+        fn = fn.replace(QMK_DIR+'keyboards/', '', 1)
         keymaplist.append(fn)
 
     for child in templist:
         p_path = str(pathlib.Path(child).parent)
-        p_name = p_path.replace(QMK_DIR+'keyboards/', '')
+        p_name = p_path.replace(QMK_DIR+'keyboards/', '', 1)
 
         if p_path not in templist and not special_file_dir(p_name):
-            name = child.replace(QMK_DIR+'keyboards/', '')
+            name = child.replace(QMK_DIR+'keyboards/', '', 1)
             # If in special dir list, then is part of the directory not keyboard
             if not special_file_dir(name):
                # This is a keyboard, not revision
@@ -47,7 +47,7 @@ def write_info(kb_info_yaml):
                kb_obj.set_libs(kblibs) 
                KBD_LIST.append(kb_obj)   
         elif special_file_dir(p_name):
-            name = child.replace(QMK_DIR+'keyboards/', '')
+            name = child.replace(QMK_DIR+'keyboards/', '', 1)
             # This is a keyboard, not revision
             kb_obj = kb_info(name)
             kblibs = name.split('/')
@@ -157,7 +157,10 @@ def create_keyplus_yaml(kbc, printout=False):
     output_yaml_info = output_yaml_info.replace('<LAYOUT>', layout)
 
     kblibs = kbc.get_libs()
-    path_list = kblibs + [ rev_n, keymap_n]
+    if rev_n:
+        path_list = kblibs + [ rev_n, keymap_n]
+    else:
+        path_list = kblibs + [keymap_n]
     output_path = '_'.join(path_list)
     output_yaml = OUT_DIR+output_path+'.yaml'
     if not os.path.exists(OUT_DIR):

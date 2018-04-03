@@ -94,7 +94,6 @@ def merge_layout_template(layers, templates, select=-1):
         merge_layout_template(layers, temp)
     if len(templates) == 1:
         index = 0
-        print('Building with template: '+templates[0].get_name())
     elif select < 0:
         print('Select KEYMAP template:')
         for i, templ in enumerate(templates):
