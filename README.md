@@ -100,6 +100,8 @@ tl;dr VERY alpha, not gaurenteed to work 100% for every keyboard with QMK suppor
 
 As for now, development is on hiatus whilst the 32u4 branch of keyplus is further developed (soon tm). Future plans include outputting to kbfirmware json layout for use with kbfirmware based GUI interfaces, developing a nicer GUI and front end, and possibly reading off qmk.config .json data as well.
 
+Ideally Q2K will be a fully fledged utility which will serve both the keyplus and QMK community.
+
 ## Credit
 
 Credit to Jack Humbert (QMK Firmware) and _spindle/ahtn (keyplus). I'm just riding on their coat tails really. 
