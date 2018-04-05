@@ -1,7 +1,7 @@
 ## Description
 ```
 Q2K Keymap Parser 
-ver. 0.0.90 dev5 (Pre-Alpha) 
+ver. 0.0.93 dev4 (Pre-Alpha) 
 by 2Cas (c) 2018
 ```
 

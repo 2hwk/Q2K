@@ -3,7 +3,6 @@
 # Copyright 2018 2Cas
 # Licensed under the MIT license (http://opensource.org/licenses/MIT)
 
-import sys, os, argparse, yaml
 
 from q2k.classes import *
 from q2k.globals import KBD_LIST, KB_INFO, MCU_COMPAT
@@ -11,8 +10,9 @@ from q2k.globals import KBD_LIST, KB_INFO, MCU_COMPAT
 from q2k.parser import *
 from q2k.convert import *
 from q2k.cpp import *
-from q2k.outputyaml import *
+from q2k.yaml import *
 from q2k.console import error_out, warning_out, note_out
+from q2k.json import *
 
 def print_keyboard_list():
 
@@ -245,22 +245,22 @@ def find_layout_header(kbc):
     warning_out(['Keyboard layout header not found for '+kbc.get_name(), 'Reverting to basic layout...']) 
     return
 
-
+# Hook in for main q2k binary
 def main():   
     # Init kb_info file from cache
     init_cache_info(KB_INFO)
     # Read ARGV input from terminaL
     parser = argparse.ArgumentParser(description='Convert AVR C based QMK keymap and matrix files to YAML Keyplus format')
     parser.add_argument('keyboard', metavar='KEYBOARD', nargs='?', default='', help='The name of the keyboard whose keymap you wish to convert')
-    parser.add_argument('-m', metavar='keymap', dest='keymap', default='default', help='The keymap folder to reference - default is /default/')
-    parser.add_argument('-r', metavar='ver',dest='rev', default='', help='Revision of layout - default is n/a')
-    parser.add_argument('-d', dest='dumpyaml', action='store_true', help='Append results to kb_info.yaml. (For debugging, May cause performance penalty)')
-    parser.add_argument('-L', dest='listkeyb', action='store_true',help='List all valid KEYBOARD inputs')
-    parser.add_argument('-M', dest='listkeym', action='store_true',help='List all valid KEYMAPS for the current keyboard')
-    parser.add_argument('-R', dest='listkeyr', action='store_true',help='List all valid REVISIONS for the current keyboard')
-    parser.add_argument('-S', metavar='string', dest='searchkeyb', help='Search valid KEYBOARD inputs')
-    parser.add_argument('-P', dest='presult', action='store_true',help='Print result of keymap conversion to terminal')
-    parser.add_argument('-c', metavar='layout', type=int, default=-1, dest = 'choosemap', help= 'Select keymap template index')
+    parser.add_argument('-m', '--keymap', metavar='keymap', dest='keymap', default='default', help='The keymap folder to reference - default is /default/')
+    parser.add_argument('-r', '--rev', metavar='ver',dest='rev', default='', help='Revision of layout - default is n/a')
+    parser.add_argument('-d', '--dump', dest='dumpyaml', action='store_true', help='Append results to kb_info.yaml. (For debugging, May cause performance penalty)')
+    parser.add_argument('-L', '--list', dest='listkeyb', action='store_true',help='List all valid KEYBOARD inputs')
+    parser.add_argument('-M', '--keymaps', dest='listkeym', action='store_true',help='List all valid KEYMAPS for the current keyboard')
+    parser.add_argument('-R', '--revlist', dest='listkeyr', action='store_true',help='List all valid REVISIONS for the current keyboard')
+    parser.add_argument('-S', '--search', metavar='string', dest='searchkeyb', help='Search valid KEYBOARD inputs')
+    parser.add_argument('-p', '--print', dest='presult', action='store_true',help='Print result of keymap conversion to terminal')
+    parser.add_argument('-t', '--template', metavar='layout', type=int, default=-1, dest = 'choosemap', help= 'Select keymap template index')
     args = parser.parse_args()
 
     if args.listkeyb:
@@ -281,32 +281,17 @@ def main():
         note_out(['Searching...'])
         search_keyboard_list(args.searchkeyb)
         sys.exit()
-     
-    # Check the cmd line arguments
-    current_kbc = check_parse_argv(args.keyboard, args.keymap, args.rev)
-    # Find and check MCU type
-    mcu_list = find_rules_mk(current_kbc)
+
+    current_kbc = check_parse_argv(args.keyboard, args.keymap, args.rev)        # Check the cmd line arguments
+    mcu_list = find_rules_mk(current_kbc)                                       # Find and check MCU type
     check_mcu_list(current_kbc)
-    # Pass config.h through CPP for matrix pinout
-    find_config_header(current_kbc)
-    # Check cache/run preprocessor for keymap.c
-    km_layers = preproc_read_keymap(current_kbc)
-
-    '''
-    for l in km_layers:
-       print(l.get_name()) 
-       print(l.get_keymap())
-    '''
-    # Find layout templates in <keyboard>.h
-    km_template = find_layout_header(current_kbc)
-    # Convert extracted keymap.c data to keyplus format
-    km_layers = convert_keymap(km_layers)
-
-    # Merge layout templates + arrays from <keyboard>.h with matrix from keymap.c
+    find_config_header(current_kbc)                                             # Pass config.h through CPP for matrix pinout
+    km_layers = preproc_read_keymap(current_kbc)                                # Check cache/run preprocessor for keymap.c
+    km_template = find_layout_header(current_kbc)                               # Find layout templates in <keyboard>.h
+    km_layers = convert_keymap(km_layers)                                       # Convert extracted keymap.c data to keyplus format
     if not km_template:
         km_template = build_layout_from_keymap(km_layers)
-
-    merge_layout_template(km_layers, km_template, args.choosemap)
+    merge_layout_template(km_layers, km_template, args.choosemap)               # Merge layout templates + arrays from <keyboard>.h with matrix from keymap.c
     note_out(['Conversion succeeded, piping output'])
 
     if args.dumpyaml:
@@ -316,3 +301,59 @@ def main():
         create_keyplus_yaml(current_kbc, True)
     else:
         create_keyplus_yaml(current_kbc)
+
+# hook in for q2kb binary
+def kbfirmware():   
+    # Init kb_info file from cache
+    init_cache_info(KB_INFO)
+    # Read ARGV input from terminaL
+    parser = argparse.ArgumentParser(description='Convert AVR C based QMK keymap and matrix files to YAML Keyplus format')
+    parser.add_argument('keyboard', metavar='KEYBOARD', nargs='?', default='', help='The name of the keyboard whose keymap you wish to convert')
+    parser.add_argument('-m', '--keymap', metavar='keymap', dest='keymap', default='default', help='The keymap folder to reference - default is /default/')
+    parser.add_argument('-r', '--rev', metavar='ver',dest='rev', default='', help='Revision of layout - default is n/a')
+    parser.add_argument('-d', '--dump', dest='dumpyaml', action='store_true', help='Append results to kb_info.yaml. (For debugging, May cause performance penalty)')
+    parser.add_argument('-L', '--list', dest='listkeyb', action='store_true',help='List all valid KEYBOARD inputs')
+    parser.add_argument('-M', '--keymaps', dest='listkeym', action='store_true',help='List all valid KEYMAPS for the current keyboard')
+    parser.add_argument('-R', '--revlist', dest='listkeyr', action='store_true',help='List all valid REVISIONS for the current keyboard')
+    parser.add_argument('-S', '--search', metavar='string', dest='searchkeyb', help='Search valid KEYBOARD inputs')
+    parser.add_argument('-p', '--print', dest='presult', action='store_true',help='Print result of keymap conversion to terminal')
+    parser.add_argument('-t', '--template', metavar='layout', type=int, default=-1, dest = 'choosemap', help= 'Select keymap template index')
+    args = parser.parse_args()
+
+    if args.listkeyb:
+        print_keyboard_list()
+        sys.exit()
+
+    if args.listkeym:
+        note_out(['Listing keymaps for '+args.keyboard+'...'])
+        print_keymap_list(args.keyboard)
+        sys.exit()
+
+    if args.listkeyr:
+        note_out(['Listing revisions for '+args.keyboard+'...'])
+        print_revision_list(args.keyboard)
+        sys.exit()
+
+    if args.searchkeyb:
+        note_out(['Searching...'])
+        search_keyboard_list(args.searchkeyb)
+        sys.exit()
+    
+    current_kbc = check_parse_argv(args.keyboard, args.keymap, args.rev)        # Check the cmd line arguments
+    mcu_list = find_rules_mk(current_kbc)                                       # Find and check MCU type
+    check_mcu_list(current_kbc)
+    find_config_header(current_kbc)                                             # Pass config.h through CPP for matrix pinout
+    km_layers = preproc_read_keymap(current_kbc)                                # Check cache/run preprocessor for keymap.c
+    km_template = find_layout_header(current_kbc)                               # Find layout templates in <keyboard>.h
+    if not km_template:
+        km_template = build_layout_from_keymap(km_layers)
+    merge_layout_template(km_layers, km_template, args.choosemap)               # Merge layout templates + arrays from <keyboard>.h with matrix from keymap.c
+    note_out(['Merge succeeded, piping output'])
+
+    if args.dumpyaml:
+        dump_info(KB_INFO)
+
+    if args.presult:
+        create_kbfirmware_json(current_kbc, True)
+    else:
+        create_kbfirmware_json(current_kbc)

@@ -8,7 +8,7 @@ import copy
 from q2k.classes import *
 from q2k.console import *
 
-from q2k.globals import qmk_to_keyp_func, qmk_to_keyp
+from q2k.globals import KEYP_FUNC_LIST, KEYP_KC_LIST
 
 def convert_keymap(layers):
 
@@ -28,8 +28,8 @@ def convert_keymap(layers):
 
 def func(qmk_func, layer_list):
     # Currently only handles layer switching functions
-    if qmk_func in qmk_to_keyp_func.keys():
-        keyp_func = qmk_to_keyp_func[qmk_func]
+    if qmk_func in KEYP_FUNC_LIST.keys():
+        keyp_func = KEYP_FUNC_LIST[qmk_func]
     else:
 
         try:
@@ -38,7 +38,7 @@ def func(qmk_func, layer_list):
             func_target = qmk_func[brac_index:-1]
             if func_target in layer_list:
                 layer = str(layer_list.index(func_target))
-                keyp_func = qmk_to_keyp_func[qfunc]+layer
+                keyp_func = KEYP_FUNC_LIST[qfunc]+layer
             else:
                 bad_kc_out('FN','['+qmk_func+'] - set to trns')
                 keyp_func = 'trns'
@@ -55,7 +55,7 @@ def func(qmk_func, layer_list):
 def keycode(qmk_kc):
 
     try:
-        keyp_kc = qmk_to_keyp[qmk_kc]
+        keyp_kc = KEYP_KC_LIST[qmk_kc]
     except KeyError:
         bad_kc_out('KC','['+qmk_kc+'] - set to trns')
         keyp_kc = 'trns'

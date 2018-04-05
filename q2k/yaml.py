@@ -173,7 +173,7 @@ def create_keyplus_yaml(kbc, printout=False):
         with open(output_yaml, 'w') as f:
             f.write(output_yaml_info)
     except:
-        error_out(['Failed to pipe output to '+output_yaml()])
+        error_out(['Failed to pipe output to '+output_yaml])
         exit()
 
     if printout:
