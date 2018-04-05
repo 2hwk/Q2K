@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 # Copyright 2018 2Cas
 # Licensed under the MIT license (http://opensource.org/licenses/MIT)
-
-
+import argparse
 from q2k.classes import *
 from q2k.globals import KBD_LIST, KB_INFO, MCU_COMPAT
 

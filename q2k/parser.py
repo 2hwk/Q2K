@@ -143,7 +143,7 @@ def read_layout_header(path):
 
     define = pp.Suppress(pp.Literal('#define'))
     name = pp.Word(pp.alphanums+'_')
-    macrovar = pp.Word(pp.alphanums+'_')
+    macrovar = pp.Word(pp.alphanums+'_#')
     layout_row = pp.Group(pp.OneOrMore(macrovar + pp.Optional(COMMA)) + pp.ZeroOrMore(BSLASH))
     layout =  LPAREN + pp.ZeroOrMore(BSLASH) + pp.OneOrMore(layout_row) + RPAREN
 
