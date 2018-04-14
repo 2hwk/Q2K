@@ -34,17 +34,17 @@ KEYP_KC_LIST = {
     # Alphas
     "KC_GRV"                :  "'`' ",
     "KC_GRAVE"              :  "'`' ",  #"grave",             # Grave (~`)kro_6
-    "KC_1"                  :  " 1  ",
-    "KC_2"                  :  " 2  ",
-    "KC_3"                  :  " 3  ",
-    "KC_4"                  :  " 4  ",
-    "KC_5"                  :  " 5  ",
-    "KC_6"                  :  " 6  ",
-    "KC_7"                  :  " 7  ",
-    "KC_8"                  :  " 8  ",
-    "KC_9"                  :  " 9  ",
-    "KC_0"                  :  " 0  ",
-    "KC_MINS"               :  " -  ",
+    "KC_1"                  :  "'1' ",
+    "KC_2"                  :  "'2' ",
+    "KC_3"                  :  "'3' ",
+    "KC_4"                  :  "'4' ",
+    "KC_5"                  :  "'5' ",
+    "KC_6"                  :  "'6' ",
+    "KC_7"                  :  "'7' ",
+    "KC_8"                  :  "'8' ",
+    "KC_9"                  :  "'9' ",
+    "KC_0"                  :  "'0' ",
+    "KC_MINS"               :  "'-' ",
     "KC_MINUS"              :  "'-' ", #"minus",               # Minus (-_)
     "KC_EQL"                :  "'=' ",
     "KC_EQUAL"              :  "'=' ", #"equal",               # Equal (=+)
@@ -58,10 +58,10 @@ KEYP_KC_LIST = {
     "KC_I"                  :  " i  ",
     "KC_O"                  :  " o  ",
     "KC_P"                  :  " p  ",
-    "KC_LBRC"               :  " [  ",
-    "KC_LBRACKET"           :  " [  ", #"left_bracket",        # Left Bracket ([)
-    "KC_RBRC"               :  " ]  ",
-    "KC_RBRACKET"           :  " ]  ", #"right_bracket",       # Right Bracket (])
+    "KC_LBRC"               :  "'[' ",
+    "KC_LBRACKET"           :  "'[' ", #"left_bracket",        # Left Bracket ([)
+    "KC_RBRC"               :  "']' ",
+    "KC_RBRACKET"           :  "']' ", #"right_bracket",       # Right Bracket (])
     "KC_BSLS"               :  "'\\' ", #"bsls",
     "KC_BSLASH"             :  "'\\' ",                        # Backslash (\|)
     "KC_A"                  :  " a  ",
@@ -73,8 +73,8 @@ KEYP_KC_LIST = {
     "KC_J"                  :  " j  ",
     "KC_K"                  :  " k  ",
     "KC_L"                  :  " l  ",
-    "KC_SCLN"               :  " ;  ",
-    "KC_SCOLON"             :  " ;  ", #"semicolon",          # Semicolon (;:)
+    "KC_SCLN"               :  "';' ",
+    "KC_SCOLON"             :  "';' ", #"semicolon",          # Semicolon (;:)
     "KC_QUOT"               :  " \"\' \"", 
     "KC_QUOTE"              :  " \"\' \"", #"quot",           # Quote ('")
     "KC_Z"                  :  " z  ",
