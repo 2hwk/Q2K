@@ -86,12 +86,12 @@ def write_info(kb_info_yaml):
 
     if KBD_LIST:
         # Dump KBD_LIST to text file for faster processing in future
-        dump_info(kb_info_yaml)
+        dump_info(KBD_LIST, kb_info_yaml)
     else:
         error_out(['No keyboard information found', 'Is current directory a qmk root directory?', 'cd <qmk_dir>'])
         exit()
 
-def dump_info(kb_info_yaml):
+def dump_info(target, kb_info_yaml):
 
     kb_info_path = '/'.join(kb_info_yaml.split('/')[:-1])
     if not os.path.exists(kb_info_path):
@@ -102,18 +102,18 @@ def dump_info(kb_info_yaml):
                 raise
     try:
         with open(kb_info_yaml, 'w') as f:
-            yaml.dump(KBD_LIST, f)
+            yaml.dump(target, f)
     except:
         error_out(['Failed to create '+kb_info_yaml])
 
-def create_keyplus_yaml(kbc, printout=False):
+def create_keyplus_yaml(kbo, printout=False):
 
     # Can't simply dump to yaml as we want to keep layout (array) as a human readable matrix (2D 'array').
-    kb_n = kbc.get_name()
-    rev_n = kbc.get_rev()
-    keymap_n = kbc.get_keymap()
+    kb_n = kbo.get_name()
+    rev_n = kbo.get_rev()
+    keymap_n = kbo.get_keymap()
 
-    rev = kbc.get_rev_info(rev_n)
+    rev = kbo.get_rev_info(rev_n)
     matrix = rev.get_matrix_pins()
     layers = rev.get_layout() 
 
@@ -156,7 +156,7 @@ def create_keyplus_yaml(kbc, printout=False):
     output_yaml_info = output_yaml_info.replace('<MATRIX_MAP>', template)
     output_yaml_info = output_yaml_info.replace('<LAYOUT>', layout)
 
-    kblibs = kbc.get_libs()
+    kblibs = kbo.get_libs()
     if rev_n:
         path_list = kblibs + [ rev_n, keymap_n]
     else:

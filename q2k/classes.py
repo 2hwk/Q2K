@@ -9,31 +9,31 @@ class kb_info:
 
     def __init__(self, n=''):
         self._kbname = n
-        self._revL = []
-        self._keymapL = []       
+        self._rev_list = []
+        self._keymap_list = []       
         self._klibs = []
 
-        self.keymap_name = ''
-        self.rev = ''
+        self.current_keymap = ''
+        self.current_rev = ''
         self.rev_info = []
 
     def set_rev(self, rev):
-        self.rev = rev
+        self.current_rev = rev
 
     def set_keymap(self, keymap):
-        self.keymap_name = keymap
+        self.current_keymap = keymap
         
     def set_libs(self, lib):
         self._klibs = lib
 
     def add_rev_list(self, rev, flag=False):
-        if flag == False:
-            self._revL.append(rev)
+        if not flag:
+            self._rev_list.append(rev)
         revObj = rev_info(rev, flag)
         self.rev_info.append(revObj)
 
     def add_keymap_list(self, km):
-        self._keymapL.append(km)
+        self._keymap_list.append(km)
 
     def add_lib(self, lib):
         self._klibs.append(lib)
@@ -43,37 +43,37 @@ class kb_info:
         return self._kbname
 
     def get_keymap(self):
-        return self.keymap_name
+        return self.current_keymap
 
     def get_libs(self):
         return self._klibs
 
     def get_rev(self):
-        return self.rev
+        return self.current_rev
 
     def get_rev_info(self, rev):
         for r in self.rev_info:
-           if r._name == rev:
+           if r._rname == rev:
                return r
-           if r._name == 'n/a':
+           if r._rname == 'n/a':
                return r
     def get_keymap_list(self):
-        return self._keymapL
+        return self._keymap_list
 
     def get_rev_list(self):
         """
-        rev_list = []        
+        _rev_list = []        
         for r in self.rev_info:
             if r.isDefault == False:
-                rev_list.append(r._name)
-        return rev_list
+                _rev_list.append(r._rname)
+        return _rev_list
         """
-        return self._revL
+        return self._rev_list
 
 # A class for listing revision info and 
 class rev_info:
     def __init__ (self, n='', flag=False):
-        self._name = n
+        self._rname = n
         self.isDefault = flag
 
         self.build_m_row_pins = []
@@ -82,7 +82,6 @@ class rev_info:
         self.build_templates = []
 
         self.mcuL = []
-        #self.output_keymap = ''
 
     def set_mcu_list(self, mcu):
         self.mcuL = mcu
@@ -97,11 +96,8 @@ class rev_info:
         self.build_m_row_pins = r
         self.build_m_col_pins = c
 
-    def set_output_keymap(self, filepath):
-        self.output_keymap = filepath
-
     def get_rev_name(self):
-        return self._name
+        return self._rname
 
     def get_mcu_list(self):
         return self.mcuL
@@ -117,9 +113,6 @@ class rev_info:
         matrix.append(self.build_m_row_pins)
         matrix.append(self.build_m_col_pins)
         return matrix
-
-    #def get_output_keymap(self):
-        #return self.output_keymap
 
 
 # A class for linking matrices in <keyboard>.h with (preprocessed) keymap.c layouts

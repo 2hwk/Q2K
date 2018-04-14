@@ -119,21 +119,25 @@ def merge_layout_template(layers, templates, select=-1):
         keycode_array = l.get_keymap()
         max_index = len(keycode_array)
 
-        for i, rows in enumerate(layout_template):
-            for j, ind in enumerate(rows):
-                if ind < max_index:
-                    layout[i][j] = keycode_array[ind]
-                elif layout_name != '!MATRIX LAYOUT':
-                    warning_out(['Corrupt/incompatible layout template or keymap', 
-                        'Invalid array value: '+str(ind),
-                        'Trying again with default matrix layout...'])
-                    matrix_template = build_layout_from_keymap(layers, x)
-                    merge_layout_template(layers, matrix_template)
-                    exit()
-                else:
-                    error_out(['Corrupt/incompatible keymap',
-                        'Invalid array value: '+str(ind)])
-                    exit()
+        try:
+            for i, rows in enumerate(layout_template):
+                for j, ind in enumerate(rows):
+                    if ind < max_index:
+                        layout[i][j] = keycode_array[ind]
+                    elif layout_name != '!MATRIX LAYOUT':
+                        warning_out(['Corrupt/incompatible layout template or keymap', 
+                            'Invalid array value: '+str(ind),
+                            'Trying again with default matrix layout...'])
+                        matrix_template = build_layout_from_keymap(layers, x)
+                        merge_layout_template(layers, matrix_template)
+                        exit()
+                    else:
+                        error_out(['Corrupt/incompatible keymap',
+                            'Invalid array value: '+str(ind)])
+                        exit()
+        except TypeError:
+            error_out(['Corrupt layout template, invalid array index: '+str(ind)])
+            exit()
                     
         col_limit = l.get_matrix_cols()
         layout_template = convert_keyplus_matrix(layout_template, col_limit)

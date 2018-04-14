@@ -14,16 +14,16 @@ def error_out(info):
     for info, line in enumerate(info):
         if not info:
             line = colored(line, 'red')
-            print(error + ' ' +line, file=sys.stderr)
+            print(error + ' ' +line)
         else:
-            print(e_bullet + ' '+line,file=sys.stderr)
+            print(e_bullet + ' '+line)
 
 
 def bad_kc_out(kc_type, code):
 
     bad_kc = colored('❌ Invalid '+kc_type+':', 'cyan')
     #code = colored(code, 'cyan')
-    print(bad_kc+' '+code, file=sys.stderr)
+    print(bad_kc+' '+code)
 
 
 def warning_out(info):
@@ -34,9 +34,9 @@ def warning_out(info):
     for info, line in enumerate(info):
         if not info:
             line = colored(line, 'yellow')
-            print(warning + ' ' +line, file=sys.stderr)
+            print(warning + ' ' +line)
         else:
-            print(w_bullet + ' '+line, file=sys.stderr)
+            print(w_bullet + ' '+line)
 
 
 def note_out(info):

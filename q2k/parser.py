@@ -193,7 +193,7 @@ def read_layout_header(path):
                     if layout[i][j] == col:
                         error_out(['Array key recovery failed',
                             'Missing macro variable in: '+path])
-                        exit()
+                        #exit()
         t.set_layout(layout)
 
     """

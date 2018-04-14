@@ -131,7 +131,7 @@ def create_kbfirmware_json(kbc, printout=False):
                             kc_build += keycode_func_parse_json(kc, layer_names)+','
                         kc_build = kc_build[:-1]
                         json_out += ('{"id":'+str(id)+',"legend":"","state":{"x":'+str(col_x)+',"y":'+str(row_y)+
-                                    ',"r":0,"rx":0,"ry":0,"w":'+w+',"h":'+h+'},"row":'+r+',"col":'+c+
+                                    ',"r":0,"rx":0,"ry":0,"w":'+str(w)+',"h":'+str(h)+'},"row":'+r+',"col":'+c+
                                     ',"keycodes":['+kc_build+']},')
                 if col_x+1 > cmax:
                     cmax = col_x+1
