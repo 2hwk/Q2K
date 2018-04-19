@@ -207,7 +207,7 @@ class _cpp:
         kb = self.__kb.name
         cc = ['avr-gcc', '-E']
         kbdefine = 'KEYBOARD_'+'_'.join(kblibs)
-        QMK_KEYBOARD_H = 'QMK_KEYBOARD_H=\"'+qdir+kb+'.h\"'
+        QMK_KEYBOARD_H = 'QMK_KEYBOARD_H=\"'+kb+'.h\"'
         libs = ['-D', kbdefine, '-D', QMK_KEYBOARD_H, '-I'+self.__dirs['Local libs']]
         path = qdir
         for kbl in kblibs:
