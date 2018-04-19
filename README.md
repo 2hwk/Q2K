@@ -8,6 +8,8 @@ by 2Cas (c) 2018
 For parsing keymaps from QMK Firmware style keymap.c files to Keyplus YAML format.
 !!! EXTREMELY PRE-ALPHA AND WIP !!! 
 
+Unless you are specifically after kbfirmware output (since the current version does not have this implemented), please use the main branch.
+
 ## Requirements
 
 Requires: `python3-pip` `avr-gcc` 
@@ -96,19 +98,7 @@ Inevitably as QMK evolves over time, due to the above reasons and more, this scr
 
 ## Other Notes
 
-tl;dr VERY alpha, not gaurenteed to work 100% for every keyboard with QMK support. Lots of caught and uncaught exceptions will be thrown. Flashing firmware always has an element of risk and I am not responsible if your keyboard soft or hard bricks itself. 
-
-## Future Development
-
-Future plans include outputting to kbfirmware json layout for use with kbfirmware based GUI interfaces (a rudimentary implementation is avaliable by calling q2kb instead of q2k), and developing a user-friendly GUI and front end, including (possible?) windows support. 
-
-Right now the entire source code is being reworked to: 
-A) Better reflect qmk folder structure (bad assumptions were made which turned out to be incorrect) and ensure better compatability.
-B) Be easier to understand. Right now it's jumbled spaghetti but hopefully incorporating more OOP and actually using python classes correctly (whoops) will help make things easier to see under the hood.
-C) Provide easier hook-in methods for GUIs. Why the backend is being reworked at all tbh. 
-
-Ideally Q2K will be a fully fledged utility which will serve both the keyplus and QMK community.
-
+tl;dr VERY alpha, not gaurenteed to work 100% for every keyboard with QMK support. Lots of caught and uncaught exceptions will be thrown. Flashing firmware always has an element of risk and I am not responsible if your keyboard soft or hard bricks itself.
 ## License
 
 Distributed under the OSI: MIT License.
