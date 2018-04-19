@@ -1112,7 +1112,7 @@ class application:
                             self.console.warning(['Corrupt/incompatible layout template or keymap', 
                                 'Invalid array value: '+str(ind),
                                 'Trying again with default matrix layout...'])
-                            __generate_matrix_template(x)
+                            self.__generate_matrix_template(x)
                             merge_layout_template()
                             exit()
                         else:
