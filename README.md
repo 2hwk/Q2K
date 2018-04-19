@@ -80,7 +80,7 @@ The process is detailed more in depth at http://docs.qmk.fm, however the jist of
 
  * config.h which defines which amongst other things typically defines hardware pins to map rows and columns to on the microcontroller, as well as debouncing settings (at least when following QMK's default config.h template)
 
-This script first pulls matrix col/row pins from config.h, keycode data from keymap.c and template data from <keyboard>.h (after exhaustively searching for exactly which <keyboard>.h header file contains the layout information). It then converts the keycodes and templates to keyplus notation (KC_RIGHT -> rght) and outputs a .yaml file that is compatible with keyplus firmware, as well as other keyplus format based keyboard firmware GUI builders.
+First the program pulls matrix col/row pins from config.h, keycode data from keymap.c and template data from <keyboard>.h (after exhaustively searching for exactly which <keyboard>.h header file contains the layout information). It then converts the keycodes and templates to keyplus notation (KC_RIGHT -> rght) and outputs a .yaml file that is compatible with keyplus firmware, as well as other keyplus format based keyboard firmware GUI builders.
 
 
 ## Limitations
