@@ -104,7 +104,10 @@ ENV/
 *.swo
 qmk/
 OLD/
+TEST/
 out/
 dist/
+cache/
+pref.yaml
 MANIFEST.in
 
