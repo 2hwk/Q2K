@@ -1,7 +1,7 @@
 ## Description
 ```
 Q2K Keymap Parser 
-ver. 0.0.95.a2 (Pre-Alpha) 
+ver. 1.0.1.a1 (Pre-Alpha) 
 by 2Cas (c) 2018
 ```
 
@@ -115,4 +115,4 @@ Distributed under the OSI: MIT License.
 
 ## Credit
 
-Credit to Jack Humbert (QMK Firmware) and _spindle/ahtn (keyplus), without which this would not be possible. I'm just riding on their coat tails really. 
+Credit to Jack Humbert + QMK Firmware Contributors and _spindle/ahtn + keyplus contributors, without which this would not be possible.
