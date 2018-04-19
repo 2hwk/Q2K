@@ -28,16 +28,18 @@ GUI: run with `q2k`, point to qmk root and final output directories, then hit Ge
 Command Line: `cd` into your local qmk directory and run with `q2k-cli [options]`
 
 ## Run
-`q2k`
+`q2k` for simple tkinter based GUI
+
 OR
+
 `q2k-cli [KEYBOARD NAME] [CMD LINE OPTIONS]`
 
 Output keyplus YAML file will be found in <qmk root>/keyplus_out (Can be changed by modifying pref.yaml in q2k's dist-package folder)
 
 For example:
 ```
-q2k clueboard/66 -r rev2 -t LAYOUT => /keyplus_out/clueboard_66_rev2_default.yaml
-q2k k_type -m default => /keyplus_out/k_type_default.yaml
+q2k-cli clueboard/66 -r rev2 -t LAYOUT => /keyplus_out/clueboard_66_rev2_default.yaml
+q2k-cli k_type -m default => /keyplus_out/k_type_default.yaml
 ```
 
 ``q2k-cli -h`` provides a comprehensive list of accepted opts.
