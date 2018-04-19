@@ -10,37 +10,42 @@ For parsing keymaps from QMK Firmware style keymap.c files to Keyplus YAML forma
 
 ## Requirements
 
-Requires: `python3-pip` ``python3-tkinter`` `avr-gcc` 
+Requires: `python3-pip` `python3-tkinter` `avr-gcc` 
           `pyyaml` `pyparsing` `termcolor`
 
-Tested on bash on Windows 10 (q2k-cli) and Ubuntu Linux (q2k + q2k-cli)
+Tested on bash on Windows 10 (q2k-cli ONLY) and Ubuntu Linux
 
 ## Setup
 
 Install the required dependencies, then run
 
-`sudo pip install q2k`
+`pip3 install q2k`
 
-Once the Q2K package has been installed, `cd` into your local qmk directory and run with `q2k [options]`
+Once the Q2K package has been installed...
+
+GUI: run with `q2k`, point to qmk root and final output directories, then hit Generate Keyboard List, select your keyboard (and options) and Convert.
+
+Command Line: `cd` into your local qmk directory and run with `q2k-cli [options]`
 
 ## Run
+`q2k`
+OR
+`q2k-cli [KEYBOARD NAME] [CMD LINE OPTIONS]`
 
-`q2k [KEYBOARD NAME] [CMD LINE OPTIONS]`
-
-Output keyplus YAML file will be found in <qmk root>/keyplus_out
+Output keyplus YAML file will be found in <qmk root>/keyplus_out (Can be changed by modifying pref.yaml in q2k's dist-package folder)
 
 For example:
 ```
-q2k clueboard/66 -r rev2 => /keyplus_out/clueboard_66_rev2_default.yaml
-q2k k_type -m default => /keyplus_out/k_type__default.yaml
+q2k clueboard/66 -r rev2 -t LAYOUT => /keyplus_out/clueboard_66_rev2_default.yaml
+q2k k_type -m default => /keyplus_out/k_type_default.yaml
 ```
 
-``q2k -h`` provides a comprehensive list of accepted opts.
+``q2k-cli -h`` provides a comprehensive list of accepted opts.
 
 ## Commands
 
 ```
-Usage: q2k [KEYBOARD] [-h] [-m keymap] [-r ver] [-L] [-M] [-R] [-S string] [-c keymap] 
+Usage: q2k-cli [KEYBOARD] [-h] [-m keymap] [-r ver] [-L] [-M] [-R] [-S string] [-c keymap] 
 
 positional arguments:
 
@@ -100,14 +105,16 @@ tl;dr VERY alpha, not gaurenteed to work 100% for every keyboard with QMK suppor
 
 ## Future Development
 
-Future plans include outputting to kbfirmware json layout for use with kbfirmware based GUI interfaces (a rudimentary implementation is avaliable by calling q2kb instead of q2k), and developing a user-friendly GUI and front end, including (possible?) windows support. 
-
-Right now the entire source code is being reworked to: 
-A) Better reflect qmk folder structure (bad assumptions were made which turned out to be incorrect) and ensure better compatability.
-B) Be easier to understand. Right now it's jumbled spaghetti but hopefully incorporating more OOP and actually using python classes correctly (whoops) will help make things easier to see under the hood.
-C) Provide easier hook-in methods for GUIs. Why the backend is being reworked at all tbh. 
-
-Ideally Q2K will be a fully fledged utility which will serve both the keyplus and QMK community.
+<<<<<<< HEAD
+* KBfirmware support has been dropped for now pending a rework. 
+* The GUI and front end code could be improved (but it's unlikely to change much). 
+* Still a few edge cases where <keyboard>.h files are missed. 
+* Reading of LED/RGB data, Bootloader type, MCU (in anticipation of changes on K+ Layout side) and updating conversion dictionary AND logic for keyplus's implementation of tap and hold, etc.
+* I'd like to be able to export cached kb data (cache_kb.yaml) out into a more readable form - might be useful on QMK side of things.
+* Better documentation of code now that no more major overhauls are pending.
+* Documentation, documentation, documentation.
+=======
+>>>>>>> 6dc1b69eb750beb3072add62d54b64b3736867e6
 
 ## License
 
