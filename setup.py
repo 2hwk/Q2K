@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='q2k',
-    version='0.0.96.a3',
+    version='1.0.1.a2',
     description='Convert AVR C based QMK keymap and matrix files to YAML Keyplus format',
     url='https://github.com/2Cas/Q2K',
     author='2Cas',
@@ -23,7 +23,7 @@ setup(
         'pyyaml', 'pyparsing', 'termcolor'
     ],
     entry_points = {
-        'console_scripts': ['q2k=q2k.core:main', 'q2kb=q2k.core:kbfirmware']
+        'console_scripts': ['q2k-cli=q2k.core:q2keyplus', 'q2k=q2k.gui:main']  #, 'q2kb=q2k.core:q2kbfirmware']
     },
     keywords = ['keyboard', 'usb', 'hid', 'qmk', 'keyplus'],
     zip_safe=False,

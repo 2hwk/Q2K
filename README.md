@@ -6,7 +6,7 @@ by 2Cas (c) 2018
 ```
 
 Q2K Keymap Parser 
-ver. 1.0.1.a1 (Pre-Alpha) 
+ver. 1.0.1.a2 (Pre-Alpha) 
 by 2Cas (c) 2018
 
 For parsing keymaps from QMK Firmware style keymap.c files to Keyplus YAML format.
