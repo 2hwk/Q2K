@@ -13,7 +13,7 @@ For parsing keymaps from QMK Firmware style keymap.c files to Keyplus YAML forma
 Requires: `python3-pip` `avr-gcc` 
           `pyyaml` `pyparsing` `termcolor`
 
-Tested on bash on Windows 10 and Ubuntu Linux
+Tested on bash on Windows 10 (q2k-cli) and Ubuntu Linux (q2k + q2k-cli)
 
 ## Setup
 
