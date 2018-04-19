@@ -5,6 +5,10 @@ ver. 1.0.1.a1 (Pre-Alpha)
 by 2Cas (c) 2018
 ```
 
+Q2K Keymap Parser 
+ver. 1.0.1.a1 (Pre-Alpha) 
+by 2Cas (c) 2018
+
 For parsing keymaps from QMK Firmware style keymap.c files to Keyplus YAML format.
 !!! EXTREMELY PRE-ALPHA AND WIP !!! 
 
@@ -107,7 +111,6 @@ tl;dr VERY alpha, not gaurenteed to work 100% for every keyboard with QMK suppor
 
 ## Future Development
 
-<<<<<<< HEAD
 * KBfirmware support has been dropped for now pending a rework. 
 * The GUI and front end code could be improved (but it's unlikely to change much). 
 * Still a few edge cases where <keyboard>.h files are missed. 
@@ -115,9 +118,7 @@ tl;dr VERY alpha, not gaurenteed to work 100% for every keyboard with QMK suppor
 * I'd like to be able to export cached kb data (cache_kb.yaml) out into a more readable form - might be useful on QMK side of things.
 * Better documentation of code now that no more major overhauls are pending.
 * Documentation, documentation, documentation.
-=======
->>>>>>> 6dc1b69eb750beb3072add62d54b64b3736867e6
-
+          
 ## License
 
 Distributed under the OSI: MIT License.
