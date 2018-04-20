@@ -1,23 +1,20 @@
 ## Description
 ```
 Q2K Keymap Parser 
-ver. 1.0.1.a4 (Pre-Alpha) 
+ver. 1.0.2.a1 (Pre-Alpha) 
 by 2Cas (c) 2018
 ```
 
-Q2K Keymap Parser 
-ver. 1.0.1.a2 (Pre-Alpha) 
-by 2Cas (c) 2018
-
 For parsing keymaps from QMK Firmware style keymap.c files to Keyplus YAML format.
-!!! EXTREMELY PRE-ALPHA AND WIP !!! 
+!!! PRE-ALPHA AND WIP !!! 
 
 ## Requirements
 
 Requires: `python3-pip` `python3-tkinter` `avr-gcc` 
           `pyyaml` `pyparsing` `termcolor`
 
-Tested on bash on Windows 10 (q2k-cli ONLY) and Ubuntu Linux
+Tested on bash on Windows 10 and Ubuntu Linux
+(Bash on Windows 10 only supports q2k-cli)
 
 ## Setup
 
@@ -38,12 +35,13 @@ OR
 
 `q2k-cli [KEYBOARD NAME] [CMD LINE OPTIONS]`
 
-Output keyplus YAML file will be found in <qmk root>/keyplus_out (Can be changed by modifying pref.yaml in q2k's dist-package folder)
+Output keyplus YAML file will be found in <qmk root>/keyplus_out 
+This, along with the QMK directory can be changed from relative to fixed reference by modifying pref.yaml in q2k's dist-package folder.
 
-For example:
+Usage example:
 ```
-q2k-cli clueboard/66 -r rev2 -t LAYOUT => /keyplus_out/clueboard_66_rev2_default.yaml
-q2k-cli k_type -m default => /keyplus_out/k_type_default.yaml
+q2k-cli clueboard/66 -r rev2 -t LAYOUT => keyplus_out/clueboard_66_rev2_default.yaml
+q2k-cli k_type -m default => keyplus_out/k_type_default.yaml
 ```
 
 ``q2k-cli -h`` provides a comprehensive list of accepted opts.
@@ -80,20 +78,32 @@ The process is detailed more in depth at http://docs.qmk.fm, however the jist of
 
  * keymap.c contains keycodes data, representing the final output of pressing a particular key on the keyboard. This is actually passed as an array (through a macro) which maps into the keyboard matrix for readability.
 
- * keyboard.h (i.e. /gh60/gh60.h, clueboard/66/66.h) contains macro definitions (layout templates) which turn the one dimensional keycode array macro into a 2D matrix corresponding to the matrix column and pins
+ * [keyboard].h (i.e. /gh60/gh60.h, clueboard/66/66.h) contains macro definitions (layout templates) which turn the one dimensional keycode array macro into a 2D matrix corresponding to the matrix column and pins
 
- * config.h which defines which amongst other things typically defines hardware pins to map rows and columns to on the microcontroller, as well as debouncing settings (at least when following QMK's default config.h template)
+ * config.h which defines which amongst other things typically defines hardware pins to map rows and columns to on the microcontroller, debouncing settings and diode direction (at least when following QMK's default config.h template)
 
-First the program pulls matrix col/row pins from config.h, keycode data from keymap.c and template data from <keyboard>.h (after exhaustively searching for exactly which <keyboard>.h header file contains the layout information). It then converts the keycodes and templates to keyplus notation (KC_RIGHT -> rght) and outputs a .yaml file that is compatible with keyplus firmware, as well as other keyplus format based keyboard firmware GUI builders.
+First the program pulls matrix col/row pins from config.h, keycode data from keymap.c and template data from [keyboard].h (after exhaustively searching for exactly which [keyboard].h header file contains the layout information). 
+
+It then converts the keycodes and templates to keyplus notation (KC_RIGHT -> rght) and outputs a .yaml file that is compatible with keyplus firmware, as well as other keyplus format based keyboard firmware GUI builders.
 
 
 ## Limitations
 
-There are several inherent limitations with Q2K that you should be aware of. 
+There are several inherent limitations with this bridging utility that you should be aware of. 
 
-Firstly, keyplus does NOT support the wide range of microcontrollers, functions and custom firmware functions that QMK supports. This is due to a range of reasons, such as features being planned for inclusion but still undergoing development, to technical limitations derived from keyplus's focus on xmega development (and features being crippled on the older atmega series controllers as a result). In general if you are after advanced layer switching and custom function support, I would say QMK is still the way to go for now.
+*Keyplus*
+Firstly, keyplus currently ONLY supports atmega and xmega based mcus. 32a and cortex-m4 ARM based keyboards will NOT work with keyplus, although you can still export these as layout files, they will not work without the firmware support.
 
-If a QMK-exclusive function which is not supported by keyplus is defined in a keymap, an error will be displayed in the console, and the relevant keycode will be transcribed as a blank 'trns' instead, which is displayed in the console. Additionally converting keyboards with an incompatible microcontroller or bootloader will prompt an incompatability warning in the terminal. (partially implemented).
+Keyplus only supports boards running its own kp_32u4 bootloader OR the default atmel-dfu bootloader (>90% of boards). Boards with non-dfu based bootloaders, such as the newer revisions of the planck and OLKB keyboards (LUFA/QMK LUFA) and clone pro micros (Caterina) will have to UPDATE their bootloader, which is usually done with an ardunio ISP. 
+
+Thankfully, there is an included program with keyplus that will attempt to flash the custom kp_32u4 bootloader to your pro micro/device, however it is NOT gaurenteed to work (and obviously entails the risks of messing with the bootloader, which could soft-brick your board) 
+
+*Q2K*
+For obvious reasons it is impractical to parse through hand-written and custom C code functions and attempt to extract data from this. You may have to recreate such code similarly by hand. i.e. code which turns on particular backlight colours when a particular layer is selected, playing audio through onboard speakers on the keyboard, etc.
+
+If a QMK-exclusive function which is not supported by keyplus is defined in a keymap, an error will be displayed in the console, and the relevant keycode will be transcribed as a blank 'trns' instead, which is displayed in the console. 
+
+Additionally converting keyboards with an incompatible microcontroller or bootloader will prompt an incompatability warning in the terminal. (This is only partially implemented).
 
 Secondly, QMK has a very loose and not well defined folder structure, and does not really impose many rules or guidelines on formatting. It is natural then that as more boards are added to the QMK directory that some boards may have a non-standard enough folder structures/keymap formatting to break this script in various ways, and that config.h and keyboard.h headers may be missed. I'd like to think my code is as robust as it possibly could be to guard against this, but I feel that failure on this front is kind of inevitable.
 
@@ -103,11 +113,11 @@ Missing keyboard.h information whilst also non-fatal and less common than missin
 
 On the other hand, a failure to read a keymap.c file will always result in a fatal termination. In this case, try converting a different keymap.c file for the same board, as particular keymaps may have unique #define declarations that can throw the script off.
 
-Inevitably as QMK evolves over time, due to the above reasons and more, this script will become more and more broken than it already is (as active maintenace of this in the long run is unlikely). The last version/commit of QMK that has been verified to be (mostly) working will [always be linked here](https://github.com/qmk/qmk_firmware/tree/a09a042b8fe6a0369a7c479168492125efa24e59) in the worst case scenario that it blows up horribly. 
+Inevitably as QMK evolves over time, due to the above reasons and more, this script will become more and more broken than it already is (as active maintenace of this in the long run is unlikely). The last version/commit of QMK that has been verified to be (mostly) working will [always be linked here](https://github.com/qmk/qmk_firmware/tree/3bb647910a09146309cef59eedd78be72697c88f) in the worst case scenario that it blows up horribly. 
 
 ## Other Notes
 
-tl;dr VERY alpha, not gaurenteed to work 100% for every keyboard with QMK support. Lots of caught and uncaught exceptions will be thrown. Flashing firmware always has an element of risk and I am not responsible if your keyboard soft or hard bricks itself. 
+tl;dr VERY alpha, not gaurenteed to work 100% for every keyboard with QMK support. Lots of caught and uncaught exceptions will be thrown. Flashing firmware always has an element of risk and I am not responsible if your keyboard bricks itself. 
 
 ## Future Development
 

@@ -44,8 +44,7 @@ class _console:
             for line in info:
                 self.errors.append(line)
 
-        else:
-        '''
+        else:'''
         error_msg = tc.colored('❌ ERROR:', 'red', attrs=['reverse', 'bold'])
         e_bullet = tc.colored('•', 'red', attrs=['bold'])
             
@@ -63,8 +62,7 @@ class _console:
         if self.gui:
             for line in info:
                 self.errors.append(line)
-        else:
-        '''
+        else:'''
         message = 'Invalid '+kc_type+': '+code
         bad_kc_msg = tc.colored('❌ Invalid '+kc_type+':', 'cyan')
         print(bad_kc_msg+' '+code)
@@ -103,6 +101,10 @@ class _console:
                 print(note_msg + ' ' +line)
             else:
                 print(n_bullet + ' '+line)
+
+    def clear(self):
+
+        self.errors = []
 
 class _parse_txt:
 
@@ -382,8 +384,7 @@ class keycode_layer:
         self.matrix_map = matrix
 
     def __func(self, qmk_func, layer_list, console):
-        # Currently only handles layer switching functions
-        # TODO: support keyplus s- + c- style modifiers
+        # TODO: fully support keyplus csag- style modifiers
         if qmk_func in ref.keyp_func_list.keys():
             keyp_func = ref.keyp_func_list[qmk_func]
         else:
@@ -395,6 +396,32 @@ class keycode_layer:
                 if func_target in layer_list:
                     layer = str(layer_list.index(func_target))
                     keyp_func = ref.keyp_func_list[qfunc]+layer
+
+                elif func_target in ref.keyp_kc_list.keys():
+                    keycode = self.__keycode(func_target, console)
+                    keyp_func = ref.keyp_func_list[qfunc]+'-'+keycode
+
+                elif ')' in func_target:
+                    target = func_target
+                    func_list = [ qfunc ]
+                    while ')' in target:
+                        brac_index = target.index('(')+1
+                        func = target[:brac_index]
+                        target = target[brac_index:-1]
+                        func_list.append(func)
+                    #print(target)
+                    #print(func_list)
+
+                    keyp_func = ''
+                    for func in func_list:
+                        keyp_func += ref.keyp_func_list[func]
+
+                    if target in ref.keyp_kc_list.keys():
+                        final_kc = self.__keycode(target, console).replace(' ','')
+                        keyp_func += '-'+final_kc
+                    else:
+                        keyp_func = 'trns'
+
                 else:
                     console.bad_kc('FN','['+qmk_func+'] - set to trns')
                     keyp_func = 'trns'
@@ -656,7 +683,7 @@ class application:
         else:
             self.__read_args()
             self.__set_dirs()                              # Skip reading cmd line (set kb with hook-in method)
-            self.__pop_cache_list()
+            self.__pop_cache_list()                        # Get cached kb info and put into list                             
 
     def __read_args(self):
         # Read ARGV input from terminal
@@ -822,19 +849,15 @@ class application:
         self.__cache._clear_cache()
 
     def keyboard_list(self):
-
         return self.__cache._keyboard_list()
 
     def rev_list(self, keyboard):
-
         return self.__cache._rev_list(keyboard)
 
     def template_list(self, keyboard, rev=''):
-
         return self.__cache._template_list(keyboard, rev)
 
     def keymap_list(self, keyboard, rev=''):
-
         return self.__cache._keymap_list(keyboard, rev)
 
     def search_keyboard_list(self, string):
@@ -850,6 +873,7 @@ class application:
 
         self.__cpp = _cpp(self.build_kb, self.dirs, self.console)
 
+        self.console.clear()            # Clear console
         self.__check_mcu()              # Check for MCU and Matrix Pins
         self.__get_config_header()
         self.__get_keycodes()           # Init Layout + Templates
@@ -858,6 +882,7 @@ class application:
         self.__merge_layout_template()
         self.__convert_matrix_map()
         self.__create_output()          # Pipe output to yaml/json
+        self.console.clear()            # Clear console
 
     def __check_mcu(self):
         self.__get_mcu()
@@ -985,10 +1010,12 @@ class application:
                         i -= 1
                         del row[i]
                         row.insert(i, func)
+                if len(row) > curr_layer.matrix_cols:
+                    num_col = len(row)
 
-                num_col = len(row)
+
                 curr_layer.keymap += (list(row))
-            
+
             curr_layer.matrix_cols = num_col
             layer_list.append(curr_layer)
 
@@ -1087,6 +1114,7 @@ class application:
     def __merge_layout_template(self, DEBUG=False):
 
         selected = self.build_kb.build_template
+        print(selected)
         layers = self.build_rev.build_layout
         templates = self.build_rev.build_templates
 
@@ -1113,11 +1141,10 @@ class application:
                                 'Invalid array value: '+str(ind),
                                 'Trying again with default matrix layout...'])
                             self.__generate_matrix_template(x)
-                            merge_layout_template()
-                            exit()
+                            self.__merge_layout_template()
+                            return
                         else:
-                            self.console.error(['Corrupt/incompatible keymap',
-                                'Invalid array value: '+str(ind)])
+                            self.console.error(['Corrupt/incompatible keymap', 'Invalid array value: '+str(ind)])
                             exit()
             except TypeError:
                 self.console.error(['Corrupt layout template, invalid array index: '+str(ind)])
@@ -1133,11 +1160,18 @@ class application:
             if not self.__args.debug or DEBUG:
                 self.console.note(['Layer '+layer.name])
             if DEBUG:
+                layout_count = 0
                 for row in layout:
+                    layout_count += len(row)
                     print(str(len(row)) +'\t| '+str(row))
-                print('Array')
+                print(layout_count)
+                print('Matrix Map')
+                array_count = 0
                 for row in layout_template:
+                    array_count += len(row)
                     print(str(len(row)) +'\t| '+str(row))
+                print(array_count)
+                print(str(max_index)+'\t| '+str(keycode_array))
 
     def __convert_matrix_map(self, DEBUG=False):
         layers = self.build_rev.build_layout
@@ -1191,7 +1225,8 @@ class application:
             rows = str(rev.build_m_row_pins)
             cols = str(rev.build_m_col_pins)
         else:
-            rows = cols = ''
+            rows = '# ------- Input row pins here ------- '
+            cols = '# ------- Input col pins here ------- '
        
         template = ''
         for i, row in enumerate(template_matrix):
@@ -1258,7 +1293,7 @@ def q2kbfirmware():
     q2k.execute()
 '''
 
-# Just here as an example for reference (for now)
+# Just here as an example for reference
 '''
 def q2keyplus_gui(keyboard, rev, keymap, template):
     q2k = application('keyplus', is_gui=True)

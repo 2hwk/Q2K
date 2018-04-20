@@ -57,8 +57,8 @@ class ref:
         "KC_L"                  :  " l  ",
         "KC_SCLN"               :  "';' ",
         "KC_SCOLON"             :  "';' ", #"semicolon",          # Semicolon (;:)
-        "KC_QUOT"               :  " \"\'\" ", 
-        "KC_QUOTE"              :  " \"\'\" ", #"quot",           # Quote ('")
+        "KC_QUOT"               :  "\"\'\" ", 
+        "KC_QUOTE"              :  "\"\'\" ", #"quot",           # Quote ('")
         "KC_Z"                  :  " z  ",
         "KC_X"                  :  " x  ",
         "KC_C"                  :  " c  ",
@@ -130,6 +130,7 @@ class ref:
         "KC_INS"                :  " ins",
         "KC_INSERT"             :  " ins", #"insert",            # Insert
         "KC_DEL"                :  " del",
+        "KC_DELT"               :  " del",
         "KC_DELETE"             :  " del", #"delete",            # Delete
         "KC_HOME"               :  "home",                       # Home
         "KC_END"                :  " end",                       # End
@@ -233,7 +234,7 @@ class ref:
 
         # Misc Functions
         "KC_APP"                :  " app",
-        "KC_APPLICATION____"    :  "application",              # Application
+        "KC_APPLICATION"        :  "application",              # Application
         "KC_LCAP"               :  "locking_caps_lock",
         "KC_EXEC"               :  "execute",
         "KC_EXECUTE"            :  "execute",                  # Execute
@@ -285,6 +286,10 @@ class ref:
         "KC_INT4"               :  "international_4",          # JIS Henkan
         "KC_MHEN"               :  "international_5",
         "KC_INT5"               :  "international_5",          # JIS Muhenkan
+        "KC_INT6"               :  "international_6",
+        "KC_INT7"               :  "international_7",
+        "KC_INT8"               :  "international_8",
+        "KC_INT9"               :  "international_9",
         "KC_HAEN"               :  "lang_1",
         "KC_LANG1"              :  "lang_1",                   # KR Hangul/ENG
         "KC_HANJ"               :  "lang_2",
@@ -313,13 +318,13 @@ class ref:
         "KC_MEDIA_STOP"         :  "mstp", #"media_stop",      # Media Stop
         "KC_MPLY"               :  "mply",
         "KC_MEDIA_PLAY_PAUSE"   :  "mply", #"media_play_pause",# Media Play/Pause
-        "KKC_DELETEC_MSEL"      :  "msel",
+        "KC_MSEL"               :  "msel",
         "KC_MEDIA_SELECT"       :  "msel", #"media_select",    # Media Select
         "KC_EJCT"               :  "mjct",
         "KC_MEDIA_EJECT"        :  "mjct", #"media_eject",     # Media Eject
 
         # WWW
-        "kro_6KC_MAIL"          :  "mail",                     # Mail
+        "KC_MAIL"               :  "mail",                     # Mail
         "KC_CALC"               :  "calc",
         "KC_CALCULATOR"         :  "calculator",               # Calculator
         "KC_MYCM"               :  "comp",
@@ -375,15 +380,50 @@ class ref:
         "KC_SYSTEM_SLEEP"       :  "system_sleep",             # Sleep
         "KC_WAKE"               :  "system_wake",
         "KC_SYSTEM_WAKE"        :  "system_wake",              # Wake
+
+        # QMK Modifiers
+        "KC_HYPR"               :  "csag-none",                # Hyper
+        "KC_MEH"                :  "csa-none",                 # Ctrl+Shift+Alt
     }
 
     # QMK -> Keyplus functions
     keyp_func_list = {
+        # Layers
         "MO("                :  " L",
         "TG("                :  "toggle_L",
         "TT("                :  " L",            #Feature not fully implemented in K+
         "OSL("               :  "sticky_L",
-        "DF("                :  "set_L",
+        "TO("                :  "set_L",
+        "DF("                :  "set_L",         #Feature not fully implemented in K+
+        # Mod Keys
+        "LCTL("              :  "c",
+        "LSFT("              :  "s",
+        "S("                 :  "s",
+        "LALT("              :  "a",
+        "LGUI("              :  "g",
+        "LCMD("              :  "g",
+        "LWIN("              :  "g",
+        "RCTL("              :  "rc",
+        "RSFT("              :  "rs",
+        "RALT("              :  "ra",
+        # Multi Mod Keys
+        "SGUI("              :  "sg",
+        "SCMD("              :  "sg",
+        "SWIN("              :  "sg",
+        "LCA("               :  "ca",
+        "ALTG("              :  "rcra",
+        "LCAG("              :  "cag",
+        "MEH("               :  "csa",
+        "HYPR("              :  "csag",
+
+        "OSM(MOD_LSFT)"      :  "sticky_lshift",
+        "OSM(MOD_LCTL)"      :  "sticky_lctrl",
+        "OSM(MOD_LALT)"      :  "sticky_lalt",
+        "OSM(MOD_LGUI)"      :  "sticky_lgui",
+        "OSM(MOD_RCTL)"      :  "sticky_rctrl",
+        "OSM(MOD_RSFT)"      :  "sticky_rshift",
+        "OSM(MOD_RALT)"      :  "sticky_ralt",
+        "OSM(MOD_RGUI)"      :  "sticky_rgui",
         "OSM(KC_LSFT)"       :  "sticky_lshift",
         "OSM(KC_LSHIFT)"     :  "sticky_lshift",
         "OSM(KC_LCTL)"       :  "sticky_lctrl",
@@ -534,6 +574,7 @@ class ref:
         "KC_PAUSE"          :    "KC_PAUS",
         "KC_INSERT"         :    "KC_INS",
         "KC_DELETE"         :    "KC_DEL",
+        "KC_DELT"           :    "KC_DEL",
         "KC_PGDOWN"         :    "KC_PGDN",
         "KC_RIGHT"          :    "KC_RGHT",
         "KC_APPLICATION"    :    "KC_APP",

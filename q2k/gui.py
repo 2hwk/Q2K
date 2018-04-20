@@ -19,9 +19,9 @@ class Window():
         window = Tk()
         #window.option_add('*Dialog.msg.font', 'Helvetica 12')
         window.resizable(width=False, height=False)
-        window.option_add('*font', 'Arial -12')
+        window.option_add('*font', 'Roboto -11')
         window.title("Q2K Keymap Utility")
-        window.geometry('380x280')
+        window.geometry('380x260')
 
         menu = Menu(window)
         new_item = Menu(menu, tearoff=0)
@@ -97,11 +97,11 @@ class Window():
         kb_opts2.grid(sticky=E+W)
 
         btn = Button(kb_opts2, text='Generate Keyboard List', command=lambda:self.btn_generate_lists())
-        btn.grid(row=0, column=0)
+        btn.grid(padx=5, row=0, column=1)
         btn = Button(kb_opts2, text='Reset', command=lambda:self.btn_reset())
-        btn.grid(padx = 5, row=0, column=1)
-        btn = Button(kb_opts2, text='Convert', command=lambda:self.btn_execute())
         btn.grid(row=0, column=2)
+        btn = Button(kb_opts2, text='Convert', command=lambda:self.btn_execute())
+        btn.grid(row=0, column=0)
 
         # KBfirmware
         '''
@@ -135,7 +135,7 @@ class Window():
         string.set(folder_selected+'/')
 
     def show_about(self):
-        messagebox.showinfo('About', 'Q2K Keymap Utility\nv 1.0.0a1')
+        messagebox.showinfo('About', 'Q2K Keymap Utility\nv 1.0.2a1')
 
     def btn_generate_lists(self):
 
@@ -175,7 +175,7 @@ class Window():
         self.q2k_app.set_kb(keyboard=kb_n, rev=rev_n, keymap=km_n, template=temp_n)
         self.q2k_app.execute()
 
-    def event_rev_selected(self, event):
+    def event_rev_selected(self, event=None):
 
         keymap_list = self.q2k_app.keymap_list(self.kb.get(), self.rev.get())
         template_list = self.q2k_app.template_list(self.kb.get(), self.rev.get())
@@ -196,24 +196,35 @@ class Window():
     def event_kb_selected(self, event):
 
         rev_list = self.q2k_app.rev_list(self.kb.get())
-        keymap_list = self.q2k_app.keymap_list(self.kb.get())
-        template_list = self.q2k_app.template_list(self.kb.get())
-        if keymap_list:
-            keymap_list.sort()
+        rev_list.sort(reverse=True)
 
-        self.rev['values']= rev_list
-        self.keymap['values'] = keymap_list
-        self.template['values'] = template_list
+        if rev_list:
 
-        self.rev.set('')
-        if keymap_list and 'default' in keymap_list:
-            self.keymap.set('default')
+            self.rev.set(rev_list[0])
+            self.rev['values']= rev_list
+            self.event_rev_selected()
+
         else:
-            self.keymap.set('')
-        if template_list:
-            self.template.set(template_list[0])
-        else:
-            self.template.set('')
+
+            keymap_list = self.q2k_app.keymap_list(self.kb.get())
+            template_list = self.q2k_app.template_list(self.kb.get())
+            if keymap_list:
+                keymap_list.sort()
+
+            self.rev['values']= rev_list
+            self.keymap['values'] = keymap_list
+            self.template['values'] = template_list
+
+
+            self.rev.set('')
+            if keymap_list and 'default' in keymap_list:
+                self.keymap.set('default')
+            else:
+                self.keymap.set('')
+            if template_list:
+                self.template.set(template_list[0])
+            else:
+                self.template.set('')
 
 def main():
     window = Window()
