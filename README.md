@@ -1,7 +1,7 @@
 ## Description
 ```
 Q2K Keymap Parser 
-ver. 1.0.4.a1 (Pre-Alpha) 
+ver. 1.0.4.a3 (Pre-Alpha) 
 by 2Cas (c) 2018
 ```
 
@@ -86,6 +86,31 @@ First the program pulls matrix col/row pins from config.h, keycode data from key
 
 It then converts the keycodes and templates to keyplus notation (KC_RIGHT -> rght) and outputs a .yaml file that is compatible with keyplus firmware, as well as other keyplus format based keyboard firmware GUI builders.
 
+## Keyplus
+
+Disregarding keyplus's unique wireless capabilities, the first major difference with keyplus is your layout does NOT need to be baked into the firmware at compile time and layouts can be updated without recompiling firmware or even flashing into bootloader mode. 
+
+This paradigm shift can be initially hard to wrap your head around, as it is possible to update layouts without updating firmware, and update firmware without updating layouts. Treat the two as seperate entities in the case of keyplus. For example, a side effect of this is that boards which use the same microcontroller (32u4, 32u2, etc) can use the same BLANK hex file (no layout baked).
+
+The second major difference is how layouts are defined. All (non-wireless) settings, matrix mapping data and keycode data are all in the one file, a layout .yaml file. As previously stated, all the settings in this .yaml file can be updated WITHOUT putting your keyboard into bootloader mode. Advanced features involving custom functions (as in QMK) may require recompiling firmware however, so there is a limit to what can adjusted on the fly.
+
+This utility will generate this layout.yaml file automatically for you, however if you don't already have a precompiled hex, you will need to compile a firmware hex file. (Read the keyplus readme for more details.)
+
+## Changing Firmware
+
+Changing firmwares from QMK to Keyplus thus involves several more steps than just simply running this utility. Layouts can be updated without flashing only after a keyplus firmware hex is flashed onto your board.
+
+* Compile a 32u4 keyplus firmware hex by runnnig make (with the correct bootloader type, i.e. make BOARD=atmel-dfu). This can have an initial layout if you desire, otherwise can be left blank.
+
+* Place your keyboard into bootloader mode.
+
+* Use a flashing program of your choice (QMK Toolbox being the preferred method) to flash the keyplus hex file.
+
+* (Optional) Update the bootloader to the keyplus bootloader for 100% integration with keyplus layout and firmware loader, and driverless windows bootloader support.
+
+* Run the keyplus flasher to either initialise the layout (if none was baked into the firmware) or update the layout.
+
+* From now onwards, the keyplus flasher is all you need to update the layout. The program can also update firmware if the bootloader was switched to kp_boot_32u4, otherwise dfu-programmer and QMK toolbix are needed to flash keyplus firmware updates.
 
 ## Limitations
 
