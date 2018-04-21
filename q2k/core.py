@@ -18,7 +18,7 @@ from q2k.reference import ref
 # Defaults/Constants for Q2K
 # ───────────────────────────────────────────────────────────────────────────────────────────
 class defaults:
-    version = '1.0.4a1'
+    version = '1.0.4a2'
     # Directories
     DEBUG = False
     if DEBUG:
@@ -1444,6 +1444,8 @@ class application:
             layout +='\n        ]\n      ],\n'
 
         keycodes = ''
+        if keycode_define:
+            keycodes = 'keycodes:'
         for kc in keycode_define:
             split = kc.split('>', 1)
             tap = split[0]

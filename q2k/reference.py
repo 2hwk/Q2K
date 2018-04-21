@@ -665,7 +665,6 @@ layouts:
 '''
 
     keyplus_yaml_keycode_template = '''
-keycodes:
   '<KEYCODE>':
     keycode: hold
     delay: 200
