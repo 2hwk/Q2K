@@ -14,7 +14,9 @@ import pkg_resources as pkg
 import enum as en
 
 from q2k.reference import ref
-
+# ───────────────────────────────────────────────────────────────────────────────────────────
+# Defaults/Constants for Q2K
+# ───────────────────────────────────────────────────────────────────────────────────────────
 class defaults:
     # Directories
     DEBUG = False
@@ -31,7 +33,9 @@ class defaults:
     qmk_nonstd_dir = ['handwired', 'converter', 'clueboard', 'lfkeyboards'] # Currently only lfkeyboards causes any issues, however it is good to be verbose here
     mcu_compat = ['atmega32u4', 'atmega32u2']                               # Compatible MCU types
     kbf_mcu_compat = ['atmega32u4', 'atmega32u2']
-
+# ───────────────────────────────────────────────────────────────────────────────────────────
+# Console Output
+# ───────────────────────────────────────────────────────────────────────────────────────────
 class _console:
 
     def __init__(self, gui):
@@ -105,7 +109,9 @@ class _console:
     def clear(self):
 
         self.errors = []
-
+# ───────────────────────────────────────────────────────────────────────────────────────────
+# Text parsing
+# ───────────────────────────────────────────────────────────────────────────────────────────
 class _parse_txt:
 
     def layout_headers(data):
@@ -196,6 +202,30 @@ class _parse_txt:
 
         return km_layer.scanString(data)
 
+    def keymap_functions(data):
+
+        data = str(data)
+        LSQBRAC, RSQBRAC, EQ, COMMA = map(pp.Suppress,"[]=,")
+        words = pp.Word(pp.alphanums+'_')
+        function_header = pp.Literal('fn_actions[] = {')
+
+        func_index = LSQBRAC + pp.Word(pp.alphanums+'_') + RSQBRAC + EQ
+        func_name = words
+        #func_params = pp.Combine( '(' + pp.Word(pp.alphanums+'_'+',') + ')' )
+        func_params = pp.Combine( '(' + pp.OneOrMore(words + pp.Optional(',')) + ')', adjacent=False)
+        func = pp.Group(pp.Optional(func_index) + pp.Combine(func_name + func_params, adjacent=False))
+        func_list = pp.Group(pp.ZeroOrMore( func + pp.Optional(COMMA) ) )
+        EOF = pp.Literal('}')
+
+        function = pp.Suppress(function_header) + func_list('function') + pp.Suppress(EOF)
+        function.ignore(pp.cppStyleComment)
+
+        results = list(function.scanString(data))
+
+        return results
+# ───────────────────────────────────────────────────────────────────────────────────────────
+# Pre-processing
+# ───────────────────────────────────────────────────────────────────────────────────────────
 class _cpp:
 
     def __init__(self, kbo, dirs, console):
@@ -265,7 +295,9 @@ class _cpp:
         else:
             self.__console.error(['Keymap cannot be read by preprocessor', 'Failed to parse keymap file'])
             exit()
-
+# ───────────────────────────────────────────────────────────────────────────────────────────
+# KB Information
+# ───────────────────────────────────────────────────────────────────────────────────────────
 class kb_info:
 
     def __init__(self, n=''):
@@ -277,9 +309,12 @@ class kb_info:
 
     def init_build(self):
 
-        self.build_rev = ''                 # What revision to build with
+        self.build_rev = ''               # What revision to build with
         self.build_keymap = ''              # What keymap to build with
         self.build_template = ''            # What layout to build with
+
+        #self.build_m_row_pins = []          # Row pins
+        #self.build_m_col_pins = []          # Column 
 
     def add_rev_list(self, rev, flag=False):
         if not flag:
@@ -293,27 +328,33 @@ class kb_info:
                return r
             if r.name == 'n/a':
                return r
-
-# A class for listing revision info
+#───────────────────────────────────────────────────────────────────────────────────────────
+# KB/revision Information
+# ───────────────────────────────────────────────────────────────────────────────────────────
 class rev_info:
 
     def __init__ (self, n='', flag=False):
 
-        self.name = n                  # Name of Revision
+        self.name = n                      # Name of Revision
         self.keymap_list = []              # List of layout NAMES
         self.template_list = []            # List of template NAMES
         self.template_loc = ''             # Location of <keyboard>.h
         self.is_default = flag             # Does keyboard have revisions? (or just default)
 
     def init_build(self):
+        # TODO: Possibly move ALL build information to kb_info? Or keep it like it is?
 
         self.build_mcu_list = []                 # MCU list
         self.build_m_row_pins = []               # Row pins
-        self.build_m_col_pins = []               # Column pins
+        self.build_m_col_pins = []               # Column  pins
+
         self.build_layout = []                   # list of keycode_layers objects (which form layout) -> Final yaml/json output comes from here
         self.build_templates = []                # list of layout_template objects
 
+# ───────────────────────────────────────────────────────────────────────────────────────────
+# LAYOUT template info
 # A class for linking matrix mapping in <keyboard>.h with (preprocessed) keymap.c keycode layers.
+# ───────────────────────────────────────────────────────────────────────────────────────────
 class layout_template:
 
     def __init__(self, n=''):
@@ -346,8 +387,10 @@ class layout_template:
                     if self.layout[i][j] == col:
                         self.layout[i][j] = -1
                         console.error(['Array key recovery failed', 'Will assume this corresponds to KC_NO'])
-
+# ───────────────────────────────────────────────────────────────────────────────────────────
+# KEYCODE layers
 # A class for storing keycode layers
+# ───────────────────────────────────────────────────────────────────────────────────────────
 class keycode_layer:
 
     def __init__(self, n=''):
@@ -358,15 +401,16 @@ class keycode_layer:
         self.matrix_map = []               # Matrix mapping in [keyplus] format
         self.matrix_cols = 0
 
-    def convert_keyplus_keymap(self, layer_list, console):
+    def convert_keyplus_keymap(self, layer_names, functions, console):
 
         for i, kc in enumerate(self.keymap):
             if kc.endswith(')') and '(' in kc:
-                self.keymap[i] = self.__func(kc, layer_list, console)
+                self.keymap[i] = self.__func(kc, layer_names, functions, console)
             else:
-                self.keymap[i] = self.__keycode(kc, console)
+                self.keymap[i] = self.__keycode(kc, functions, console)
 
     def convert_keyplus_matrix(self, col_limit):
+
         matrix = copy.deepcopy(self.matrix_map)
         for i, row in enumerate(self.matrix_map):
             j = 0
@@ -383,65 +427,115 @@ class keycode_layer:
                     j = max(j-1, 0)
         self.matrix_map = matrix
 
-    def __func(self, qmk_func, layer_list, console):
-        # TODO: fully support keyplus csag- style modifiers
+    def __func(self, qmk_func, layer_names, functions, console):
+
         if qmk_func in ref.keyp_func_list.keys():
             keyp_func = ref.keyp_func_list[qmk_func]
         else:
-            try:
-                brac_index = qmk_func.index('(')+1
-                qfunc = qmk_func[:brac_index]
-                func_target = qmk_func[brac_index:-1]
+            brac_index = qmk_func.index('(')+1
+            qfunc = qmk_func[:brac_index]
+            func_target = qmk_func[brac_index:-1]
 
-                if func_target in layer_list:
-                    layer = str(layer_list.index(func_target))
-                    keyp_func = ref.keyp_func_list[qfunc]+layer
-
-                elif func_target in ref.keyp_kc_list.keys():
-                    keycode = self.__keycode(func_target, console)
-                    keyp_func = ref.keyp_func_list[qfunc]+'-'+keycode
-
-                elif ')' in func_target:
-                    target = func_target
-                    func_list = [ qfunc ]
-                    while ')' in target:
-                        brac_index = target.index('(')+1
-                        func = target[:brac_index]
-                        target = target[brac_index:-1]
-                        func_list.append(func)
-                    #print(target)
-                    #print(func_list)
-
-                    keyp_func = ''
-                    for func in func_list:
-                        keyp_func += ref.keyp_func_list[func]
-
-                    if target in ref.keyp_kc_list.keys():
-                        final_kc = self.__keycode(target, console).replace(' ','')
-                        keyp_func += '-'+final_kc
-                    else:
+            # Legacy QMK Functions
+            if qfunc in ref.qmk_legacy_functions:
+                # Check for blank function list
+                if not functions:
+                    console.bad_kc('FN','['+qmk_func+'] - set to trns')
+                    keyp_func = 'trns'
+                else: 
+                    func_action = functions[int(func_target)]
+                    # Check for blank function
+                    if not func_action:
+                        console.bad_kc('FN','['+qmk_func+'] - set to trns')
                         keyp_func = 'trns'
+                    else:
+                        keyp_func = func_action
 
+            # Layer Functions
+            elif func_target in layer_names:
+                if qfunc in ref.keyp_func_list.keys():
+                    layer = str(layer_names.index(func_target))
+                    keyp_func = ref.keyp_func_list[qfunc]+layer
                 else:
                     console.bad_kc('FN','['+qmk_func+'] - set to trns')
                     keyp_func = 'trns'
-            except KeyError:
-                console.bad_kc('FN','['+qmk_func+'] - set to trns')
-                keyp_func = 'trns'
-            except ValueError:
+
+            # Other Quantum Functions
+            elif func_target in ref.keyp_kc_list.keys():
+                if qfunc in ref.keyp_func_list.keys():
+                    keycode = self.__keycode(func_target, functions, console)
+                    keyp_func = ref.keyp_func_list[qfunc]+'-'+keycode
+                else:
+                    console.bad_kc('FN','['+qmk_func+'] - set to trns')
+                    keyp_func = 'trns'
+
+            # Chained Quantum Functions - i.e. LCTL(LALT(KC_E))
+            elif ')' in func_target:
+
+                target = func_target
+                func_list = [ qfunc ]
+                while ')' in target:
+                    brac_index = target.index('(')+1
+                    func = target[:brac_index]
+                    target = target[brac_index:-1]
+                    func_list.append(func)
+
+                keyp_func = ''
+                for func in func_list:
+                    if func in ref.keyp_func_list.keys():
+                        keyp_func += ref.keyp_func_list[func]
+                    else:
+                        console.bad_kc('FN','['+qmk_func+'] - set to trns')
+                        keyp_func = 'trns'
+                        return keyp_func
+
+                if target in ref.keyp_kc_list.keys():
+                    final_kc = self.__keycode(target, functions, console).replace(' ','')
+                    keyp_func += '-'+final_kc
+                else:
+                    console.bad_kc('FN','['+qmk_func+'] - set to trns')
+                    keyp_func = 'trns'
+            
+            else:
                 console.bad_kc('FN','['+qmk_func+'] - set to trns')
                 keyp_func = 'trns'
 
         return keyp_func
 
-    def __keycode(self, qmk_kc, console):
-        try:
+    def __keycode(self, qmk_kc, functions, console):
+
+        if qmk_kc in ref.keyp_kc_list.keys():
+
             keyp_kc = ref.keyp_kc_list[qmk_kc]
-        except KeyError:
+
+        elif qmk_kc[:5] in ref.qmk_legacy_functions:
+            # Check for blank function list
+            if not functions:
+                console.bad_kc('FN','['+qmk_kc+'] - set to trns')
+                keyp_kc = 'trns'
+            else:
+                func_index = int(qmk_kc[5:])
+                # Check array out of bounds
+                if func_index < len(functions):
+                    func_action = functions[func_index]
+                    # Check for blank function
+                    if func_action:
+                        keyp_kc = func_action
+                    else:
+                        console.bad_kc('FN','['+qmk_kc+'] - set to trns')
+                        keyp_kc = 'trns'
+                else:
+                    console.bad_kc('FN','['+qmk_kc+'] - set to trns')
+                    keyp_kc = 'trns'
+
+        else:
             console.bad_kc('KC','['+qmk_kc+'] - set to trns')
             keyp_kc = 'trns'
+        
         return keyp_kc
-
+# ───────────────────────────────────────────────────────────────────────────────────────────
+# Cached Lists and Dictionaries
+# ───────────────────────────────────────────────────────────────────────────────────────────
 class _cache:
 
     def __init__(self, dirs, console, f_cache=False):
@@ -661,7 +755,9 @@ class _cache:
                 else: 
                     self.__console.error(['Revision # required - Valid Revisions:'])
                     print(self._rev_list(keyboard))
-
+# ───────────────────────────────────────────────────────────────────────────────────────────
+# Q2K Application
+# ───────────────────────────────────────────────────────────────────────────────────────────
 class application:
 
     def __init__(self, app_type, is_gui=False):
@@ -710,7 +806,7 @@ class application:
             try:
                 with open(defaults.src+'pref.yaml', 'r') as f:
                     self.dirs = yaml.load(f)
-                    self.console.note(['Using preferences from '+defaults.src+'/pref.yaml', '--reset to reset to defaults'])
+                    self.console.note(['───────────────────────────────────────────────────────────────────────────────────────────', 'Using preferences from '+defaults.src+'pref.yaml', '--reset to reset to defaults'])
 
             except FileNotFoundError:
                 self.__generate_dirs()
@@ -732,7 +828,7 @@ class application:
         with open(defaults.src+'pref.yaml', 'w') as f:
             f.write('# Q2K Folder Locations\n')
             yaml.dump(dirs, f, default_flow_style = False)
-            self.console.note(['New pref.yaml generated'])
+            self.console.note(['───────────────────────────────────────────────────────────────────────────────────────────', 'New pref.yaml generated'])
 
     def __pop_cache_list(self):
 
@@ -830,6 +926,10 @@ class application:
             build_kbo.build_rev = rev
             self.build_kb = build_kbo
             self.build_rev = build_revo
+            if rev:
+                self.console.note(['───────────────────────────────────────────────────────────────────────────────────────────','Building '+keyboard+'/'+rev+':'+keymap+':'+template, '───────────────────────────────────────────────────────────────────────────────────────────'])
+            else:
+                self.console.note(['───────────────────────────────────────────────────────────────────────────────────────────','Building '+keyboard+':'+keymap+':'+template, '───────────────────────────────────────────────────────────────────────────────────────────'])
         else:
             self.console.error(['Invalid Keyboard Name - '+keyboard, 'Valid Names:'])
             if not self.is_gui:
@@ -877,18 +977,17 @@ class application:
         self.__check_mcu()              # Check for MCU and Matrix Pins
         self.__get_config_header()
         self.__get_keycodes()           # Init Layout + Templates
-        self.__get_templates()
-        self.__convert_keycodes()       # Process Layout + Templates
-        self.__merge_layout_template()
+        self.__get_templates() 
+        self.__merge_layout_template()  # Process Layout + Templates
         self.__convert_matrix_map()
         self.__create_output()          # Pipe output to yaml/json
         self.console.clear()            # Clear console
 
     def __check_mcu(self):
         self.__get_mcu()
-        kb = self.build_kb.name
-        rev = self.build_rev.name
+        kb_n = self.build_kb.name
         revo = self.build_rev
+        rev_n = self.build_kb.build_rev
 
         for mcu in revo.build_mcu_list:
             if mcu in defaults.mcu_compat:
@@ -896,7 +995,7 @@ class application:
             else:
                 self.console.warning(
                     ['Possible MCU incompatability detected', 
-                    'MCU type: '+mcu+' in '+kb+'/'+rev+' rules.mk', 
+                    'MCU type: '+mcu+' in '+kb_n+'/'+rev_n+'rules.mk', 
                     'Currently, keyplus supports only boards with the following microcontrollers:',
                     str(defaults.mcu_compat),
                     'If your board has a MCU on this list then ignore this warning as a false positive',
@@ -989,16 +1088,22 @@ class application:
         revo = self.build_rev
         data = self.__cpp.preproc_keymap()
         token_list = _parse_txt.keymaps(data)
+        function_token_list = _parse_txt.keymap_functions(data)
 
         layer_list = []
+        layer_names = []
         num_col = 0
         layer_index = -1
         for tokens, start, stop in token_list:
             layer_index += 1
             if tokens.layer_name == '':
-                curr_layer = keycode_layer(str(layer_index))
+                name = str(layer_index)
+                curr_layer = keycode_layer(name)
+                layer_names.append(name)
             else:
-                curr_layer = keycode_layer(tokens.layer_name[1:-1]) 
+                name = tokens.layer_name[1:-1]
+                curr_layer = keycode_layer(tokens.layer_name[1:-1])
+                layer_names.append(name)
 
             for row in tokens.layer:
                 # Annoying fix for problem with QMK functions X(x,y)
@@ -1012,12 +1117,41 @@ class application:
                         row.insert(i, func)
                 if len(row) > curr_layer.matrix_cols:
                     num_col = len(row)
-
-
                 curr_layer.keymap += (list(row))
 
             curr_layer.matrix_cols = num_col
             layer_list.append(curr_layer)
+
+        # Functions
+        functions = []
+        for tokens, start, end in function_token_list:
+            for f_token in tokens.function:
+
+                if len(f_token) < 2:
+                    index = None
+                    function = f_token[0]
+                else:
+                    index = int(f_token[0])
+                    function = f_token[1]
+
+                if function in ref.keyp_actions_list.keys():
+                    if index:
+                        while len(functions) < index:
+                            functions.append('')
+                    functions.append(ref.keyp_actions_list[function])
+                else:
+                    if index:
+                        while len(functions) < index:
+                            functions.append('')
+                    brac_index = function.index('(')+1
+                    func = function[:brac_index]
+                    target = function[brac_index:-1]
+
+                    if func in ref.keyp_actions_list.keys() and target in layer_names:
+                        layer = str(layer_names.index(target))
+                        functions.append(ref.keyp_actions_list[func]+layer)
+                    else:
+                        functions.append('')
 
         if self.__args.debug or DEBUG:
             self.console.note(['Keycodes'])
@@ -1031,16 +1165,13 @@ class application:
         else:
             revo.build_layout = layer_list
 
-    def __convert_keycodes(self, DEBUG=False):
+        self.__convert_keycodes(layer_names, functions)
 
-        layers = self.build_rev.build_layout
-        layer_list = []
-        for layer in layers:
-            layer_list.append(layer.name)
+    def __convert_keycodes(self, layer_names, functions, DEBUG=False):
 
-        for layer in layers:
+        for layer in self.build_rev.build_layout:
             if self.format == self.__output.keyplus:
-                layer.convert_keyplus_keymap(layer_list, self.console)
+                layer.convert_keyplus_keymap(layer_names, functions, self.console)
             #elif self.format == self.__output.kbfirmware:
                 #layer.convert_kbf_keymap(layer_list, self.console)
 
@@ -1114,7 +1245,6 @@ class application:
     def __merge_layout_template(self, DEBUG=False):
 
         selected = self.build_kb.build_template
-        print(selected)
         layers = self.build_rev.build_layout
         templates = self.build_rev.build_templates
 
@@ -1283,8 +1413,8 @@ class application:
 
         self.console.note(['SUCCESS! Output is in: '+output_yaml])
 
-def q2keyplus():
 
+def q2keyplus():
     q2k = application('keyplus')
     q2k.execute()
 '''

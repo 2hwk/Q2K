@@ -12,6 +12,7 @@ class ref:
         "MAGIC_HOST_NKRO"       :  "kro_n",                       # FORCE NKRO
         "MAGIC_UNHOST_NKRO"     :  "kro_6",                       # FORCE 6KRO
         "MAGIC_TOGGLE_NKRO"     :  "kro_auto",                    # Set Auto NKRO
+        "KC_GESC"               :  "gesc",
 
         # Alphas
         "KC_GRV"                :  "'`' ",
@@ -242,6 +243,7 @@ class ref:
         "KC_SELECT"             :  "select",                   # Select____
         "KC_AGIN"               :  "again", 
         "KC_AGAIN"              :  "again",                    # Again
+        "KC_HELP"               :  "help",
         "KC_MENU"               :  "hid_menu",                 # Menu
         "KC_UNDO"               :  "undo",                     # Undo
         "KC_CUT"                :  " cut",                      # Cut
@@ -406,6 +408,9 @@ class ref:
         "RCTL("              :  "rc",
         "RSFT("              :  "rs",
         "RALT("              :  "ra",
+        "RGUI("              :  "rg",
+        "RWIN("              :  "rg",
+        "RCMD("              :  "rg",
         # Multi Mod Keys
         "SGUI("              :  "sg",
         "SCMD("              :  "sg",
@@ -442,6 +447,20 @@ class ref:
         "OSM(KC_RCMD)"       :  "sticky_rgui", 
     }
 
+    # Legacy QMK functions
+    qmk_legacy_functions = ["KC_FN", "FUNC(", "F("]
+    keyp_actions_list = { 
+        "ACTION_LAYER_MOMENTARY("          : " L", 
+        "ACTION_LAYER_TOGGLE("             : "toggle_L",
+        "ACTION_LAYER_SET("                : "set_L",
+        "ACTION_LAYER_TAP_TOGGLE("         : "sticky_L",
+        "ACTION_FUNCTION(SHIFT_ESC)"       : "gesc",
+        "ACTION_FUNCTION(ESC_GRV)"         : "gesc",
+        "ACTION_FUNCTION(LFK_ESC_TILDE)"   : "gesc",
+        "ACTION_FUNCTION(ESCAPE)"          : "gesc",
+        "ACTION_LAYER_TAP_KEY(2, KC_CAPS)" : "trns",
+        #"ACTION"
+    }
 
     # QMK Keycodes currently not supported
     keyp_missing = {

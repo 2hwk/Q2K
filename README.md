@@ -1,7 +1,7 @@
 ## Description
 ```
 Q2K Keymap Parser 
-ver. 1.0.2.a1 (Pre-Alpha) 
+ver. 1.0.3.a1 (Pre-Alpha) 
 by 2Cas (c) 2018
 ```
 
@@ -121,13 +121,14 @@ tl;dr VERY alpha, not gaurenteed to work 100% for every keyboard with QMK suppor
 
 ## Future Development
 
-* KBfirmware support has been dropped for now pending a rework. 
+* KBfirmware support has been dropped indefinitely. (Will focus purely on keyplus for now until everything is fleshed out)
 * The GUI and front end code could be improved (but it's unlikely to change much). 
 * Still a few edge cases where <keyboard>.h files are missed. 
 * Reading of LED/RGB data, Bootloader type, MCU (in anticipation of changes on K+ Layout side) and updating conversion dictionary AND logic for keyplus's implementation of tap and hold, etc.
 * I'd like to be able to export cached kb data (cache_kb.yaml) out into a more readable form - might be useful on QMK side of things.
 * Better documentation of code now that no more major overhauls are pending.
 * Documentation, documentation, documentation.
+* Proper Windows Support? Maybe. For now Bash on Win10 works.
           
 ## License
 
