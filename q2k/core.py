@@ -18,7 +18,7 @@ from q2k.reference import ref
 # Defaults/Constants for Q2K
 # ───────────────────────────────────────────────────────────────────────────────────────────
 class defaults:
-    version = '1.0.3a2'
+    version = '1.0.4a1'
     # Directories
     DEBUG = False
     if DEBUG:
@@ -430,20 +430,105 @@ class keycode_layer:
 
     def __func(self, qmk_func, layer_names, functions, console):
 
-        if qmk_func in ref.keyp_func_list.keys():
-            keyp_func = ref.keyp_func_list[qmk_func]
+        # ───────────────────────────────────────────────────────────────────────────────
+        # OSM Functions
+        # ───────────────────────────────────────────────────────────────────────────────
+        if qmk_func in ref.keyp_func.keys():
+            keyp_func = ref.keyp_func[qmk_func]
         else:
+            # Break up into [qfunc]([func_target])
             brac_index = qmk_func.index('(')+1
             qfunc = qmk_func[:brac_index]
             func_target = qmk_func[brac_index:-1]
+            # ───────────────────────────────────────────────────────────────────────────────
+            # Layer Switching Functions
+            # ───────────────────────────────────────────────────────────────────────────────
+            if qfunc in ref.keyp_layer_func.keys() and func_target in layer_names:
+                layer = str(layer_names.index(func_target))
+                keyp_func = ref.keyp_layer_func[qfunc]+layer
+            # ───────────────────────────────────────────────────────────────────────────────
+            # Mod/Multi-Mod Functions
+            # ───────────────────────────────────────────────────────────────────────────────
+            elif qfunc in ref.keyp_func.keys() and func_target in ref.keyp_kc.keys():
+                keycode = self.__keycode(func_target, functions, console)
+                keyp_func = ref.keyp_func[qfunc]+'-'+keycode
+            # ───────────────────────────────────────────────────────────────────────────────
+            # For Layer-Tap Keys e.g. LT(1, KC_SPACE) -> Space-FN
+            # ───────────────────────────────────────────────────────────────────────────────
+            elif qfunc in ref.keyp_tap_layer.keys():
+                split = func_target.split(',', 1)
+                if len(split) != 2:
+                    console.bad_kc('FN','['+qmk_func+'] - set to trns')
+                    keyp_func = 'trns'
+                    return keyp_func
+                else:
+                    layer_target = split[0].replace(' ','')
+                    keycode = split[1].replace(' ','')
 
-            # Legacy QMK Functions
-            if qfunc in ref.qmk_legacy_functions:
+                if layer_target not in layer_names:
+                    console.bad_kc('FN','['+qmk_func+'] - set to trns')
+                    keyp_func = 'trns'
+                    return keyp_func
+                else:
+                    layer = str(layer_names.index(layer_target))
+                    hold = ref.keyp_tap_layer[qfunc]+layer
+
+                    if keycode not in ref.keyp_kc.keys() and keycode not in ref.qmk_legacy_mod.keys():
+                        console.bad_kc('FN','['+qmk_func+'] - set to trns')
+                        keyp_func = 'trns'
+                        return keyp_func
+
+                    elif keycode in ref.keyp_kc.keys():
+                        tap = ref.keyp_kc[keycode]
+                        if tap == "\"\'\" ":
+                            tap = 'quot'
+                        tap = tap.replace("'", '')
+                        keyp_func = (tap +'>'+hold).replace(' ','')
+
+                    elif keycode in ref.qmk_legacy_mod.keys():
+                        tap = ref.qmk_legacy_mod[keycode]+'-none'
+                        if tap == "\"\'\" ":
+                            tap = 'quot'
+                        tap = tap.replace("'", '')
+                        keyp_func = (tap +'>'+hold).replace(' ','')
+            # ───────────────────────────────────────────────────────────────────────────────
+            # Modifier Tap e.g. RSFT_T(KC_UP) -> Up when Tapped, RShift when Held
+            # ───────────────────────────────────────────────────────────────────────────────
+            elif qfunc in ref.keyp_tap_mod.keys() and func_target in ref.keyp_kc.keys():
+                hold = ref.keyp_tap_mod[qfunc]+'-none'
+                tap = ref.keyp_kc[func_target]
+                if tap == "\"\'\" ":
+                    tap = 'quot'
+                tap = tap.replace("'", '')
+                keyp_func = (tap+'>'+hold).replace(' ','')
+            # ───────────────────────────────────────────────────────────────────────────────
+            # Chained Quantum Functions [Legacy] - i.e. LCTL(LALT(KC_DEL))
+            # ───────────────────────────────────────────────────────────────────────────────
+            elif qfunc in ref.keyp_func.keys() and ')' in func_target:
+                target = func_target
+                keyp_func = ref.keyp_func[qfunc]
+                while ')' in target:
+                    brac_index = target.index('(')+1
+                    func = target[:brac_index]
+                    target = target[brac_index:-1]
+                    if func in ref.keyp_func.keys():
+                        keyp_func += ref.keyp_func[func]
+
+                if target in ref.keyp_kc.keys():
+                    final_kc = self.__keycode(target, functions, console)
+                    keyp_func = (keyp_func+'-'+final_kc).replace(' ','')
+                else:
+                    console.bad_kc('FN','['+qmk_func+'] - set to trns')
+                    keyp_func = 'trns'
+            # ───────────────────────────────────────────────────────────────────────────────
+            # Legacy TMK-style QMK Functions
+            # ───────────────────────────────────────────────────────────────────────────────
+            elif qfunc in ref.qmk_legacy_func:
                 # Check for blank function list
                 if not functions:
                     console.bad_kc('FN','['+qmk_func+'] - set to trns')
                     keyp_func = 'trns'
-                else: 
+                else:
                     func_action = functions[int(func_target)]
                     # Check for blank function
                     if not func_action:
@@ -451,52 +536,25 @@ class keycode_layer:
                         keyp_func = 'trns'
                     else:
                         keyp_func = func_action
+            # ───────────────────────────────────────────────────────────────────────────────
+            # Legacy QMK Modkey format e.g. MT(MOD_LCTL, KC_Z) -> Ctrl+Z
+            # ───────────────────────────────────────────────────────────────────────────────
+            elif qfunc == 'MT(':
 
-            # Layer Functions
-            elif func_target in layer_names:
-                if qfunc in ref.keyp_func_list.keys():
-                    layer = str(layer_names.index(func_target))
-                    keyp_func = ref.keyp_func_list[qfunc]+layer
-                else:
+                split = func_target.split(',', 1)
+                if len(split) != 2:
                     console.bad_kc('FN','['+qmk_func+'] - set to trns')
                     keyp_func = 'trns'
-
-            # Other Quantum Functions
-            elif func_target in ref.keyp_kc_list.keys():
-                if qfunc in ref.keyp_func_list.keys():
-                    keycode = self.__keycode(func_target, functions, console)
-                    keyp_func = ref.keyp_func_list[qfunc]+'-'+keycode
+                    return keyp_func
                 else:
-                    console.bad_kc('FN','['+qmk_func+'] - set to trns')
-                    keyp_func = 'trns'
+                    modifier = split[0]
+                    keycode = split[1]
 
-            # Chained Quantum Functions - i.e. LCTL(LALT(KC_E))
-            elif ')' in func_target:
+                if modifier in ref.qmk_legacy_mod.keys() and keycode in ref.keyp_kc.keys():
+                    mod = ref.qmk_legacy_mod[modifier]
+                    kc = ref.keyp_kc[keycode]
+                    keyp_func = (mod+'-'+kc).replace(' ','')
 
-                target = func_target
-                func_list = [ qfunc ]
-                while ')' in target:
-                    brac_index = target.index('(')+1
-                    func = target[:brac_index]
-                    target = target[brac_index:-1]
-                    func_list.append(func)
-
-                keyp_func = ''
-                for func in func_list:
-                    if func in ref.keyp_func_list.keys():
-                        keyp_func += ref.keyp_func_list[func]
-                    else:
-                        console.bad_kc('FN','['+qmk_func+'] - set to trns')
-                        keyp_func = 'trns'
-                        return keyp_func
-
-                if target in ref.keyp_kc_list.keys():
-                    final_kc = self.__keycode(target, functions, console).replace(' ','')
-                    keyp_func += '-'+final_kc
-                else:
-                    console.bad_kc('FN','['+qmk_func+'] - set to trns')
-                    keyp_func = 'trns'
-            
             else:
                 console.bad_kc('FN','['+qmk_func+'] - set to trns')
                 keyp_func = 'trns'
@@ -505,11 +563,11 @@ class keycode_layer:
 
     def __keycode(self, qmk_kc, functions, console):
 
-        if qmk_kc in ref.keyp_kc_list.keys():
+        if qmk_kc in ref.keyp_kc.keys():
 
-            keyp_kc = ref.keyp_kc_list[qmk_kc]
+            keyp_kc = ref.keyp_kc[qmk_kc]
 
-        elif qmk_kc[:5] in ref.qmk_legacy_functions:
+        elif qmk_kc[:5] in ref.qmk_legacy_func:
             # Check for blank function list
             if not functions:
                 console.bad_kc('FN','['+qmk_kc+'] - set to trns')
@@ -1135,11 +1193,11 @@ class application:
                     index = int(f_token[0])
                     function = f_token[1]
 
-                if function in ref.keyp_actions_list.keys():
+                if function in ref.keyp_actions.keys():
                     if index:
                         while len(functions) < index:
                             functions.append('')
-                    functions.append(ref.keyp_actions_list[function])
+                    functions.append(ref.keyp_actions[function])
                 else:
                     if index:
                         while len(functions) < index:
@@ -1148,9 +1206,9 @@ class application:
                     func = function[:brac_index]
                     target = function[brac_index:-1]
 
-                    if func in ref.keyp_actions_list.keys() and target in layer_names:
+                    if func in ref.keyp_actions.keys() and target in layer_names:
                         layer = str(layer_names.index(target))
-                        functions.append(ref.keyp_actions_list[func]+layer)
+                        functions.append(ref.keyp_actions[func]+layer)
                     else:
                         functions.append('')
 
@@ -1367,17 +1425,34 @@ class application:
                 template += '\n        '
 
         layout = ''
+        keycode_define = []
         for i, layer in enumerate(layers):
             layout += '      [ # layer '+str(i)+'\n        ['
             for row in layer.layout:
                 layout += '\n          '
                 for keycode in row:
-                   if len(keycode) < 4:
-                       repeat = 4 - len(keycode)
-                       for i in (range(repeat)):
-                           keycode+=' '
-                   layout += keycode+', '
+                    if len(keycode) < 4:
+                        repeat = 4 - len(keycode)
+                        for i in (range(repeat)):
+                            keycode+=' '
+                    # tap>hold must be explicitly declared for now
+                    if '>' in keycode and keycode != "'>' ":
+                        keycode_define.append(keycode)
+                        keycode = "'"+keycode+"'"
+
+                    layout += keycode+', '
             layout +='\n        ]\n      ],\n'
+
+        keycodes = ''
+        for kc in keycode_define:
+            split = kc.split('>', 1)
+            tap = split[0]
+            hold = split[1]
+
+            keycodes += ref.keyplus_yaml_keycode_template
+            keycodes = keycodes.replace('<KEYCODE>', kc)
+            keycodes = keycodes.replace('<TAP>', tap)
+            keycodes = keycodes.replace('<HOLD>', hold)
 
         # Load Template
         output_yaml_info = ref.keyplus_yaml_template
@@ -1388,6 +1463,7 @@ class application:
         output_yaml_info = output_yaml_info.replace('<COLS>', cols)
         output_yaml_info = output_yaml_info.replace('<MATRIX_MAP>', template)
         output_yaml_info = output_yaml_info.replace('<LAYOUT>', layout)
+        output_yaml_info = output_yaml_info.replace('<KEYCODES>', keycodes)
 
         kblibs = self.build_kb.libs
         if rev_n:
@@ -1431,6 +1507,5 @@ def q2keyplus_gui(keyboard, rev, keymap, template):
     q2k.set_kb(keyboard, rev, keymap, template)
     q2k.execute()
 '''
-
 if __name__ == '__main__':
     q2keyplus()
