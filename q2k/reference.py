@@ -684,14 +684,13 @@ class ref:
 ---
 <ERRORS>
 
-version: 0
 report_mode: auto_nkro # options: auto_nkro, 6kro, nkro
 
 devices:
   <KB_NAME>:
     id : 0
     layout: <LAYOUT_NAME>
-    layout offset: 0
+    layout_offset: 0
     scan_mode:
       mode: col_row # options: col_row, pins, none
       rows: <ROWS>

@@ -135,7 +135,7 @@ class Window():
         string.set(folder_selected+'/')
 
     def show_about(self):
-        messagebox.showinfo('About', 'Q2K Keymap Utility\nv 1.0.3a1')
+        messagebox.showinfo('About', 'Q2K Keymap Utility\nv '+q2k.core.defaults.version)
 
     def btn_generate_lists(self):
 

@@ -18,6 +18,7 @@ from q2k.reference import ref
 # Defaults/Constants for Q2K
 # ───────────────────────────────────────────────────────────────────────────────────────────
 class defaults:
+    version = '1.0.3a2'
     # Directories
     DEBUG = False
     if DEBUG:
