@@ -1,6 +1,7 @@
 import argparse
 import glob
 import pathlib
+import platform
 import errno
 import os
 import yaml
@@ -21,19 +22,19 @@ class defaults:
 
     if getattr(sys, 'frozen', False):
         # If Frozen - Use os.getcwd()
-        src = os.getcwd()+'/'
+        src = os.getcwd().replace('\\', '/')+'/'
     else:
         # If Live, use bundle_dir
         frozen = False
-        src = os.path.dirname(os.path.abspath(__file__))+'/'
+        src = os.path.dirname(os.path.abspath(__file__)).replace('\\', '/')+'/'
 
     version = '1.0.6.a1'
     # Directories
     libs = src+'lib/'                                # Local Libs - We want these to be in a single, FIXED directory. [Avoid using relative directories]
     cache = src+'.cache/cache_kb.yaml'               # Cache-  We want this to be in a single, FIXED directory. [Avoid using relative directories]
     qmk = ''                                         # QMK Directory - To be provided by user
-    keyp = os.getcwd()+'/q2k_out/keyplus/'           # Output. This can either be fixed in one location (defined by user) or be a relative directory (default)
-    kbf = os.getcwd()+'/q2k_out/kbfirmware/'
+    keyp = os.getcwd().replace('\\', '/')+'/q2k_out/keyplus/'           # Output. This can either be fixed in one location (defined by user) or be a relative directory (default)
+    kbf = os.getcwd().replace('\\', '/')+'/q2k_out/kbfirmware/'
     # Lists
     qmk_nonstd_dir = ['handwired', 'converter', 'clueboard', 'lfkeyboards'] # Currently only lfkeyboards causes any issues, however it is good to be verbose here
     q2k_incompat = ['handwired/']
@@ -272,7 +273,11 @@ class _cpp:
         # Setting up -I and custom define options
         qdir = self.__dirs['QMK dir'] + 'keyboards/'
         kb = self.__kb.name
-        cc = ['avr-gcc', '-E']
+        if platform.system() == 'Linux':
+            cc = ['avr-gcc', '-E']
+        elif platform.system() == 'Windows':
+            avr_gcc = defaults.src + 'avr-gcc/bin/avr-gcc.exe'
+            cc = [avr_gcc, '-E']
         kbdefine = 'KEYBOARD_'+'_'.join(kblibs)
         QMK_KEYBOARD_H = 'QMK_KEYBOARD_H=\"'+kb+'.h\"'
         libs = ['-D', kbdefine, '-D', QMK_KEYBOARD_H, '-I'+self.__dirs['Local libs']]
@@ -672,18 +677,18 @@ class _cache:
         keymaplist = []
 
         for fn in glob.glob(self.__qmk+'keyboards/**/rules.mk', recursive=True):
-            fn = fn[:-9]
+            fn = fn[:-9].replace('\\','/')
             templist.append(fn)
 
         for fn in glob.glob(self.__qmk+'keyboards/**/keymaps/**/keymap.c', recursive=True):
-            fn = fn[:-9]
+            fn = fn[:-9].replace('\\','/')
             if fn in templist:
                 templist.remove(fn)
             fn = fn.replace(self.__qmk+'keyboards/', '', 1)
             keymaplist.append(fn)
 
         for child in templist:
-            p_path = str(pathlib.Path(child).parent)
+            p_path = str(pathlib.Path(child).parent).replace('\\','/')
             p_name = p_path.replace(self.__qmk+'keyboards/', '', 1)
 
             if p_path not in templist and p_name not in defaults.qmk_nonstd_dir:
@@ -773,11 +778,10 @@ class _cache:
                 kbl_f = kbl.split('/')
                 kb_h = kbl_f[-2]        
                 kb_h += '.h'
-
                 path = qdir+kbl+kb_h
 
                 try:
-                    with open(path, 'r') as f:
+                    with open(path, 'r', encoding='utf8') as f:
                         data = str(f.read())
                 except FileNotFoundError:
                     #self.__console.warning(['Layout header not found in '+path, 'Trying a different path...'])

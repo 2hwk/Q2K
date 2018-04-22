@@ -112,3 +112,5 @@ cache/
 pref.yaml
 MANIFEST.in
 execute.py
+avr-gcc/
+
