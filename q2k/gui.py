@@ -5,8 +5,7 @@ import threading
 import traceback
 import yaml
 
-from tkinter import filedialog
-from tkinter import Tk, E, W, LEFT, INSERT, NORMAL, ttk, Menu, Text, scrolledtext, messagebox, Button, Entry, StringVar, LabelFrame, Label, Frame
+from tkinter import filedialog, Tk, E, W, LEFT, INSERT, NORMAL, ttk, Menu, Text, scrolledtext, messagebox, Button, Entry, StringVar, LabelFrame, Label, Frame
 from tkinter.ttk import Combobox
 
 class ConsoleText(Text):
@@ -14,7 +13,7 @@ class ConsoleText(Text):
     stderr and stdout.'''
 
     class IORedirector(object):
-        '''A general class for redirecting I/O to this Text widget.'''
+        '''A general class for redirecting I/O to this Text gcwidget.'''
         def __init__(self,text_area):
             self.text_area = text_area
 
@@ -77,7 +76,6 @@ class ConsoleText(Text):
 
         self.write_lock.release()
 
-
 class Window():
 
     def __init__(self):
@@ -97,8 +95,6 @@ class Window():
         # ───────────────────────────────────────────────────────────────────────────────────────────
         self.set_dirs()
         self.window.mainloop()
-
-
 
     def init_q2k_gui(self):
         self.window = Tk()
@@ -266,8 +262,6 @@ class Window():
     def show_about(self):
         messagebox.showinfo('About', 'Q2K Keymap Utility\nv '+core.defaults.version)
 
-    def show_error(self, error):
-        messagebox.showinfo('Error', error)
 
     def btn_generate_lists(self):
         self.output.start()
@@ -300,7 +294,7 @@ class Window():
         self.rev.set('')
         self.keymap.set('')
         self.template.set('')
-
+        self.btn_generate_lists()
         self.output.stop()
 
     def btn_execute(self):
@@ -311,16 +305,18 @@ class Window():
 
         try:
             self.output.start()
-
             self.q2k_app.set_kb(keyboard=kb_n, rev=rev_n, keymap=km_n, template=temp_n)
             self.q2k_app.execute()
-
             self.output.stop()
+
         except RuntimeError as e:
-            print(traceback.format_exc(), file=sys.stderr)
+            #print(traceback.format_exc(), file=sys.stderr)
+            print(str(e), file=sys.stderr)
             self.output.stop()
-            self.show_error(str(e))
 
+        except RuntimeWarning as e:
+            print(str(e), file=sys.stderr)
+            self.output.stop()
 
     def event_rev_selected(self, event=None):
 

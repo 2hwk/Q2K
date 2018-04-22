@@ -1,7 +1,7 @@
 ## Description
 ```
 Q2K Keymap Parser 
-ver. 1.0.5.a2 (Pre-Alpha) 
+ver. 1.0.6.a1 (Pre-Alpha) 
 by 2Cas (c) 2018
 ```
 
@@ -10,14 +10,16 @@ For parsing keymaps from QMK Firmware style keymap.c files to Keyplus YAML forma
 
 ## Requirements
 
-Requires: `python3-pip` `python3-tkinter` `avr-gcc` 
+Requires (pip): `python3-pip` `python3-tkinter` `avr-gcc` 
           `pyyaml` `pyparsing` `termcolor`
+
+Requires (exec): ``avr-gcc``
 
 Tested on bash on Windows 10 and Ubuntu Linux
 (Bash on Windows 10 only supports q2k-cli)
 
 ## Setup
-
+**Using PyPI and pip**
 Install the required dependencies, then run
 
 `pip3 install q2k`
@@ -27,6 +29,10 @@ Once the Q2K package has been installed...
 GUI: run with `q2k`, point to qmk root and final output directories, then hit Generate Keyboard List, select your keyboard (and options) and Convert.
 
 Command Line: `cd` into your local qmk directory and run with `q2k-cli [options]`
+
+**Using Executables**
+
+Go to the releases tab (or /bin) and get the latest executable q2k_util file. Run like a traditional program (Click/Use terminal ./q2k_util)
 
 ## Run
 `q2k` for simple tkinter based GUI

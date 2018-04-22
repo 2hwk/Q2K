@@ -11,6 +11,7 @@ import subprocess
 import pyparsing as pp
 import termcolor as tc
 import enum as en
+import tkinter as tk
 
 from q2k.reference import ref
 # ───────────────────────────────────────────────────────────────────────────────────────────
@@ -26,7 +27,7 @@ class defaults:
         frozen = False
         src = os.path.dirname(os.path.abspath(__file__))+'/'
 
-    version = '1.0.5a2'
+    version = '1.0.6.a1'
     # Directories
     libs = src+'lib/'                                # Local Libs - We want these to be in a single, FIXED directory. [Avoid using relative directories]
     cache = src+'.cache/cache_kb.yaml'               # Cache-  We want this to be in a single, FIXED directory. [Avoid using relative directories]
@@ -48,19 +49,21 @@ class _console:
         self.gui = gui
         self.errors = []
 
-    def error(self, info, fatal=True):
+    def error(self, info):
         if self.gui:
             msg = ''
             for info, line in enumerate(info):
+                msg += line+' \n'
                 if not info:
-                    msg = line
+                    warning=line
                     self.errors.append(line)
                     print('❌ ERROR: ' +line)
                 else:
                     self.errors.append(line)
                     print('• '+line)
 
-            raise RuntimeError(msg)
+            tk.messagebox.showerror('Error', msg)
+            raise RuntimeError(warning)
         else:
             error_msg = tc.colored('❌ ERROR:', 'red', attrs=['reverse', 'bold'])
             e_bullet = tc.colored('•', 'red', attrs=['bold'])
@@ -73,8 +76,7 @@ class _console:
                 else:
                     self.errors.append(line)
                     print(e_bullet + ' '+line)
-            if fatal:
-                exit()
+            exit()
 
     def bad_kc(self, kc_type, code):
         if self.gui:
@@ -88,17 +90,22 @@ class _console:
             print(bad_kc_msg+' '+code)
             self.errors.append(message)
 
-    def warning(self, info):
+    def warning(self, info, pause=False):
     
         if self.gui:
-            
+            msg = ''
             for info, line in enumerate(info):
+                msg += line+' \n'
                 if not info:
+                    warning=line
                     self.errors.append(line)
                     print('▲ WARNING: ' +line)
-                else:
+                else: 
                     self.errors.append(line)
                     print('• '+line)
+            if pause:
+                if not tk.messagebox.askyesno('Warning', msg+'\nContinue?'):
+                    raise RuntimeWarning(warning)
 
         else: 
             warning_msg = tc.colored('▲ WARNING:', 'yellow', attrs=['bold'])
@@ -112,6 +119,10 @@ class _console:
                 else:
                     self.errors.append(line)
                     print(w_bullet + ' '+line)
+            if pause:
+                print(w_bullet+' Press [ENTER] to continue')
+                input()
+
 
     def note(self, info):
         
@@ -1067,16 +1078,13 @@ class application:
             if mcu in defaults.mcu_compat:
                 continue
             else:
-                self.console.error(
+                self.console.warning(
                     ['Possible MCU incompatability detected', 
-                    'MCU type: '+mcu+' in '+kb_n+'/'+rev_n+'rules.mk', 
+                    mcu+' in '+kb_n+'/'+rev_n+'rules.mk', 
                     'Currently, keyplus supports only boards with the following microcontrollers:',
-                    str(defaults.mcu_compat),
+                    ', '.join(defaults.mcu_compat),
                     'If your board has a MCU on this list then ignore this warning as a false positive',
-                    'Else layout files produced may not work with keyplus until your board\'s mcu is supported'])
-                if not self.is_gui:
-                    self.console.warning(['Press [ENTER] to continue'], fatal=False)
-                    input()
+                    'Else layout files produced will not work with keyplus until your board\'s mcu is supported'], True)
                 return
 
         self.console.note(['No MCU incompatability detected'])
@@ -1153,7 +1161,7 @@ class application:
             else:
                 continue
 
-        self.console.warning(['Config.h header not found for '+self.build_kb.name, 'Matrix row/col pins must be provided manually!']) 
+        self.console.warning(['Config.h header not found for '+self.build_kb.name, 'Matrix row/col pins must be provided manually!'], pause=True) 
         return
 
     def __get_keycodes(self, DEBUG=False):
