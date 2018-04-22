@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='q2k',
-    version='1.0.4.a3',
+    version='1.0.5.a2',
     description='Convert AVR C based QMK keymap and matrix files to YAML Keyplus format',
     url='https://github.com/2Cas/Q2K',
     author='2Cas',
@@ -18,7 +18,7 @@ setup(
     ],
     license='MIT',
     packages=find_packages(include=['q2k', 'q2k.*']),
-    python_requires='>=3',
+    python_requires='>=3.0',
     install_requires=[
         'pyyaml', 'pyparsing', 'termcolor'
     ],

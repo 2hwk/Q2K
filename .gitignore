@@ -106,8 +106,9 @@ qmk/
 OLD/
 TEST/
 out/
+exec/
 dist/
 cache/
 pref.yaml
 MANIFEST.in
-
+execute.py

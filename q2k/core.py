@@ -10,7 +10,6 @@ import copy
 import subprocess
 import pyparsing as pp
 import termcolor as tc
-import pkg_resources as pkg
 import enum as en
 
 from q2k.reference import ref
@@ -18,22 +17,28 @@ from q2k.reference import ref
 # Defaults/Constants for Q2K
 # ───────────────────────────────────────────────────────────────────────────────────────────
 class defaults:
-    version = '1.0.4a3'
-    # Directories
-    DEBUG = False
-    if DEBUG:
-        src = ''
+
+    if getattr(sys, 'frozen', False):
+        # If Frozen - Use os.getcwd()
+        src = os.getcwd()+'/'
     else:
-        src = pkg.resource_filename(pkg.Requirement.parse("q2k"),"q2k/")
-    libs = pkg.resource_filename(pkg.Requirement.parse("q2k"),"q2k/lib/")
-    cache = src+'cache/cache_kb.yaml'
+        # If Live, use bundle_dir
+        frozen = False
+        src = os.path.dirname(os.path.abspath(__file__))+'/'
+
+    version = '1.0.5a2'
+    # Directories
+    libs = src+'lib/'
+    cache = src+'.cache/cache_kb.yaml'
     qmk = ''
-    keyp = 'q2k_out/keyplus/'
-    kbf = 'q2k_out/kbfirmware/'
+    keyp = src+'q2k_out/keyplus/'
+    kbf = src+'q2k_out/kbfirmware/'
     # Lists
     qmk_nonstd_dir = ['handwired', 'converter', 'clueboard', 'lfkeyboards'] # Currently only lfkeyboards causes any issues, however it is good to be verbose here
+    q2k_incompat = ['handwired/']
     mcu_compat = ['atmega32u4', 'atmega32u2']                               # Compatible MCU types
     kbf_mcu_compat = ['atmega32u4', 'atmega32u2']
+
 # ───────────────────────────────────────────────────────────────────────────────────────────
 # Console Output
 # ───────────────────────────────────────────────────────────────────────────────────────────
@@ -43,69 +48,88 @@ class _console:
         self.gui = gui
         self.errors = []
 
-    def error(self, info):
-        '''
+    def error(self, info, fatal=True):
         if self.gui:
-            for line in info:
-                self.errors.append(line)
+            msg = ''
+            for info, line in enumerate(info):
+                if not info:
+                    msg = line
+                    self.errors.append(line)
+                    print('❌ ERROR: ' +line)
+                else:
+                    self.errors.append(line)
+                    print('• '+line)
 
-        else:'''
-        error_msg = tc.colored('❌ ERROR:', 'red', attrs=['reverse', 'bold'])
-        e_bullet = tc.colored('•', 'red', attrs=['bold'])
+            raise RuntimeError(msg)
+        else:
+            error_msg = tc.colored('❌ ERROR:', 'red', attrs=['reverse', 'bold'])
+            e_bullet = tc.colored('•', 'red', attrs=['bold'])
             
-        for info, line in enumerate(info):
-            if not info:
-                self.errors.append(line)
-                line = tc.colored(line, 'red')
-                print(error_msg + ' ' +line)
-            else:
-                self.errors.append(line)
-                print(e_bullet + ' '+line)
+            for info, line in enumerate(info):
+                if not info:
+                    self.errors.append(line)
+                    line = tc.colored(line, 'red')
+                    print(error_msg + ' ' +line)
+                else:
+                    self.errors.append(line)
+                    print(e_bullet + ' '+line)
+            if fatal:
+                exit()
 
     def bad_kc(self, kc_type, code):
-        '''
         if self.gui:
-            for line in info:
-                self.errors.append(line)
-        else:'''
-        message = 'Invalid '+kc_type+': '+code
-        bad_kc_msg = tc.colored('❌ Invalid '+kc_type+':', 'cyan')
-        print(bad_kc_msg+' '+code)
-        self.errors.append(message)
+            message = 'Invalid '+kc_type+': '+code
+            bad_kc_msg = '❌ Invalid '+kc_type+':'
+            print(bad_kc_msg+' '+code)
+            self.errors.append(message)
+        else:
+            message = 'Invalid '+kc_type+': '+code
+            bad_kc_msg = tc.colored('❌ Invalid '+kc_type+':', 'cyan')
+            print(bad_kc_msg+' '+code)
+            self.errors.append(message)
 
     def warning(self, info):
-        '''
+    
         if self.gui:
-            for line in info:
-                self.errors.append(line)
+            
+            for info, line in enumerate(info):
+                if not info:
+                    self.errors.append(line)
+                    print('▲ WARNING: ' +line)
+                else:
+                    self.errors.append(line)
+                    print('• '+line)
+
         else: 
-        '''
-        warning_msg = tc.colored('▲ WARNING:', 'yellow', attrs=['bold'])
-        w_bullet = tc.colored('•', 'yellow', attrs=['bold'])
-        
-        for info, line in enumerate(info):
-            if not info:
-                self.errors.append(line)
-                line = tc.colored(line, 'yellow')
-                print(warning_msg + ' ' +line)
-            else:
-                self.errors.append(line)
-                print(w_bullet + ' '+line)
+            warning_msg = tc.colored('▲ WARNING:', 'yellow', attrs=['bold'])
+            w_bullet = tc.colored('•', 'yellow', attrs=['bold'])
+            
+            for info, line in enumerate(info):
+                if not info:
+                    self.errors.append(line)
+                    line = tc.colored(line, 'yellow')
+                    print(warning_msg + ' ' +line)
+                else:
+                    self.errors.append(line)
+                    print(w_bullet + ' '+line)
 
     def note(self, info):
-        '''
-        if self.gui:
-            return
-        else:
-        '''
-        note_msg = tc.colored('✔', 'green', attrs=['bold'])
-        n_bullet = tc.colored('•', 'green', attrs=['bold'])
         
-        for info, line in enumerate(info):
-            if not info:
-                print(note_msg + ' ' +line)
-            else:
-                print(n_bullet + ' '+line)
+        if self.gui:
+            for info, line in enumerate(info):
+                if not info:
+                    print('✔ ' +line)
+                else:
+                    print('• '+line)
+        else:
+            note_msg = tc.colored('✔', 'green', attrs=['bold'])
+            n_bullet = tc.colored('•', 'green', attrs=['bold'])
+            
+            for info, line in enumerate(info):
+                if not info:
+                    print(note_msg + ' ' +line)
+                else:
+                    print(n_bullet + ' '+line)
 
     def clear(self):
 
@@ -258,7 +282,7 @@ class _cpp:
                 output = e.output
                 return output
             else:
-                self.console.warning(['Potentially catastrophic compilation error'])
+                self.console.warning(['Potentially catastrophic segfault related compilation error'])
                 return
     
     def preproc_header(self, path):
@@ -294,7 +318,6 @@ class _cpp:
             return output
         else:
             self.__console.error(['Keymap cannot be read by preprocessor', 'Failed to parse keymap file'])
-            exit()
 # ───────────────────────────────────────────────────────────────────────────────────────────
 # KB Information
 # ───────────────────────────────────────────────────────────────────────────────────────────
@@ -386,7 +409,7 @@ class layout_template:
                                 continue
                     if self.layout[i][j] == col:
                         self.layout[i][j] = -1
-                        console.error(['Array key recovery failed', 'Will assume this corresponds to KC_NO'])
+                        console.warning(['Array key recovery failed', 'Will assume this corresponds to KC_NO'])
 # ───────────────────────────────────────────────────────────────────────────────────────────
 # KEYCODE layers
 # A class for storing keycode layers
@@ -711,8 +734,7 @@ class _cache:
             self.__save_cache()
             self.__console.note(['New cache_kb.yaml successfully generated', 'Location: '+self.__loc])
         else:
-            self.__console.error(['No keyboard information found', 'Check QMK directory location in pref.yaml : '+self.__qmk])
-            if not self.__console.gui: exit()
+            self.__console.warning(['No keyboard information found', 'Check QMK directory location in pref.yaml : '+self.__qmk])
         
 
     def __find_layout_names(self, kbo):
@@ -803,8 +825,8 @@ class _cache:
                         km_names.append(km)
                     return km_names
                 else: 
-                    self.__console.error(['Revision # required - Valid Revisions:'])
-                    print(self._rev_list(keyboard))
+                    print_rev_list = ', '.join(self._rev_list(keyboard))
+                    self.__console.error(['Revision # required - Valid Revisions: '+print_rev_list])
 
     def _rev_list(self, keyboard):
 
@@ -821,16 +843,15 @@ class _cache:
                     for tp in revo.template_list:
                         tp_names.append(tp)
                     return tp_names
-                else: 
-                    self.__console.error(['Revision # required - Valid Revisions:'])
-                    print(self._rev_list(keyboard))
+                else:
+                    print_rev_list = ', '.join(self._rev_list(keyboard))
+                    self.__console.error(['Revision # required - Valid Revisions: '+print_rev_list])
 # ───────────────────────────────────────────────────────────────────────────────────────────
 # Q2K Application
 # ───────────────────────────────────────────────────────────────────────────────────────────
 class application:
 
     def __init__(self, app_type, is_gui=False):
-
         self.__output = en.Enum('output', 'keyplus kbfirmware')
         self.format = self.__output[app_type]
         self.is_gui = is_gui
@@ -875,7 +896,7 @@ class application:
             try:
                 with open(defaults.src+'pref.yaml', 'r') as f:
                     self.dirs = yaml.load(f)
-                    self.console.note(['───────────────────────────────────────────────────────────────────────────────────────────', 'Using preferences from '+defaults.src+'pref.yaml', '--reset to reset to defaults'])
+                    self.console.note(['─────────────────────────────────────────────────────────────────', 'Using preferences from '+defaults.src+'pref.yaml', '--reset to reset to defaults'])
 
             except FileNotFoundError:
                 self.__generate_dirs()
@@ -897,7 +918,7 @@ class application:
         with open(defaults.src+'pref.yaml', 'w') as f:
             f.write('# Q2K Folder Locations\n')
             yaml.dump(dirs, f, default_flow_style = False)
-            self.console.note(['───────────────────────────────────────────────────────────────────────────────────────────', 'New pref.yaml generated'])
+            self.console.note(['─────────────────────────────────────────────────────────────────', 'New pref.yaml generated'])
 
     def __pop_cache_list(self):
 
@@ -906,32 +927,30 @@ class application:
     def __check_args(self):
 
         if self.__args.listkeyb and not self.is_gui:
-            self.console.note(['Listing keyboards...'])
-            print(self.keyboard_list())
+            print_kb_list = '[ '+', '.join(self.keyboard_list())+' ]'
+            self.console.note(['Listing keyboards...', print_kb_list])
             exit()
         elif self.__args.listkeyr and not self.is_gui:
-            self.console.note(['Listing revisions for '+self.__args.keyboard+'...'])
-            print(self.rev_list(self.__args.keyboard))
+            print_rev_list = '[ '+', '.join(self.rev_list(self.__args.keyboard))+' ]'
+            self.console.note(['Listing revisions for '+self.__args.keyboard+'...', print_rev_list])
             exit()
         elif self.__args.listkeym and not self.is_gui:
+            print_km_list = '[ '+', '.join(self.keymap_list(self.__args.keyboard, self.__args.rev))+' ]'
             if self.__args.rev == '':
-                self.console.note(['Listing keymaps for '+self.__args.keyboard+'...'])
-                print(self.keymap_list(self.__args.keyboard))
+                self.console.note(['Listing keymaps for '+self.__args.keyboard+'...', print_km_list])
             else:
-                self.console.note(['Listing keymaps for '+self.__args.keyboard+'/'+self.__args.rev+'...'])
-                print(self.keymap_list(self.__args.keyboard, self.__args.rev))
+                self.console.note(['Listing keymaps for '+self.__args.keyboard+'/'+self.__args.rev+'...', print_km_list])
             exit()
         elif self.__args.listkeyt and not self.is_gui:
+            print_temp_list = '[ '+', '.join(self.template_list(self.__args.keyboard, self.__args.rev))+' ]'
             if self.__args.rev == '':
-                self.console.note(['Listing layout templates for '+self.__args.keyboard+'...'])
-                self.template_list(self.__args.keyboard, self.__args.rev)
+                self.console.note(['Listing layout templates for '+self.__args.keyboard+'...', print_temp_list])
             else:
-                self.console.note(['Listing layout templates for '+self.__args.keyboard+'/'+self.__args.rev+'...'])
-                self.template_list(self.__args.keyboard)
+                self.console.note(['Listing layout templates for '+self.__args.keyboard+'/'+self.__args.rev+'...', print_temp_list])
             exit()
         elif self.__args.searchkeyb and not self.is_gui:
-            self.console.note(['Searching...'])
-            print(self.search_keyboard_list(self.__args.searchkeyb))
+            print_search_list = '[ '+', '.join(self.search_keyboard_list(self.__args.searchkeyb))+' ]'
+            self.console.note(['Searching for '+self.__args.searchkeyb+'...', print_search_list])
             exit()
 
         self.set_kb(self.__args.keyboard, self.__args.rev, self.__args.keymap, self.__args.template)
@@ -943,10 +962,8 @@ class application:
         build_kbo = ''
 
         if not keyboard:
-            self.console.error(['No keyboard name given', 'Valid Names:'])
-            if not self.is_gui:
-                print(self.keyboard_list())
-            exit()
+            print_kb_list = ', '.join(self.keyboard_list())
+            self.console.error(['No keyboard name given', 'Valid Names: '+print_kb_list])
 
         for kbo in kb_list:
             if kbo.name == keyboard:
@@ -957,36 +974,26 @@ class application:
             # Check Revision
             # Case 1: Have Revisions
             if len(build_kbo.rev_list) > 0 and rev not in build_kbo.rev_list:
-                self.console.error(['Invalid Revision - '+rev, 'Valid Revisions:'])
-                if not self.is_gui:
-                    print(self.rev_list(keyboard))
-                exit()
+                print_rev_list = ', '.join(self.rev_list(keyboard))
+                self.console.error(['Invalid Revision - '+rev, 'Valid Revisions: '+print_rev_list])
             # Case 2: No Revisions
             elif len(build_kbo.rev_list) < 1 and rev != '':
-                self.console.error(['Invalid Revision - '+rev, 'Valid Revisions:'])
-                print(self.rev_list(keyboard))
-                exit()
+                self.console.error(['Invalid Revision - '+rev, 'Valid Revisions: None'])
 
             build_revo = build_kbo.get_rev_info(rev)
             # Check Layout
             # Case 1: Have Layout Templates
             if len(build_revo.template_list) > 0 and template not in build_revo.template_list:
-                self.console.error(['Invalid Template - '+template, 'Valid Layouts:'])
-                if not self.is_gui:
-                    print(self.template_list(keyboard, rev))
-                exit()
+                print_temp_list = ', '.join(self.template_list(keyboard, rev))
+                self.console.error(['Invalid Template - '+template, 'Valid Layouts: '+print_temp_list])
             # Case 2: No Layout Templates
             elif len(build_revo.template_list) < 1 and template != '':
                 self.console.error(['Invalid Template - '+template, 'Valid Layouts: None'])
-                #print(self.template_list(keyboard, rev))
-                exit()
 
             # Check Keymap
             if keymap not in build_revo.keymap_list:
-                self.console.warning(['Invalid Keymap - '+template, 'Valid Keymaps:'])
-                if not self.is_gui:
-                    print(self.keymap_list(keyboard))
-                exit()
+                print_km_list = ', '.join(self.keymap_list(keyboard))
+                self.console.warning(['Invalid Keymap - '+template, 'Valid Keymaps: '+print_km_list])
 
             build_kbo.init_build()    
             build_revo.init_build()
@@ -996,14 +1003,12 @@ class application:
             self.build_kb = build_kbo
             self.build_rev = build_revo
             if rev:
-                self.console.note(['───────────────────────────────────────────────────────────────────────────────────────────','Building '+keyboard+'/'+rev+':'+keymap+':'+template, '───────────────────────────────────────────────────────────────────────────────────────────'])
+                self.console.note(['─────────────────────────────────────────────────────────────────','Building '+keyboard+'/'+rev+':'+keymap+':'+template, '─────────────────────────────────────────────────────────────────'])
             else:
-                self.console.note(['───────────────────────────────────────────────────────────────────────────────────────────','Building '+keyboard+':'+keymap+':'+template, '───────────────────────────────────────────────────────────────────────────────────────────'])
+                self.console.note(['─────────────────────────────────────────────────────────────────','Building '+keyboard+':'+keymap+':'+template, '─────────────────────────────────────────────────────────────────'])
         else:
-            self.console.error(['Invalid Keyboard Name - '+keyboard, 'Valid Names:'])
-            if not self.is_gui:
-                print(self.keyboard_list())
-            exit()
+            print_kb_list = ', '.join(self.keyboard_list())
+            self.console.error(['Invalid Keyboard Name - '+keyboard, 'Valid Names: '+print_kb_list])
 
     def refresh_dir(self):
         self.__set_dirs()
@@ -1062,15 +1067,15 @@ class application:
             if mcu in defaults.mcu_compat:
                 continue
             else:
-                self.console.warning(
+                self.console.error(
                     ['Possible MCU incompatability detected', 
                     'MCU type: '+mcu+' in '+kb_n+'/'+rev_n+'rules.mk', 
                     'Currently, keyplus supports only boards with the following microcontrollers:',
                     str(defaults.mcu_compat),
                     'If your board has a MCU on this list then ignore this warning as a false positive',
-                    'Else layout files produced may not work with keyplus until your board\'s mcu is supported',
-                    'Press [ENTER] to continue'])
+                    'Else layout files produced may not work with keyplus until your board\'s mcu is supported'])
                 if not self.is_gui:
+                    self.console.warning(['Press [ENTER] to continue'], fatal=False)
                     input()
                 return
 
@@ -1230,7 +1235,6 @@ class application:
 
         if not layer_list:
             self.console.error(['Parsed and found no keymap', 'Failed to parse keymap file'])
-            exit()
         else:
             revo.build_layout = layer_list
 
@@ -1344,10 +1348,8 @@ class application:
                             return
                         else:
                             self.console.error(['Corrupt/incompatible keymap', 'Invalid array value: '+str(ind)])
-                            exit()
             except TypeError:
                 self.console.error(['Corrupt layout template, invalid array index: '+str(ind)])
-                exit()
 
             if not self.build_rev.build_m_col_pins:
                 col_limit = layer.matrix_cols
@@ -1496,7 +1498,6 @@ class application:
                 f.write(output_yaml_info)
         except:
             self.console.error(['Failed to pipe output to '+output_yaml])
-            exit()
 
         if self.__args.debug or DEBUG:
             print(output_yaml_info)
@@ -1520,5 +1521,5 @@ def q2keyplus_gui(keyboard, rev, keymap, template):
     q2k.set_kb(keyboard, rev, keymap, template)
     q2k.execute()
 '''
-if __name__ == '__main__':
-    q2keyplus()
+#if __name__ == '__main__':
+    #q2keyplus()

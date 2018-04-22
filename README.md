@@ -1,7 +1,7 @@
 ## Description
 ```
 Q2K Keymap Parser 
-ver. 1.0.4.a3 (Pre-Alpha) 
+ver. 1.0.5.a2 (Pre-Alpha) 
 by 2Cas (c) 2018
 ```
 
@@ -98,39 +98,44 @@ This utility will generate this layout.yaml file automatically for you, however 
 
 ## Changing Firmware
 
-Changing firmwares from QMK to Keyplus thus involves several more steps than just simply running this utility. Layouts can be updated without flashing only after a keyplus firmware hex is flashed onto your board.
+Changing firmwares from QMK to Keyplus thus involves several more steps than just simply running this utility. Layouts can be updated without flashing only after a keyplus firmware hex is flashed onto your board. This process is thankfully a one-off, and once you have successfully flashed the firmware to your board once, you can stop messing with flashing and compiling.
 
-* Compile a 32u4 keyplus firmware hex by runnnig make (with the correct bootloader type, i.e. make BOARD=atmel-dfu). This can have an initial layout if you desire, otherwise can be left blank.
+* Compile a 32u4 keyplus firmware hex by runnnig `make` (with the correct bootloader type, i.e. `make BOARD=atmel-dfu`). This can have an initial layout if you desire, otherwise can be left blank.
 
-* Place your keyboard into bootloader mode.
+* Place your keyboard into bootloader mode. Hit the hardware reset button.
 
-* Use a flashing program of your choice (QMK Toolbox being the preferred method) to flash the keyplus hex file.
+* Use a flashing program of your choice (`QMK Toolbox` being the preferred method) to flash the keyplus hex file.
 
 * (Optional) Update the bootloader to the keyplus bootloader for 100% integration with keyplus layout and firmware loader, and driverless windows bootloader support.
 
 * Run the keyplus flasher to either initialise the layout (if none was baked into the firmware) or update the layout.
 
-* From now onwards, the keyplus flasher is all you need to update the layout. The program can also update firmware if the bootloader was switched to kp_boot_32u4, otherwise dfu-programmer and QMK toolbix are needed to flash keyplus firmware updates.
+* From now onwards, the keyplus flasher is all you need to update the layout. The program can also update firmware if the bootloader was switched to `kp_boot_32u4`, otherwise `dfu-programmer` and `QMK toolbix` are needed to flash keyplus firmware updates.
 
 ## Limitations
 
 There are several inherent limitations with this bridging utility that you should be aware of. 
 
-*Keyplus*
+**Keyplus**
+
+
 Firstly, keyplus currently ONLY supports atmega and xmega based mcus. 32a and cortex-m4 ARM based keyboards will NOT work with keyplus, although you can still export these as layout files, they will not work without the firmware support.
 
 Keyplus only supports boards running its own kp_32u4 bootloader OR the default atmel-dfu bootloader (>90% of boards). Boards with non-dfu based bootloaders, such as the newer revisions of the planck and OLKB keyboards (LUFA/QMK LUFA) and clone pro micros (Caterina) will have to UPDATE their bootloader, which is usually done with an ardunio ISP. 
 
 Thankfully, there is an included program with keyplus that will attempt to flash the custom kp_32u4 bootloader to your pro micro/device, however it is NOT gaurenteed to work (and obviously entails the risks of messing with the bootloader, which could soft-brick your board) 
 
-*Q2K*
+**Q2K**
+
 For obvious reasons it is impractical to parse through hand-written and custom C code functions and attempt to extract data from this. You may have to recreate such code similarly by hand. i.e. code which turns on particular backlight colours when a particular layer is selected, playing audio through onboard speakers on the keyboard, etc.
 
 If a QMK-exclusive function which is not supported by keyplus is defined in a keymap, an error will be displayed in the console, and the relevant keycode will be transcribed as a blank 'trns' instead, which is displayed in the console. 
 
 Additionally converting keyboards with an incompatible microcontroller or bootloader will prompt an incompatability warning in the terminal. (This is only partially implemented).
 
-Secondly, QMK has a very loose and not well defined folder structure, and does not really impose many rules or guidelines on formatting. It is natural then that as more boards are added to the QMK directory that some boards may have a non-standard enough folder structures/keymap formatting to break this script in various ways, and that config.h and keyboard.h headers may be missed. I'd like to think my code is as robust as it possibly could be to guard against this, but I feel that failure on this front is kind of inevitable.
+**QMK**
+
+QMK has a very loose and not well defined folder structure, and does not really impose many rules or guidelines on formatting. It is natural then that as more boards are added to the QMK directory that some boards may have a non-standard enough folder structures/keymap formatting to break this script in various ways, and that config.h and keyboard.h headers may be missed. I'd like to think my code is as robust as it possibly could be to guard against this, but I feel that failure on this front is kind of inevitable.
 
 A failure to read matrix column and pin data from config.h a fairly common problem, which is a fairly trivial but annoying manual fix. In some cases, this matrix row/col pin information is not contained in config.h at all and may need to be pulled from one of many possible locations, including but not limited to keymap.c, matrix.c, matrix.h, keyboard.h, etc, where often board makers will list row/pinout information within either comments or physical code. When this occurs, a warning will be printed to the console.
 
