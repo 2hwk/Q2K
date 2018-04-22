@@ -28,11 +28,11 @@ class defaults:
 
     version = '1.0.5a2'
     # Directories
-    libs = src+'lib/'
-    cache = src+'.cache/cache_kb.yaml'
-    qmk = ''
-    keyp = src+'q2k_out/keyplus/'
-    kbf = src+'q2k_out/kbfirmware/'
+    libs = src+'lib/'                                # Local Libs - We want these to be in a single, FIXED directory. [Avoid using relative directories]
+    cache = src+'.cache/cache_kb.yaml'               # Cache-  We want this to be in a single, FIXED directory. [Avoid using relative directories]
+    qmk = ''                                         # QMK Directory - To be provided by user
+    keyp = os.getcwd()+'/q2k_out/keyplus/'           # Output. This can either be fixed in one location (defined by user) or be a relative directory (default)
+    kbf = os.getcwd()+'/q2k_out/kbfirmware/'
     # Lists
     qmk_nonstd_dir = ['handwired', 'converter', 'clueboard', 'lfkeyboards'] # Currently only lfkeyboards causes any issues, however it is good to be verbose here
     q2k_incompat = ['handwired/']
