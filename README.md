@@ -15,8 +15,7 @@ Requires (pip): `python3-pip` `python3-tkinter` `avr-gcc`
 
 Requires (exec): ``avr-gcc``
 
-Tested on bash on Windows 10 and Ubuntu Linux
-(Bash on Windows 10 only supports q2k-cli)
+Tested on bash on Windows 10 (q2k-cli only), Windows 10 and Ubuntu Linux
 
 ## Setup
 **Using PyPI and pip**
@@ -30,9 +29,11 @@ GUI: run with `q2k`, point to qmk root and final output directories, then hit Ge
 
 Command Line: `cd` into your local qmk directory and run with `q2k-cli [options]`
 
-**Using Executables**
+**Using Executables (WIN/Linux)**
 
 Go to the releases tab (or /bin) and get the latest executable q2k_util file. Run like a traditional program (Click/Use terminal ./q2k_util)
+
+For the windows version, you will need [http://andybrown.me.uk/2015/03/08/avr-gcc-492/](this avr-gcc compiler installed in the avr-gcc folder at the same level as q2k_util.exe
 
 ## Run
 `q2k` for simple tkinter based GUI
