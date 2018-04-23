@@ -22,12 +22,11 @@ class defaults:
 
     if getattr(sys, 'frozen', False):
         src = os.getcwd()                                     # If Frozen - $Q2K = [cwd]
-    else:
-        # If Live, use bundle_dir
+    else:                                                     # If Live, use bundle_dir
         frozen = False
         src = os.path.dirname(os.path.abspath(__file__))      # else $Q2K is its own install dir, seperate from working directory
 
-    version = '1.0.8.a2'
+    version = q2k.__version__
     # Directories
     
     libs  = os.path.join(src, 'lib')                          # Local Libs - We want these to be in a single, FIXED directory. [Avoid using relative directories]              Default is $Q2K/libs
@@ -1031,7 +1030,8 @@ class application:
     def refresh_dir(self):
         self.__set_dirs()
 
-    def reset_dir_defaults(self):
+    def reset(self):
+        self.clear_cache()
         self.__generate_dirs()
 
     def refresh_cache(self):

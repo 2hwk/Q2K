@@ -2,6 +2,7 @@ import q2k.core as core
 import sys
 import os
 import threading
+import platform
 import traceback
 import yaml
 
@@ -52,11 +53,11 @@ class ConsoleText(Text):
         self.original_stdout = sys.stdout
         self.original_stderr = sys.stderr
 
-        stdout_redirector = ConsoleText.StdoutRedirector(self)
-        stderr_redirector = ConsoleText.StderrRedirector(self)
+        stdout_redirector    = ConsoleText.StdoutRedirector(self)
+        stderr_redirector    = ConsoleText.StderrRedirector(self)
         if not self.__debug:
-            sys.stdout = stdout_redirector
-            sys.stderr = stderr_redirector
+            sys.stdout       = stdout_redirector
+            sys.stderr       = stderr_redirector
 
     def stop(self):
 
@@ -89,7 +90,7 @@ class Window():
         # ───────────────────────────────────────────────────────────────────────────────────────────
         self.output.start() # Ensure output from loading q2k gets printed to console
         self.q2k_app = core.application('keyplus', is_gui=True)
-        self.dirs = self.q2k_app.dirs
+        self.dirs    = self.q2k_app.dirs
         self.output.stop() # Stop output printing
         # ───────────────────────────────────────────────────────────────────────────────────────────
         # Set dynamic lists and enter main loop
@@ -99,13 +100,15 @@ class Window():
 
     def init_q2k_gui(self):
         self.window = Tk()
-        #window.option_add('*Dialog.msg.font', 'Helvetica 12')
         self.window.resizable(width=False, height=False)
-        self.window.option_add('*font', 'Roboto -11')
+        if platform.system()   == 'Linux':
+            self.window.option_add('*font', ('Liberation Sans', '-12'))
+        if platform.system() == 'Windows':
+            self.window.option_add('*font', ('Segoe UI', '11'))
         self.window.title("Q2K Keymap Utility")
         self.window.geometry('380x560')
 
-        menu = Menu(self.window)
+        menu     = Menu(self.window)
         new_item = Menu(menu, tearoff=0)
         #new_item.add_command(label='Settings')
         #menu.add_cascade(label='File', menu=new_item)
@@ -117,8 +120,8 @@ class Window():
         # ──────────────────────────────────────────────────────────────────────────────────────────
 
         tab_control = ttk.Notebook(self.window)
-        tab1 = ttk.Frame(tab_control)
-        #tab2 = ttk.Frame(tab_control)
+        tab1        = ttk.Frame(tab_control)
+        #tab2       = ttk.Frame(tab_control)
         tab_control.add(tab1, text='Keyplus')
         #tab_control.add(tab2, text='KBfirmware')
         # ───────────────────────────────────────────────────────────────────────────────────────────
@@ -137,31 +140,33 @@ class Window():
         #       QMK Firmware Directory Entry
         # ───────────────────────────────────────────────────────────────────────────────────────────
         # Label
-        qmk_lbl = Label(top_frame, text='QMK Firmware Directory:')
-        qmk_lbl.grid(column=0, row=0, sticky=W)
+        qmk_lbl           = Label(top_frame, text='QMK Firmware Directory:')
         # Text Box
-        self.qmk_dir = StringVar()
-        qmk_dir = self.qmk_dir
-        qmkdir_entry = Entry(top_frame, textvariable=qmk_dir, width=44)
-        qmkdir_entry.grid(column=0, row=1, sticky=W+E)
+        self.qmk_dir      = StringVar()
+        qmkdir_entry      = Entry(top_frame, width=44, textvariable=self.qmk_dir)
         # Button
-        btn = Button(top_frame, text="..", command=lambda:self.find_directory(qmk_dir))
-        btn.grid(column=1, row=1)
+        qmk_dir_btn       = Button(top_frame, width=2, text="..", command=lambda:self.find_directory(self.qmk_dir))
 
         # ───────────────────────────────────────────────────────────────────────────────────────────
-        #       QMK Firmware Directory Entry
+        #      Keyplus Output Directory Entry
         # ───────────────────────────────────────────────────────────────────────────────────────────
         # Label
-        keyplus_lbl = Label(top_frame, text='Output Directory:')
-        keyplus_lbl.grid(column=0, row=2, sticky=W)
+        keyplus_lbl       = Label(top_frame, text='Output Directory:')
         # Text Box
-        self.keyplus_dir = StringVar()
-        keyplus_dir = self.keyplus_dir
-        keyplus_dir_entry = Entry(top_frame, textvariable=keyplus_dir, width=44)
-        keyplus_dir_entry.grid(column=0, row=3, sticky=W+E)
+        self.keyplus_dir  = StringVar()
+        keyplus_dir_entry = Entry(top_frame,  width=44, textvariable=self.keyplus_dir)
+
         # Button
-        btn = Button(top_frame, text="..", command=lambda:self.find_directory(keyplus_dir))
-        btn.grid(column=1, row=3)
+        keyplus_dir_btn   = Button(top_frame, width=2, text="..", command=lambda:self.find_directory(self.keyplus_dir))
+
+        # Settings / Positioning
+        qmk_lbl.grid          (row=0, column=0,   sticky=W)
+        keyplus_lbl.grid      (row=2, column=0,   sticky=W)
+
+        qmkdir_entry.grid     (row=1, column=0, sticky=W+E)
+        qmk_dir_btn.grid      (row=1, column=1)
+        keyplus_dir_entry.grid(row=3, column=0, sticky=W+E)
+        keyplus_dir_btn.grid  (row=3, column=1)
         # ───────────────────────────────────────────────────────────────────────────────────────────
         #   Frame 2 - Combo Boxes
         # ───────────────────────────────────────────────────────────────────────────────────────────
@@ -173,26 +178,30 @@ class Window():
         #          | Keymap                 |  Template            | 
         # ───────────────────────────────────────────────────────────────────────────────────────────
         # Labels
-        kb_lbl = Label(kb_opts, text='Keyboard:')
-        rev_lbl = Label(kb_opts, text='Rev:')
-        keymap_lbl = Label(kb_opts, text='Keymap:')
+        kb_lbl       = Label(kb_opts, text='Keyboard:')
+        rev_lbl      = Label(kb_opts, text='Rev:')
+        keymap_lbl   = Label(kb_opts, text='Keymap:')
         template_lbl = Label(kb_opts, text='Template:')
+
         # Combo Boxes
         self.template = Combobox(kb_opts, width=22, state='readonly')
-        self.keymap = Combobox(kb_opts, width=22, state='readonly')
-        self.rev = Combobox(kb_opts, width=22, state='readonly')
+        self.keymap   = Combobox(kb_opts, width=22, state='readonly')
+        self.rev      = Combobox(kb_opts, width=22, state='readonly')
+        self.kb       = Combobox(kb_opts, width=22,  state='readonly')
+
         self.rev.bind('<<ComboboxSelected>>', self.event_rev_selected) # Updating list triggers event rev_select
-        self.kb = Combobox(kb_opts, width=22,  state='readonly')
-        self.kb.bind('<<ComboboxSelected>>', self.event_kb_selected) # Updating list triggers event kb_select
-        # Settings/Location
-        kb_lbl.grid(sticky='w',column=0, row=0)
-        rev_lbl.grid(sticky='w',column=1, row=0)
-        keymap_lbl.grid(sticky='w',column=0, row=2)
-        template_lbl.grid(sticky='w',column=1, row=2)
-        self.kb.grid(column=0,row=1)
-        self.rev.grid(column=1,row=1)
-        self.keymap.grid(column=0,row=3)
-        self.template.grid(column=1,row=3)
+        self.kb.bind( '<<ComboboxSelected>>', self.event_kb_selected)   # Updating list triggers event kb_select
+
+        # Settings / Positioning
+        self.kb.grid       (row=1, column=0)
+        self.rev.grid      (row=1, column=1)
+        self.keymap.grid   (row=3, column=0)
+        self.template.grid (row=3, column=1)
+
+        kb_lbl.grid        (row=0, column=0, sticky=W)
+        rev_lbl.grid       (row=0, column=1, sticky=W)
+        keymap_lbl.grid    (row=2, column=0, sticky=W)
+        template_lbl.grid  (row=2, column=1, sticky=W)
         # ───────────────────────────────────────────────────────────────────────────────────────────
         # Frame 3 - Buttons 
         # ───────────────────────────────────────────────────────────────────────────────────────────
@@ -201,12 +210,14 @@ class Window():
         # ───────────────────────────────────────────────────────────────────────────────────────────
         #     Buttons:  | Convert | Generate Keyboard List | Reset |
         # ───────────────────────────────────────────────────────────────────────────────────────────
-        btn = Button(kb_opts2, text='Generate Keyboard List', command=lambda:self.btn_generate_lists())
-        btn.grid(padx=5, row=0, column=1)
-        btn = Button(kb_opts2, text='Reset', command=lambda:self.btn_reset())
-        btn.grid(row=0, column=2)
-        btn = Button(kb_opts2, text='Convert', command=lambda:self.btn_execute())
-        btn.grid(row=0, column=0)
+
+        convert_btn = Button(kb_opts2, text='Convert', command=lambda:self.btn_execute())
+        gen_btn     = Button(kb_opts2, text='Generate Keyboard List', command=lambda:self.btn_generate_lists())
+        reset_btn   = Button(kb_opts2, text='Reset', command=lambda:self.btn_reset())
+
+        convert_btn.grid(row=0, column=0)
+        gen_btn.grid    (row=0, column=1, padx=5)
+        reset_btn.grid  (row=0, column=2)
         # ───────────────────────────────────────────────────────────────────────────────────────────
         # Frame 4 - Output 
         # ───────────────────────────────────────────────────────────────────────────────────────────
@@ -219,7 +230,12 @@ class Window():
         con_lbl = Label(console, text='Console')
         con_lbl.grid(padx=5, row=0, column=0)
         # Text Box
-        self.output = ConsoleText(console, height=27, width=56, bd=0, bg='black', fg='white', font='Consolas 8')
+        self.output = ConsoleText(console, height=27, width=56, bd=0, bg='black', fg='white')
+        if platform.system()   == 'Linux':
+            self.output['font'] = ('Consolas', '8')
+        elif platform.system() == 'Windows':
+            self.output['font'] = ('Segoe UI Mono', '8')
+
         self.output.grid(padx=5, row=1, column=0, sticky=W+E)
 
         # KBfirmware
@@ -254,6 +270,7 @@ class Window():
 
         kb_list = self.q2k_app.keyboard_list()
         kb_list.sort()
+
         self.kb['values'] = kb_list
 
     def find_directory(self, string):
@@ -267,42 +284,53 @@ class Window():
     def btn_generate_lists(self):
         self.output.start()
 
+        # Get dirs from StringVars
         self.dirs['QMK dir'] = self.qmk_dir.get()
         self.dirs['Keyplus YAML output'] = self.keyplus_dir.get()
-
+        # Save to pref.yaml
         pref_yaml = os.path.join(core.defaults.src, 'pref.yaml')
-
         with open(pref_yaml, 'w') as f:
             f.write('# Q2K Folder Locations\n')
             yaml.dump(self.dirs, f, default_flow_style = False)
-
+        # Refresh Q2K App variables
         self.q2k_app.refresh_dir()
         self.q2k_app.refresh_cache()
+        # Get KB list, sort and set combobox to this list.
         kb_list = self.q2k_app.keyboard_list()
         kb_list.sort()
         self.kb['values'] = kb_list
+        # Reset comboboxes to blank
         self.kb.set('')
         self.rev.set('')
         self.keymap.set('')
         self.template.set('')
+
+        self.output.stop()
 
     def btn_reset(self):
         self.output.start()
 
-        self.q2k_app.reset_dir_defaults()
+        # Reset Q2K App to defaults
+        self.q2k_app.reset()
+        # Set fields to defaults
         self.qmk_dir.set(core.defaults.qmk)
         self.keyplus_dir.set(core.defaults.keyp)
+        # Set all combo boxes to blank
         self.kb.set('')
         self.rev.set('')
         self.keymap.set('')
         self.template.set('')
-        self.btn_generate_lists()
+        # Get KB list, sort and set combobox to this list.
+        kb_list = self.q2k_app.keyboard_list()
+        kb_list.sort()
+        self.kb['values'] = kb_list
+
         self.output.stop()
 
     def btn_execute(self):
-        kb_n = self.kb.get()
-        rev_n = self.rev.get()
-        km_n = self.keymap.get()
+        kb_n   = self.kb.get()
+        rev_n  = self.rev.get()
+        km_n   = self.keymap.get()
         temp_n = self.template.get()
 
         try:
@@ -322,12 +350,12 @@ class Window():
 
     def event_rev_selected(self, event=None):
 
-        keymap_list = self.q2k_app.keymap_list(self.kb.get(), self.rev.get())
+        keymap_list   = self.q2k_app.keymap_list(self.kb.get(), self.rev.get())
         template_list = self.q2k_app.template_list(self.kb.get(), self.rev.get())
         if keymap_list:
             keymap_list.sort()
 
-        self.keymap['values'] = keymap_list
+        self.keymap['values']   = keymap_list
         self.template['values'] = template_list
         if keymap_list and 'default' in keymap_list:
             self.keymap.set('default')
@@ -351,13 +379,13 @@ class Window():
 
         else:
 
-            keymap_list = self.q2k_app.keymap_list(self.kb.get())
+            keymap_list   = self.q2k_app.keymap_list(self.kb.get())
             template_list = self.q2k_app.template_list(self.kb.get())
             if keymap_list:
                 keymap_list.sort()
 
-            self.rev['values']= rev_list
-            self.keymap['values'] = keymap_list
+            self.rev['values']      = rev_list
+            self.keymap['values']   = keymap_list
             self.template['values'] = template_list
 
 

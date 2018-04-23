@@ -6,3 +6,4 @@
 from q2k.reference import *
 from q2k.core import *
 from q2k.gui import *
+from q2k.version import *
