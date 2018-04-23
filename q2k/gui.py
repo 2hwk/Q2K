@@ -258,6 +258,7 @@ class Window():
 
     def find_directory(self, string):
         folder_selected = filedialog.askdirectory()
+        string.set(folder_selected)
 
     def show_about(self):
         messagebox.showinfo('About', 'Q2K Keymap Utility\nv '+core.defaults.version)
