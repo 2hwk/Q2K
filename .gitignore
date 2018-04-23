@@ -113,5 +113,7 @@ pref.yaml
 MANIFEST.in
 execute.py
 avr-gcc/
-
+*.lnk
+*.tar.gz
+*.zip
 q2k/BUILD EXEC.lnk

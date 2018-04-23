@@ -277,14 +277,14 @@ class _cpp:
 
     def __preproc(self, kblibs, arg_list, DEBUG=False):
         # Setting up -I and custom define options
-        qdir           = os.path.join(self.__dirs['QMK dir'], 'keyboards')
-        kb             = self.__kb.name
+        qdir = os.path.join(self.__dirs['QMK dir'], 'keyboards')
+        kb = self.__kb.name
         if platform.system() == 'Linux':
-            cc         = ['avr-gcc', '-E']
+            cc = ['avr-gcc', '-E']
         elif platform.system() == 'Windows':
-            avr_gcc    = os.path.join(defaults.src, 'avr-gcc', 'bin', 'avr-gcc.exe')
-            cc         = [avr_gcc, '-E']
-        kbdefine       = 'KEYBOARD_'+'_'.join(kblibs)
+            avr_gcc = os.path.join(defaults.src, 'avr-gcc', 'bin', 'avr-gcc.exe')
+            cc = [avr_gcc, '-E']
+        kbdefine = 'KEYBOARD_'+'_'.join(kblibs)
         QMK_KEYBOARD_H = 'QMK_KEYBOARD_H=\"'+kb+'.h\"'
         libs = ['-D', kbdefine, '-D', QMK_KEYBOARD_H, '-I'+self.__dirs['Local libs']]
         path = qdir
@@ -342,7 +342,6 @@ class _cpp:
 # ===========================================================================================
 # KB Information
 # ===========================================================================================
-
 class kb_info:
 
     def __init__(self, n=''):
@@ -373,7 +372,7 @@ class kb_info:
                return r
             if r.name == 'n/a':
                return r
-# ===========================================================================================
+#───────────────────────────────────────────────────────────────────────────────────────────
 # KB and revision Information
 # ===========================================================================================
 class rev_info:
@@ -803,7 +802,9 @@ class _cache:
 
     def __save_cache(self):
         path = os.path.split(self.__loc)[0]
-        
+        print(self.__loc)
+        print(path)
+        #======================================================================================================================
         if not os.path.exists(path):
             try:
                 os.makedirs(path)
@@ -909,19 +910,12 @@ class application:
                 with open(pref_yaml, 'r') as f:
                     self.dirs = yaml.load(f)
 
-                for key, value in self.dirs.items():
-                    self.dirs[key] = os.path.normpath(value)
-
-                if platform.system() == 'Linux':
-                    lines = '─────────────────────────────────────────────────────────────────'
-                elif platform.system() == 'Windows':
-                    lines = '───────────────────────────────────────────────────────'
-                self.console.note([lines, 'Using preferences from '+pref_yaml, '--reset to reset to defaults'])
+                    self.console.note(['─────────────────────────────────────────────────────────────────', 'Using preferences from '+pref_yaml, '--reset to reset to defaults'])
 
             except FileNotFoundError:
                 self.__generate_dirs()
 
-            except AttributeError:  
+            except AttributeError:
                 self.__generate_dirs()
 
     def __generate_dirs(self):
@@ -939,11 +933,7 @@ class application:
             with open(pref_yaml, 'w') as f:
                 f.write('# Q2K Folder Locations\n')
                 yaml.dump(dirs, f, default_flow_style = False)
-                if platform.system() == 'Linux':
-                    lines = '─────────────────────────────────────────────────────────────────'
-                elif platform.system() == 'Windows':
-                    lines = '───────────────────────────────────────────────────────'
-                self.console.note([lines, 'New pref.yaml generated @ '+pref_yaml])
+                self.console.note(['─────────────────────────────────────────────────────────────────', 'New pref.yaml generated @ '+pref_yaml])
 
         except FileNotFoundError:
             self.console.error(['Failed to generate '+pref_yaml])
@@ -1553,3 +1543,4 @@ def q2keyplus_gui(keyboard, rev, keymap, template):
 # Uncomment this to run as a traditional python script (Commnand Line Interface)
 #if __name__ == '__main__':
     #q2keyplus()
+
