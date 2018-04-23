@@ -15,6 +15,7 @@ import enum as en
 import tkinter as tk
 
 from q2k.reference import ref
+from q2k.version import q2kversion
 # ===========================================================================================
 # Default Constants for Q2K
 # ===========================================================================================
@@ -26,7 +27,7 @@ class defaults:
         frozen = False
         src = os.path.dirname(os.path.abspath(__file__))      # else $Q2K is its own install dir, seperate from working directory
 
-    version = q2k.__version__
+    version = q2kversion
     # Directories
     
     libs  = os.path.join(src, 'lib')                          # Local Libs - We want these to be in a single, FIXED directory. [Avoid using relative directories]              Default is $Q2K/libs

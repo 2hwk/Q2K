@@ -1,1 +1,1 @@
-__version__ = '1.0.8.a3'
+q2kversion = '1.0.8.a4'
