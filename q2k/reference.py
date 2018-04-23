@@ -406,8 +406,8 @@ class ref:
         "DF("                              :          "set_L",                       # Feature not fully implemented in K+
 
     }                      
-    # QMK -> Keyplus functions
-    keyp_func = {
+    # QMK -> Keyplus Modifier functions
+    keyp_mods = {
         # Mod Keys
         "LCTL("                            :          "C",
         "LSFT("                            :          "S",

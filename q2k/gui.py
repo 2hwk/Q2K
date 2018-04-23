@@ -28,6 +28,7 @@ class ConsoleText(Text):
             self.text_area.write(str,True)
 
     def __init__(self, master=None, cnf={}, **kw):
+        self.__debug = False
         '''See the __init__ for Tkinter.Text for most of this stuff.'''
 
         Text.__init__(self, master, cnf, **kw)
@@ -53,9 +54,9 @@ class ConsoleText(Text):
 
         stdout_redirector = ConsoleText.StdoutRedirector(self)
         stderr_redirector = ConsoleText.StderrRedirector(self)
-
-        sys.stdout = stdout_redirector
-        sys.stderr = stderr_redirector
+        if not self.__debug:
+            sys.stdout = stdout_redirector
+            sys.stderr = stderr_redirector
 
     def stop(self):
 
@@ -63,9 +64,9 @@ class ConsoleText(Text):
             return
 
         self.started = False
-
-        sys.stdout = self.original_stdout
-        sys.stderr = self.original_stderr
+        if not self.__debug:
+            sys.stdout = self.original_stdout
+            sys.stderr = self.original_stderr
 
     def write(self,val,is_stderr=False):
 
@@ -257,7 +258,6 @@ class Window():
 
     def find_directory(self, string):
         folder_selected = filedialog.askdirectory()
-        string.set(folder_selected+'/')
 
     def show_about(self):
         messagebox.showinfo('About', 'Q2K Keymap Utility\nv '+core.defaults.version)
@@ -269,7 +269,9 @@ class Window():
         self.dirs['QMK dir'] = self.qmk_dir.get()
         self.dirs['Keyplus YAML output'] = self.keyplus_dir.get()
 
-        with open(core.defaults.src+'pref.yaml', 'w') as f:
+        pref_yaml = os.path.join(core.defaults.src, 'pref.yaml')
+
+        with open(pref_yaml, 'w') as f:
             f.write('# Q2K Folder Locations\n')
             yaml.dump(self.dirs, f, default_flow_style = False)
 
@@ -287,7 +289,6 @@ class Window():
         self.output.start()
 
         self.q2k_app.reset_dir_defaults()
-        self.q2k_app.clear_cache()
         self.qmk_dir.set(core.defaults.qmk)
         self.keyplus_dir.set(core.defaults.keyp)
         self.kb.set('')

@@ -15,35 +15,38 @@ import enum as en
 import tkinter as tk
 
 from q2k.reference import ref
-# ───────────────────────────────────────────────────────────────────────────────────────────
-# Defaults/Constants for Q2K
-# ───────────────────────────────────────────────────────────────────────────────────────────
+# ===========================================================================================
+# Default Constants for Q2K
+# ===========================================================================================
 class defaults:
 
     if getattr(sys, 'frozen', False):
-        # If Frozen - Use os.getcwd()
-        src = os.getcwd().replace('\\', '/')+'/'
+        src = os.getcwd()                                     # If Frozen - $Q2K = [cwd]
     else:
         # If Live, use bundle_dir
         frozen = False
-        src = os.path.dirname(os.path.abspath(__file__)).replace('\\', '/')+'/'
+        src = os.path.dirname(os.path.abspath(__file__))      # else $Q2K is its own install dir, seperate from working directory
 
-    version = '1.0.6.a1'
+    version = '1.0.8.a2'
     # Directories
-    libs = src+'lib/'                                # Local Libs - We want these to be in a single, FIXED directory. [Avoid using relative directories]
-    cache = src+'.cache/cache_kb.yaml'               # Cache-  We want this to be in a single, FIXED directory. [Avoid using relative directories]
-    qmk = ''                                         # QMK Directory - To be provided by user
-    keyp = os.getcwd().replace('\\', '/')+'/q2k_out/keyplus/'           # Output. This can either be fixed in one location (defined by user) or be a relative directory (default)
-    kbf = os.getcwd().replace('\\', '/')+'/q2k_out/kbfirmware/'
+    
+    libs  = os.path.join(src, 'lib')                          # Local Libs - We want these to be in a single, FIXED directory. [Avoid using relative directories]              Default is $Q2K/libs
+    cache = os.path.join(src, '.cache','cache_kb.yaml')       # Cache -  We want this to be in a single, FIXED directory. [Avoid using relative directories]                   Default is $Q2K/.cache/cache_kb.yaml
+    qmk   = os.path.join(src, 'qmk')                          # QMK Directory - To be provided by user                                                                         Default is [cwd]/qmk
+    keyp  = os.path.join(os.getcwd(),'q2k_out','keyplus')     # Output. This can either be fixed in one location (defined by user) or be a relative directory (default)        Default is [cwd]/q2k_out/keyplus
+    kbf   = os.path.join(os.getcwd(),'q2k_out','kbfirmware')
     # Lists
-    qmk_nonstd_dir = ['handwired', 'converter', 'clueboard', 'lfkeyboards'] # Currently only lfkeyboards causes any issues, however it is good to be verbose here
-    q2k_incompat = ['handwired/']
-    mcu_compat = ['atmega32u4', 'atmega32u2']                               # Compatible MCU types
-    kbf_mcu_compat = ['atmega32u4', 'atmega32u2']
+    qmk_nonstd_dir = ['handwired', 'converter', 
+                      'clueboard', 'lfkeyboards']             # Currently only lfkeyboards causes any issues, however it is good to be verbose here
+    mcu_compat     = ['atmega32u4']                           # Compatible MCU types
+    kbf_mcu_compat = ['atmega32u4', 'atmega32u2', 
+                      'at90usb1286']
+    # Misc
+    invalid_kc = 'trns'                                       # What to set invalid KC codes to
 
-# ───────────────────────────────────────────────────────────────────────────────────────────
+# ===========================================================================================
 # Console Output
-# ───────────────────────────────────────────────────────────────────────────────────────────
+# ===========================================================================================
 class _console:
 
     def __init__(self, gui):
@@ -146,28 +149,29 @@ class _console:
     def clear(self):
 
         self.errors = []
-# ───────────────────────────────────────────────────────────────────────────────────────────
+# ===========================================================================================
 # Text parsing
-# ───────────────────────────────────────────────────────────────────────────────────────────
+# ===========================================================================================
 class _parse_txt:
 
     def layout_headers(data):
 
+        data = str(data.replace('\\n', ' '))
         LPAREN, RPAREN, LBRAC, RBRAC, COMMA = map(pp.Suppress, "(){},")
         BSLASH = pp.Suppress(pp.Literal('\\'))
 
-        define = pp.Suppress(pp.Literal('#define'))
-        name = pp.Word(pp.alphanums+'_')
-        macrovar = pp.Word(pp.alphanums+'_#')
+        define     = pp.Suppress(pp.Literal('#define'))
+        name       = pp.Word(pp.alphanums+'_')
+        macrovar   = pp.Word(pp.alphanums+'_#')
         layout_row = pp.Group(pp.OneOrMore(macrovar + pp.Optional(COMMA)) + pp.ZeroOrMore(BSLASH))
-        layout =  LPAREN + pp.ZeroOrMore(BSLASH) + pp.OneOrMore(layout_row) + RPAREN
+        layout     =  LPAREN + pp.ZeroOrMore(BSLASH) + pp.OneOrMore(layout_row) + RPAREN
         matrix_row = pp.ZeroOrMore(BSLASH) + pp.Optional(LBRAC) +  pp.ZeroOrMore(BSLASH) + pp.OneOrMore(macrovar + pp.Optional(COMMA)) + pp.ZeroOrMore(RBRAC) + pp.Optional(COMMA) + pp.ZeroOrMore(BSLASH)
-        matrix = pp.ZeroOrMore(BSLASH) + LBRAC +  pp.ZeroOrMore(BSLASH) + pp.OneOrMore(matrix_row) +  pp.ZeroOrMore(BSLASH) + RBRAC +  pp.ZeroOrMore(BSLASH)
+        matrix     = pp.ZeroOrMore(BSLASH) + LBRAC +  pp.ZeroOrMore(BSLASH) + pp.OneOrMore(matrix_row) +  pp.ZeroOrMore(BSLASH) + RBRAC +  pp.ZeroOrMore(BSLASH)
 
-        header = define + name('name') + pp.ZeroOrMore(BSLASH) + layout('layout') + pp.ZeroOrMore(BSLASH) + matrix('array')
+        header     = define + name('name') + pp.ZeroOrMore(BSLASH) + layout('layout') + pp.ZeroOrMore(BSLASH) + matrix('array')
         header.ignore(pp.cStyleComment)
 
-        hresults = list(header.scanString(data))
+        hresults   = list(header.scanString(data))
         names = []
         for tokens, start, end in (hresults):
             i = 0
@@ -183,7 +187,7 @@ class _parse_txt:
 
     def config_headers(data):
 
-        data = str(data)
+        data = str(data.replace('\\n', ' '))
         matrix_pins = []
         matrix_row_pins = []
         matrix_col_pins = []
@@ -191,9 +195,9 @@ class _parse_txt:
         LBRAC, RBRAC, COMMA = map(pp.Suppress, "{},")
         define_rows = pp.Suppress(pp.Literal('#define MATRIX_ROW_PINS'))
         define_cols = pp.Suppress(pp.Literal('#define MATRIX_COL_PINS'))
-        pincode = pp.Word(pp.alphanums) | pp.Word(pp.nums)
+        pincode     = pp.Word(pp.alphanums) | pp.Word(pp.nums)
 
-        array = LBRAC + pp.ZeroOrMore(pincode + pp.Optional(COMMA)) + RBRAC
+        array       = LBRAC + pp.ZeroOrMore(pincode + pp.Optional(COMMA)) + RBRAC
         matrix_rows = define_rows + LBRAC + pp.ZeroOrMore(pincode + pp.Optional(COMMA)) + RBRAC
         matrix_cols = define_cols + LBRAC + pp.ZeroOrMore(pincode + pp.Optional(COMMA)) + RBRAC
 
@@ -210,10 +214,10 @@ class _parse_txt:
 
     def rules_mk(data):
 
-        data = str(data)
-        EQUALS = pp.Suppress('=')
-        mcu_tag = pp.Suppress(pp.Literal('MCU'))
-        mcu_type = pp.Word(pp.alphanums+'_')
+        data = str(data.replace('\\n', ' '))
+        EQUALS    = pp.Suppress('=')
+        mcu_tag   = pp.Suppress(pp.Literal('MCU'))
+        mcu_type  = pp.Word(pp.alphanums+'_')
 
         mcu = mcu_tag + EQUALS + mcu_type('mcu')
         mcu.ignore('#'+pp.restOfLine)
@@ -222,46 +226,48 @@ class _parse_txt:
 
     def keymaps(data):
 
-        data = str(data)
+        data = str(data.replace('\\n', ' '))
         LBRAC, RBRAC,EQ, COMMA = map(pp.Suppress,"{}=,")
 
-        integer = pp.Word(pp.nums)
-        keycode = pp.Word(pp.alphanums+'_'+'('+')')
-        layer_string = pp.Word(pp.printables) | pp.Word(pp.nums)
+        integer       = pp.Word(pp.nums)
+        keycode       = pp.Word(pp.alphanums+'_'+'('+')')
+        layer_string  = pp.Word(pp.printables) | pp.Word(pp.nums)
 
-        keycode_list = pp.Group(pp.ZeroOrMore(keycode + pp.Optional(COMMA)))
-        row = LBRAC + keycode_list + RBRAC
+        keycode_list  = pp.Group(pp.ZeroOrMore(keycode + pp.Optional(COMMA)))
+        row           = LBRAC + keycode_list + RBRAC
 
-        layern = layer_string('layer_name') + EQ
+        layern        = layer_string('layer_name') + EQ
         km_layer_data = LBRAC + pp.OneOrMore(row + pp.Optional(COMMA)) + RBRAC
-        km_layer = pp.Optional(layern) + km_layer_data('layer') + pp.Optional(COMMA)
+        km_layer      = pp.Optional(layern) + km_layer_data('layer') + pp.Optional(COMMA)
+
         km_layer.ignore(pp.cppStyleComment+pp.pythonStyleComment)
 
         return km_layer.scanString(data)
 
     def keymap_functions(data):
 
-        data = str(data)
+        data = str(data.replace('\\n', ' '))
         LSQBRAC, RSQBRAC, EQ, COMMA = map(pp.Suppress,"[]=,")
-        words = pp.Word(pp.alphanums+'_')
-        function_header = pp.Literal('fn_actions[] = {')
 
-        func_index = LSQBRAC + pp.Word(pp.alphanums+'_') + RSQBRAC + EQ
-        func_name = words
+        words       = pp.Word(pp.alphanums+'_')
+        function_h  = pp.Literal('fn_actions[] = {')
+
+        func_index  = LSQBRAC + pp.Word(pp.alphanums+'_') + RSQBRAC + EQ
+        func_name   = words
         func_params = pp.Combine( '(' + pp.ZeroOrMore(words + pp.Optional(',')) + ')', adjacent=False)
-        func = pp.Group(pp.Optional(func_index) + pp.Combine(func_name + func_params, adjacent=False))
-        func_list = pp.Group(pp.ZeroOrMore( func + pp.Optional(COMMA) ) )
-        EOF = pp.Literal('}')
+        func        = pp.Group(pp.Optional(func_index) + pp.Combine(func_name + func_params, adjacent=False))
+        func_list   = pp.Group(pp.ZeroOrMore( func + pp.Optional(COMMA) ) )
+        EOF         = pp.Literal('}')
+        function    = pp.Suppress(function_h) + func_list('function') + pp.Suppress(EOF)
 
-        function = pp.Suppress(function_header) + func_list('function') + pp.Suppress(EOF)
         function.ignore(pp.cppStyleComment)
 
         results = list(function.scanString(data))
 
         return results
-# ───────────────────────────────────────────────────────────────────────────────────────────
+# ===========================================================================================
 # Pre-processing
-# ───────────────────────────────────────────────────────────────────────────────────────────
+# ===========================================================================================
 class _cpp:
 
     def __init__(self, kbo, dirs, console):
@@ -271,21 +277,20 @@ class _cpp:
 
     def __preproc(self, kblibs, arg_list, DEBUG=False):
         # Setting up -I and custom define options
-        qdir = self.__dirs['QMK dir'] + 'keyboards/'
+        qdir = os.path.join(self.__dirs['QMK dir'], 'keyboards')
         kb = self.__kb.name
         if platform.system() == 'Linux':
             cc = ['avr-gcc', '-E']
         elif platform.system() == 'Windows':
-            avr_gcc = defaults.src + 'avr-gcc/bin/avr-gcc.exe'
+            avr_gcc = os.path.join(defaults.src, 'avr-gcc', 'bin', 'avr-gcc.exe')
             cc = [avr_gcc, '-E']
         kbdefine = 'KEYBOARD_'+'_'.join(kblibs)
         QMK_KEYBOARD_H = 'QMK_KEYBOARD_H=\"'+kb+'.h\"'
         libs = ['-D', kbdefine, '-D', QMK_KEYBOARD_H, '-I'+self.__dirs['Local libs']]
         path = qdir
         for kbl in kblibs:
-            kbl += '/'
-            path += kbl
-            libs.append('-I'+path)
+            path = os.path.join(path, kbl)
+            libs.append('-I'+path+os.sep)
         argv = cc + libs + arg_list
         if DEBUG: print(' '.join(argv))
         try:
@@ -309,51 +314,51 @@ class _cpp:
 
         arg = [ '-D', 'QMK_KEYBOARD_CONFIG_H=\"config_common.h\"', '-dD', path ]
         if os.path.isfile(path):
-            output = str(self.__preproc(kblibs, arg)).replace('\\n', ' ')
+            output = str(self.__preproc(kblibs, arg))
             return output
 
     def preproc_keymap(self):
 
-        qdir = self.__dirs['QMK dir'] +'keyboards/'
+        qdir = os.path.join(self.__dirs['QMK dir'], 'keyboards')
         kb = self.__kb.name
-        km = self.__kb.build_keymap+'/keymap.c'
+        km = os.path.join(self.__kb.build_keymap, 'keymap.c')
         kblibs = list(self.__kb.libs)
         rev = self.__kb.build_rev
         if rev != '':
             kblibs.append(rev)
 
         # KEYMAP
-        keym = qdir+kb+'/keymaps/'+km
-        if rev != '' and not os.path.isfile(keym):
-            keym = qdir+kb+'/'+rev+'/keymaps/'+km
+        keym = os.path.join(qdir, kb, rev, 'keymaps', km)
+        if not os.path.isfile(keym):
+            keym = os.path.join(qdir, kb, 'keymaps', km)
 
         # OUTPUT
         argkm = [keym]
         if os.path.isfile(keym):
-            output = str(self.__preproc(kblibs, argkm)).replace('\\n', ' ')
+            output = str(self.__preproc(kblibs, argkm))
             return output
         else:
             self.__console.error(['Keymap cannot be read by preprocessor', 'Failed to parse keymap file'])
-# ───────────────────────────────────────────────────────────────────────────────────────────
+# ===========================================================================================
 # KB Information
-# ───────────────────────────────────────────────────────────────────────────────────────────
+# ===========================================================================================
 class kb_info:
 
     def __init__(self, n=''):
 
-        self.name = n                       # Name of keyboard
-        self.libs = []                      # Possible QMK lib folders (partly depreciated)
-        self.rev_list = []                  # List of rev obj names
-        self.rev_info = []                  # A list of rev_info objects
+        self.name              = n             # Name of keyboard
+        self.libs              = []            # Possible QMK lib folders (partly depreciated)
+        self.rev_list          = []            # List of rev obj names
+        self.rev_info          = []            # A list of rev_info objects
 
     def init_build(self):
 
-        self.build_rev = ''               # What revision to build with
-        self.build_keymap = ''              # What keymap to build with
-        self.build_template = ''            # What layout to build with
+        self.build_rev         = ''            # What revision to build with
+        self.build_keymap      = ''            # What keymap to build with
+        self.build_template    = ''            # What layout to build with
 
-        #self.build_m_row_pins = []          # Row pins
-        #self.build_m_col_pins = []          # Column 
+        #self.build_m_row_pins = []            # Row pins
+        #self.build_m_col_pins = []            # Column 
 
     def add_rev_list(self, rev, flag=False):
         if not flag:
@@ -368,38 +373,37 @@ class kb_info:
             if r.name == 'n/a':
                return r
 #───────────────────────────────────────────────────────────────────────────────────────────
-# KB/revision Information
-# ───────────────────────────────────────────────────────────────────────────────────────────
+# KB and revision Information
+# ===========================================================================================
 class rev_info:
 
     def __init__ (self, n='', flag=False):
 
-        self.name = n                      # Name of Revision
-        self.keymap_list = []              # List of layout NAMES
-        self.template_list = []            # List of template NAMES
-        self.template_loc = ''             # Location of <keyboard>.h
-        self.is_default = flag             # Does keyboard have revisions? (or just default)
+        self.name             = n                # Name of Revision
+        self.keymap_list      = []               # List of layout NAMES
+        self.template_list    = []               # List of template NAMES
+        self.template_loc     = ''               # Location of <keyboard>.h
+        self.is_default       = flag             # Does keyboard have revisions? (or just default)
 
     def init_build(self):
-        # TODO: Possibly move ALL build information to kb_info? Or keep it like it is?
 
-        self.build_mcu_list = []                 # MCU list
+        self.build_mcu_list   = []               # MCU list
         self.build_m_row_pins = []               # Row pins
         self.build_m_col_pins = []               # Column  pins
 
-        self.build_layout = []                   # list of keycode_layers objects (which form layout) -> Final yaml/json output comes from here
-        self.build_templates = []                # list of layout_template objects
+        self.build_layout     = []               # list of keycode_layers objects (which form layout) -> Final yaml or json output comes from here
+        self.build_templates  = []               # list of layout_template objects
 
-# ───────────────────────────────────────────────────────────────────────────────────────────
+# ===========================================================================================
 # LAYOUT template info
 # A class for linking matrix mapping in <keyboard>.h with (preprocessed) keymap.c keycode layers.
-# ───────────────────────────────────────────────────────────────────────────────────────────
+# ===========================================================================================
 class layout_template:
 
     def __init__(self, n=''):
-        self.name = n                      # Name of template : e.g. LAYOUT, KEYMAP, LAYOUT_66_ANSI
-        self.layout = []                   # List of layout rows
-        self.array = []                    # Array holding index values (to be merged with keycode_layers)
+        self.name             = n                # Name of template : e.g. LAYOUT, KEYMAP, LAYOUT_66_ANSI
+        self.layout           = []               # List of layout rows
+        self.array            = []               # Array holding index values (to be merged with keycode_layers)
 
     def convert_template_index(self, console=_console(False), template_list=[]):
 
@@ -426,19 +430,19 @@ class layout_template:
                     if self.layout[i][j] == col:
                         self.layout[i][j] = -1
                         console.warning(['Array key recovery failed', 'Will assume this corresponds to KC_NO'])
-# ───────────────────────────────────────────────────────────────────────────────────────────
+# ===========================================================================================
 # KEYCODE layers
 # A class for storing keycode layers
-# ───────────────────────────────────────────────────────────────────────────────────────────
+# ===========================================================================================
 class keycode_layer:
 
     def __init__(self, n=''):
 
-        self.name = n                      # Name of current layer
-        self.keymap = []                   # List of lists representing Raw [QMK] KEYMAP layers (keycode layers)
-        self.layout = []                   # List of lists output for converted [keyplus] keycode layers/layout
-        self.matrix_map = []               # Matrix mapping in [keyplus] format
-        self.matrix_cols = 0
+        self.name               = n                # Name of current layer
+        self.keymap             = []               # List of lists representing Raw [QMK] KEYMAP layers (keycode layers)
+        self.layout             = []               # List of lists output for converted [keyplus] keycode layers - our layout
+        self.matrix_map         = []               # Matrix mapping in [keyplus] format
+        self.matrix_cols        = 0
 
     def convert_keyplus_keymap(self, layer_names, functions, console):
 
@@ -463,187 +467,184 @@ class keycode_layer:
                 else:
                     del matrix[i][j]
                     del self.layout[i][j]
-                    j = max(j-1, 0)
         self.matrix_map = matrix
 
     def __func(self, qmk_func, layer_names, functions, console):
+        invalid = defaults.invalid_kc
 
-        # ───────────────────────────────────────────────────────────────────────────────
+        # ===============================================================================
         # OSM Functions
-        # ───────────────────────────────────────────────────────────────────────────────
-        if qmk_func in ref.keyp_func.keys():
-            keyp_func = ref.keyp_func[qmk_func]
+        # ===============================================================================
+        # OSM keys are defined non-dynamically
+        if qmk_func in ref.keyp_mods.keys():
+            keyp_func = ref.keyp_mods[qmk_func]
+            return keyp_func
         else:
             # Break up into [qfunc]([func_target])
-            brac_index = qmk_func.index('(')+1
-            qfunc = qmk_func[:brac_index]
-            func_target = qmk_func[brac_index:-1]
-            # ───────────────────────────────────────────────────────────────────────────────
-            # Layer Switching Functions
-            # ───────────────────────────────────────────────────────────────────────────────
+            br = qmk_func.index('(')+1
+            qfunc = qmk_func[:br]
+            func_target = qmk_func[br:-1]
+            # ===============================================================================
+            # Layer Switching Functions e.g. LT(1), TT(2)
+            # ===============================================================================
             if qfunc in ref.keyp_layer_func.keys() and func_target in layer_names:
                 layer = str(layer_names.index(func_target))
-                keyp_func = ref.keyp_layer_func[qfunc]+layer
-            # ───────────────────────────────────────────────────────────────────────────────
-            # Mod/Multi-Mod Functions
-            # ───────────────────────────────────────────────────────────────────────────────
-            elif qfunc in ref.keyp_func.keys() and func_target in ref.keyp_kc.keys():
-                #keycode = self.__keycode(func_target, functions, console)
-                keycode = ref.keyp_kc[func_target]
-                if keycode == "\"\'\" ":
-                    keycode = 'quot'
-                keycode = keycode.replace("'", '')
-                keyp_func = "'"+(ref.keyp_func[qfunc]+'-'+keycode).replace(' ','')+"'"
-            # ───────────────────────────────────────────────────────────────────────────────
-            # For Layer-Tap Keys e.g. LT(1, KC_SPACE) -> Space-FN
-            # ───────────────────────────────────────────────────────────────────────────────
+                keyp_func = ref.keyp_layer_func[qfunc]+layer # ' L' + 2
+                return keyp_func
+            # ===============================================================================
+            # Modifier/Multi-Modifier Functions - e.g. HYPR(KC), LCAG(KC), LCTL(KC)
+            # ===============================================================================
+            elif qfunc in ref.keyp_mods.keys() and func_target in ref.keyp_kc.keys():
+                keycode = self.__keycode(func_target, functions, console, allow_quotes=False)
+                # Wrap with quotes -> '[func]' - note: keyplus Format is [TAP]>[HOLD]
+                keyp_func = "'"+(ref.keyp_mods[qfunc]+'-'+keycode)+"'"
+                return keyp_func
+            # ===============================================================================
+            # For Layer-Tap Keys e.g. LT(1, KC_SPACE), LM(3, MOD_CTL) - Format FN(HOLD,TAP)
+            # ===============================================================================
+            # Hold = Layer for these
             elif qfunc in ref.keyp_tap_layer.keys():
+
+                # Split up into [TAP_LAYER], [HOLD_KC]
                 split = func_target.split(',', 1)
                 if len(split) != 2:
-                    console.bad_kc('FN','['+qmk_func+'] - set to trns')
-                    keyp_func = 'trns'
-                    return keyp_func
+                    console.bad_kc('FN','['+qmk_func+'] - set to '+invalid)
+                    return invalid
                 else:
-                    layer_target = split[0].replace(' ','')
+                    layer_t = split[0].replace(' ','')
                     keycode = split[1].replace(' ','')
 
-                if layer_target not in layer_names:
-                    console.bad_kc('FN','['+qmk_func+'] - set to trns')
-                    keyp_func = 'trns'
-                    return keyp_func
+                # Check if [TAP_LAYER] references a layer 
+                if layer_t not in layer_names:
+                    console.bad_kc('FN','['+qmk_func+'] - set to '+invalid)
+                    return invalid
                 else:
-                    layer = str(layer_names.index(layer_target))
+                    layer = str(layer_names.index(layer_t))
                     hold = ref.keyp_tap_layer[qfunc]+layer
 
-                    if keycode not in ref.keyp_kc.keys() and keycode not in ref.qmk_legacy_mod.keys():
-                        console.bad_kc('FN','['+qmk_func+'] - set to trns')
-                        keyp_func = 'trns'
+                    # =======================================================================
+                    # For regular QMK Keycodes LT([HOLD],[TAP]) - KC_E, KC_ESC, etc.
+                    # =======================================================================
+                    if keycode in ref.keyp_kc.keys():
+                        tap = self.__keycode(keycode, functions, console, allow_quotes=False)
+                        # Wrap with quotes -> '[func]' - note: Keyplus Format is [TAP]>[HOLD]
+                        keyp_func = "'"+tap +'>'+hold+"'"
                         return keyp_func
-
-                    elif keycode in ref.keyp_kc.keys():
-                        tap = ref.keyp_kc[keycode]
-                        if tap == "\"\'\" ":
-                            tap = 'quot'
-                        tap = tap.replace("'", '')
-                        keyp_func = "'"+(tap +'>'+hold).replace(' ','')+"'"
-
+                    # =======================================================================
+                    # [For legacy QMK Keycodes  LM([HOLD],[TAP]) - [TAP]= MOD_LCTL, etc.
+                    # =======================================================================
                     elif keycode in ref.qmk_legacy_mod.keys():
                         tap = ref.qmk_legacy_mod[keycode]+'-none'
-                        if tap == "\"\'\" ":
-                            tap = 'quot'
-                        tap = tap.replace("'", '')
-                        keyp_func = "'"+(tap +'>'+hold).replace(' ','')+"'"
-            # ───────────────────────────────────────────────────────────────────────────────
-            # Modifier Tap e.g. RSFT_T(KC_UP) -> Up when Tapped, RShift when Held
-            # ───────────────────────────────────────────────────────────────────────────────
+                        # Wrap with quotes -> '[func]' - note Keyplus Format is [TAP]>[HOLD]
+                        keyp_func = "'"+tap +'>'+hold+"'"
+                        return keyp_func
+            # ===============================================================================
+            # Modifier Tap e.g. RSFT_T(HOLD) - [HOLD]= KC_A, KC_B, etc.  
+            # ===============================================================================
+            # Hold = Modifier
             elif qfunc in ref.keyp_tap_mod.keys() and func_target in ref.keyp_kc.keys():
                 hold = ref.keyp_tap_mod[qfunc]+'-none'
-                tap = ref.keyp_kc[func_target]
-                if tap == "\"\'\" ":
-                    tap = 'quot'
-                tap = tap.replace("'", '')
-                keyp_func = "'"+(tap+'>'+hold).replace(' ','')+"'"
-            # ───────────────────────────────────────────────────────────────────────────────
+                tap = self.__keycode(func_target, functions, console, allow_quotes=False)
+                # Wrap with quotes -> '[func]' - note: Keyplus Format is [TAP]>[HOLD]
+                keyp_func = "'"+tap+'>'+hold+"'"
+                return keyp_func
+            # ===============================================================================
             # Chained Quantum Functions [Legacy] - i.e. LCTL(LALT(KC_DEL))
-            # ───────────────────────────────────────────────────────────────────────────────
-            elif qfunc in ref.keyp_func.keys() and ')' in func_target:
+            # ===============================================================================
+            elif qfunc in ref.keyp_mods.keys() and ')' in func_target:
                 target = func_target
-                keyp_func = ref.keyp_func[qfunc]
+                # Init functions with the first function
+                functions = ref.keyp_mods[qfunc]
+                # Recursively pipe func into functions until no more functions are left.
                 while ')' in target:
-                    brac_index = target.index('(')+1
-                    func = target[:brac_index]
-                    target = target[brac_index:-1]
-                    if func in ref.keyp_func.keys():
-                        keyp_func += ref.keyp_func[func]
-
+                    br = target.index('(')+1
+                    func = target[:br]
+                    target = target[br:-1]
+                    if func in ref.keyp_mods.keys():
+                        functions += ref.keyp_mods[func]
+                # Check that this LAST element is a keycode
                 if target in ref.keyp_kc.keys():
-                    #final_kc = self.__keycode(target, functions, console)
-                    final_kc = ref.keyp_kc[target]
-                    if final_kc == "\"\'\" ":
-                        final_kc = 'quot'
-                    final_kc = final_kc.replace("'", '')
-                    keyp_func = "'"+ (keyp_func+'-'+final_kc).replace(' ','')+"'"
-                else:
-                    console.bad_kc('FN','['+qmk_func+'] - set to trns')
-                    keyp_func = 'trns'
-            # ───────────────────────────────────────────────────────────────────────────────
-            # Legacy TMK-style QMK Functions
-            # ───────────────────────────────────────────────────────────────────────────────
+                    final_kc = self.__keycode(target, functions, console, allow_quotes=False)
+                    # Wrap with quotes -> '[func]' - note: keyplus Format is [TAP]>[HOLD]
+                    keyp_func = "'"+functions+'-'+final_kc+"'"
+                    return keyp_func
+            # ===============================================================================
+            # Legacy TMK-style QMK Functions e.g. FUNC(x)
+            # ===============================================================================
+            # Sometimes these are used for layer switching, thus why we care.
             elif qfunc in ref.qmk_legacy_func:
-                # Check for blank function list
-                if not functions:
-                    console.bad_kc('FN','['+qmk_func+'] - set to trns')
-                    keyp_func = 'trns'
-                else:
-                    func_action = functions[int(func_target)]
-                    # Check for blank function
-                    if not func_action:
-                        console.bad_kc('FN','['+qmk_func+'] - set to trns')
-                        keyp_func = 'trns'
-                    else:
-                        keyp_func = func_action
-            # ───────────────────────────────────────────────────────────────────────────────
+                # Function list cannot be blank (else no func is defined)
+                if functions:
+                    index = int(func_target)
+                    # Check array out of bounds (also no func defined)
+                    if index < len(functions):
+                        func_action = functions[index]
+                        # Check for blank function (obviously no func defined)
+                        if func_action:
+                            keyp_func = func_action
+                            return keyp_func
+            # ===============================================================================
             # Legacy QMK Modkey format e.g. MT(MOD_LCTL, KC_Z) -> Ctrl+Z
-            # ───────────────────────────────────────────────────────────────────────────────
+            # ===============================================================================
             elif qfunc == 'MT(':
-
                 split = func_target.split(',', 1)
                 if len(split) != 2:
-                    console.bad_kc('FN','['+qmk_func+'] - set to trns')
-                    keyp_func = 'trns'
-                    return keyp_func
+                    console.bad_kc('FN','['+qmk_func+'] - set to '+invalid)
+                    return invalid
                 else:
                     modifier = split[0]
                     keycode = split[1]
 
                 if modifier in ref.qmk_legacy_mod.keys() and keycode in ref.keyp_kc.keys():
                     mod = ref.qmk_legacy_mod[modifier]
-                    kc = ref.keyp_kc[keycode]
-                    if kc == "\"\'\" ":
-                        kc = 'quot'
-                    kc = kc.replace("'", '')
-                    keyp_func = "'"+(mod+'-'+kc).replace(' ','')+"'"
+                    kc = self.__keycode(keycode, functions, console, allow_quotes=False)
+                    # Wrap with quotes -> '[func]' - note: keyplus Format is [TAP]>[HOLD]
+                    keyp_func = "'"+(mod+'-'+kc)+"'"
+                    return keyp_func
+        # Didn't get a match, so return [invalid]
+        return invalid
 
-            else:
-                console.bad_kc('FN','['+qmk_func+'] - set to trns')
-                keyp_func = 'trns'
-
-        return keyp_func
-
-    def __keycode(self, qmk_kc, functions, console):
-
-        if qmk_kc in ref.keyp_kc.keys():
-
-            keyp_kc = ref.keyp_kc[qmk_kc]
-
-        elif qmk_kc[:5] in ref.qmk_legacy_func:
-            # Check for blank function list
-            if not functions:
-                console.bad_kc('FN','['+qmk_kc+'] - set to trns')
-                keyp_kc = 'trns'
-            else:
-                func_index = int(qmk_kc[5:])
-                # Check array out of bounds
-                if func_index < len(functions):
-                    func_action = functions[func_index]
-                    # Check for blank function
-                    if func_action:
-                        keyp_kc = func_action
-                    else:
-                        console.bad_kc('FN','['+qmk_kc+'] - set to trns')
-                        keyp_kc = 'trns'
-                else:
-                    console.bad_kc('FN','['+qmk_kc+'] - set to trns')
-                    keyp_kc = 'trns'
-
+    def __keycode(self, qmk_kc, functions, console, allow_quotes=True):
+        invalid = defaults.invalid_kc
+        if allow_quotes:
+            # ===============================================================================
+            # Normal Keycodes
+            # ===============================================================================
+            if qmk_kc in ref.keyp_kc.keys():
+                keyp_kc = ref.keyp_kc[qmk_kc]
+                return keyp_kc
+            # ===============================================================================
+            # Legacy TMK-style QMK FN Keycodes - KC_FNx
+            # ===============================================================================
+            # Sometimes these are used for layer switching, thus why we care.
+            elif qmk_kc[:5] in ref.qmk_legacy_func:
+                # Function list cannot be blank (else no func is defined)
+                if functions:
+                    func_index = int(qmk_kc[5:])
+                    # Check array out of bounds (also no func defined)
+                    if func_index < len(functions):
+                        func_action = functions[func_index]
+                        # Check for blank function (obviously no func defined)
+                        if func_action:
+                            keyp_kc = func_action
+                            return keyp_kc
         else:
-            console.bad_kc('KC','['+qmk_kc+'] - set to trns')
-            keyp_kc = 'trns'
-        
-        return keyp_kc
-# ───────────────────────────────────────────────────────────────────────────────────────────
+            # Fix final yaml output - caused by " and ' 
+            if qmk_kc in ref.keyp_kc.keys():
+                keyp_kc = ref.keyp_kc[qmk_kc]
+                if keyp_kc == "\"\'\" ":                  # "'" -> quot
+                    keyp_kc = 'quot' 
+                keyp_kc = keyp_kc.replace("'", '')        # Strip ' from all keycodes
+                keyp_kc = keyp_kc.replace(' ','')         # Strip whitespace
+                return keyp_kc
+
+        # Didn't get a match, so return [invalid]
+        console.bad_kc('KC','['+qmk_kc+'] - set to '+invalid)
+        return invalid
+    
+# ===========================================================================================
 # Cached Lists and Dictionaries
-# ───────────────────────────────────────────────────────────────────────────────────────────
+# ===========================================================================================
 class _cache:
 
     def __init__(self, dirs, console, f_cache=False):
@@ -675,41 +676,42 @@ class _cache:
 
         templist = []
         keymaplist = []
+        qdir = os.path.join(self.__qmk, 'keyboards')
 
-        for fn in glob.glob(self.__qmk+'keyboards/**/rules.mk', recursive=True):
-            fn = fn[:-9].replace('\\','/')
+        for fn in glob.glob( os.path.join(qdir, '**', 'rules.mk'), recursive=True ):
+            fn = os.path.split(fn)[0]
             templist.append(fn)
 
-        for fn in glob.glob(self.__qmk+'keyboards/**/keymaps/**/keymap.c', recursive=True):
-            fn = fn[:-9].replace('\\','/')
+        for fn in glob.glob( os.path.join(qdir, '**', 'keymaps', '**', 'keymap.c'), recursive=True):
+            fn = os.path.split(fn)[0]
             if fn in templist:
                 templist.remove(fn)
-            fn = fn.replace(self.__qmk+'keyboards/', '', 1)
+            fn = fn.replace(qdir+os.sep, '', 1)
             keymaplist.append(fn)
 
         for child in templist:
-            p_path = str(pathlib.Path(child).parent).replace('\\','/')
-            p_name = p_path.replace(self.__qmk+'keyboards/', '', 1)
+            p_path = str(pathlib.Path(child).parent)
+            p_name = p_path.replace(qdir+os.sep, '', 1)
 
             if p_path not in templist and p_name not in defaults.qmk_nonstd_dir:
-                name = child.replace(self.__qmk+'keyboards/', '', 1)
+                name = child.replace(qdir+os.sep, '', 1)
                 # If in special dir list, then is part of the directory not keyboard
                 if name not in defaults.qmk_nonstd_dir:
                    # This is a keyboard, not revision
                    kbo = kb_info(name)
-                   kblibs = name.split('/')
-                   kbo.libs = kblibs 
-                   self.kbo_list.append(kbo)   
+                   kblibs = name.split(os.sep)
+                   kbo.libs = kblibs
+                   self.kbo_list.append(kbo)
             elif p_name in defaults.qmk_nonstd_dir:
-                name = child.replace(self.__qmk+'keyboards/', '', 1)
+                name = child.replace(qdir+os.sep, '', 1)
                 # This is a keyboard, not revision
                 kbo = kb_info(name)
-                kblibs = name.split('/')
+                kblibs = name.split(os.sep)
                 kbo.libs = kblibs
                 self.kbo_list.append(kbo)
             else:
                 # This is a 'revision' of an existing keyboard
-                rev = child.replace(p_path+'/', '')
+                rev = child.replace(p_path+os.sep, '', 1)
                 for kbo in self.kbo_list:
                     if kbo.name == p_name:
                         kbo.add_rev_list(rev)
@@ -721,15 +723,15 @@ class _cache:
             self.__find_layout_names(kbo)
 
         for km_path in keymaplist:
-            info_list = km_path.split('/keymaps/')
+            info_list = km_path.split(os.sep+'keymaps'+os.sep)
             kb_name = info_list[0]
             km_name = info_list[-1]
-            namelist = kb_name.split('/')
+            namelist = kb_name.split(os.sep)
             match = False
             prev = 'n/a'
             for i in range(0, len(namelist)):
-                if i > 0: 
-                    kb_name = '/'.join(namelist)
+                if i > 0:
+                    kb_name = (os.sep).join( namelist )
 
                 for kbo in self.kbo_list:
                     if kbo.name == kb_name:
@@ -757,28 +759,25 @@ class _cache:
         
         rev_list = list(kbo.rev_list)
         if not rev_list:
-            rev_list.append('n/a')
+            rev_list.append('')
         
         for rev in rev_list:
             found = False
             revo = kbo.get_rev_info(rev)
-            # qmk/keyboards/
             kblibs = list(kbo.libs)
-            if rev != 'n/a':
+            if rev != '':
                 kblibs.append(rev)
-            qdir = self.__qmk +'keyboards/'
+            qdir = os.path.join(self.__qmk, 'keyboards')
 
             folders = []
             path = ''
             for kbl in kblibs:
-                path += kbl+'/'
+                path = os.path.join(path, kbl)
                 folders.append(path)
 
             for kbl in reversed(folders):
-                kbl_f = kbl.split('/')
-                kb_h = kbl_f[-2]        
-                kb_h += '.h'
-                path = qdir+kbl+kb_h
+                kb_h = os.path.split(kbl)[-1]+'.h'
+                path = os.path.join(qdir, kbl, kb_h)
 
                 try:
                     with open(path, 'r', encoding='utf8') as f:
@@ -788,7 +787,6 @@ class _cache:
                     continue
 
                 token_list = _parse_txt.layout_headers(data)
-                #template_list = []
                 for tokens, start, end in token_list:
                     revo.template_list.append(tokens.name)
 
@@ -798,16 +796,15 @@ class _cache:
                     revo.template_loc = path
                     break
 
-            if rev != 'n/a' and not found:
-                self.__console.warning(['Layout templates not found for '+kbo.name+'/'+rev])
-                revo.template_loc = 'n/a'
-            elif not found:
-                self.__console.warning(['Layout templates not found for '+kbo.name])
+            if not found:
+                self.__console.warning(['Layout templates not found for '+ os.path.join(kbo.name, rev)])
                 revo.template_loc = 'n/a'
 
     def __save_cache(self):
-
-        path = '/'.join(self.__loc.split('/')[:-1])
+        path = os.path.split(self.__loc)[0]
+        print(self.__loc)
+        print(path)
+        #======================================================================================================================
         if not os.path.exists(path):
             try:
                 os.makedirs(path)
@@ -861,9 +858,9 @@ class _cache:
                 else:
                     print_rev_list = ', '.join(self._rev_list(keyboard))
                     self.__console.error(['Revision # required - Valid Revisions: '+print_rev_list])
-# ───────────────────────────────────────────────────────────────────────────────────────────
+# ===========================================================================================
 # Q2K Application
-# ───────────────────────────────────────────────────────────────────────────────────────────
+# ===========================================================================================
 class application:
 
     def __init__(self, app_type, is_gui=False):
@@ -890,7 +887,7 @@ class application:
         # Read ARGV input from terminal
         parser = argparse.ArgumentParser(description='Convert AVR C based QMK keymap and matrix files to YAML Keyplus format')
         parser.add_argument('keyboard', metavar='KEYBOARD', nargs='?', default='', help='The name of the keyboard whose keymap you wish to convert')
-        parser.add_argument('-m', '--keymap', metavar='KEYMAP', dest='keymap', default='default', help='The keymap folder to reference - default is /default/')
+        parser.add_argument('-m', '--keymap', metavar='KEYMAP', dest='keymap', default='default', help='The keymap folder to reference - default is [default]')
         parser.add_argument('-t', '--template', metavar='LAYOUT', dest='template', default='', help='The layout template to reference')
         parser.add_argument('-r', '--rev', metavar='ver',dest='rev', default='', help='Revision of layout - default is n/a')
         parser.add_argument('--cache', dest='clearcache', action='store_true', help='Clear cached data (cache_kb.yaml)')
@@ -909,9 +906,11 @@ class application:
             self.__generate_dirs()
         else:
             try:
-                with open(defaults.src+'pref.yaml', 'r') as f:
+                pref_yaml = os.path.join(defaults.src, 'pref.yaml')
+                with open(pref_yaml, 'r') as f:
                     self.dirs = yaml.load(f)
-                    self.console.note(['─────────────────────────────────────────────────────────────────', 'Using preferences from '+defaults.src+'pref.yaml', '--reset to reset to defaults'])
+
+                    self.console.note(['─────────────────────────────────────────────────────────────────', 'Using preferences from '+pref_yaml, '--reset to reset to defaults'])
 
             except FileNotFoundError:
                 self.__generate_dirs()
@@ -929,11 +928,15 @@ class application:
             'Cache' : defaults.cache,            
         }
         self.dirs = dirs
+        try:
+            pref_yaml = os.path.join(defaults.src, 'pref.yaml')
+            with open(pref_yaml, 'w') as f:
+                f.write('# Q2K Folder Locations\n')
+                yaml.dump(dirs, f, default_flow_style = False)
+                self.console.note(['─────────────────────────────────────────────────────────────────', 'New pref.yaml generated @ '+pref_yaml])
 
-        with open(defaults.src+'pref.yaml', 'w') as f:
-            f.write('# Q2K Folder Locations\n')
-            yaml.dump(dirs, f, default_flow_style = False)
-            self.console.note(['─────────────────────────────────────────────────────────────────', 'New pref.yaml generated'])
+        except FileNotFoundError:
+            self.console.error(['Failed to generate '+pref_yaml])
 
     def __pop_cache_list(self):
 
@@ -954,14 +957,14 @@ class application:
             if self.__args.rev == '':
                 self.console.note(['Listing keymaps for '+self.__args.keyboard+'...', print_km_list])
             else:
-                self.console.note(['Listing keymaps for '+self.__args.keyboard+'/'+self.__args.rev+'...', print_km_list])
+                self.console.note(['Listing keymaps for '+self.__args.keyboard+ os.sep +self.__args.rev+'...', print_km_list])
             exit()
         elif self.__args.listkeyt and not self.is_gui:
             print_temp_list = '[ '+', '.join(self.template_list(self.__args.keyboard, self.__args.rev))+' ]'
             if self.__args.rev == '':
                 self.console.note(['Listing layout templates for '+self.__args.keyboard+'...', print_temp_list])
             else:
-                self.console.note(['Listing layout templates for '+self.__args.keyboard+'/'+self.__args.rev+'...', print_temp_list])
+                self.console.note(['Listing layout templates for '+self.__args.keyboard+ os.sep +self.__args.rev+'...', print_temp_list])
             exit()
         elif self.__args.searchkeyb and not self.is_gui:
             print_search_list = '[ '+', '.join(self.search_keyboard_list(self.__args.searchkeyb))+' ]'
@@ -1018,7 +1021,7 @@ class application:
             self.build_kb = build_kbo
             self.build_rev = build_revo
             if rev:
-                self.console.note(['─────────────────────────────────────────────────────────────────','Building '+keyboard+'/'+rev+':'+keymap+':'+template, '─────────────────────────────────────────────────────────────────'])
+                self.console.note(['─────────────────────────────────────────────────────────────────','Building '+keyboard+ os.sep +rev+':'+keymap+':'+template, '─────────────────────────────────────────────────────────────────'])
             else:
                 self.console.note(['─────────────────────────────────────────────────────────────────','Building '+keyboard+':'+keymap+':'+template, '─────────────────────────────────────────────────────────────────'])
         else:
@@ -1069,7 +1072,7 @@ class application:
         self.__get_templates() 
         self.__merge_layout_template()  # Process Layout + Templates
         self.__convert_matrix_map()
-        self.__create_output()          # Pipe output to yaml/json
+        self.__create_output()          # Pipe output to yaml or json
         self.console.clear()            # Clear console
 
     def __check_mcu(self):
@@ -1084,7 +1087,7 @@ class application:
             else:
                 self.console.warning(
                     ['Possible MCU incompatability detected', 
-                    mcu+' in '+kb_n+'/'+rev_n+'rules.mk', 
+                    mcu+' in '+kb_n+ os.sep +rev_n+'rules.mk', 
                     'Currently, keyplus supports only boards with the following microcontrollers:',
                     ', '.join(defaults.mcu_compat),
                     'If your board has a MCU on this list then ignore this warning as a false positive',
@@ -1101,18 +1104,17 @@ class application:
         if rev != 'n/a':
             kblibs.append(rev)
 
-        qdir = self.dirs['QMK dir'] +'keyboards/'
+        qdir = os.path.join(self.dirs['QMK dir'], 'keyboards')
         folders = []
         path = ''
 
         for kbl in kblibs:
-            path += kbl+'/'
+            path = os.path.join(path, kbl)
             folders.append(path)
 
         for kbl in reversed(folders):
             rules_mk = 'rules.mk'
-
-            path = qdir+kbl+rules_mk
+            path = os.path.join(qdir, kbl, rules_mk)
             mcu_list = []
             try:
                 with open(path, 'r') as f:
@@ -1120,6 +1122,9 @@ class application:
             except FileNotFoundError:
                 self.console.warning(['Rules.mk not found in '+path, 'Trying a different path...'])
                 return
+
+            if not data:
+                continue
 
             token_list = _parse_txt.rules_mk(data)
             for tokens, start, end in token_list:
@@ -1142,19 +1147,21 @@ class application:
         if rev != 'n/a':
             kblibs.append(rev)
 
-        qdir = self.dirs['QMK dir'] +'keyboards/'
+        qdir = os.path.join(self.dirs['QMK dir'], 'keyboards')
         folders = []
         path = ''
 
         for kbl in kblibs:
-            path += kbl+'/'
+            path = os.path.join(path, kbl)
             folders.append(path)
 
         for kbl in reversed(folders):
             config_h = 'config.h'
-
-            path = qdir+kbl+config_h
+            path = os.path.join(qdir, kbl, config_h)
             data = self.__cpp.preproc_header(path)
+
+            if not data:
+                continue
 
             matrix_pins = _parse_txt.config_headers(data)
             if matrix_pins:
@@ -1229,9 +1236,9 @@ class application:
                     if index:
                         while len(functions) < index:
                             functions.append('')
-                    brac_index = function.index('(')+1
-                    func = function[:brac_index]
-                    target = function[brac_index:-1]
+                    br = function.index('(')+1
+                    func = function[:br]
+                    target = function[br:-1]
 
                     if func in ref.keyp_actions.keys() and target in layer_names:
                         layer = str(layer_names.index(target))
@@ -1352,14 +1359,14 @@ class application:
                         if ind < max_index:
                             layout[i][j] = keycode_array[ind]
                         elif template.name != '!MATRIX LAYOUT':
-                            self.console.warning(['Corrupt/incompatible layout template or keymap', 
+                            self.console.warning(['Corrupt or incompatible layout template or keymap', 
                                 'Invalid array value: '+str(ind),
                                 'Trying again with default matrix layout...'])
                             self.__generate_matrix_template(x)
                             self.__merge_layout_template()
                             return
                         else:
-                            self.console.error(['Corrupt/incompatible keymap', 'Invalid array value: '+str(ind)])
+                            self.console.error(['Corrupt or incompatible keymap', 'Invalid array value: '+str(ind)])
             except TypeError:
                 self.console.error(['Corrupt layout template, invalid array index: '+str(ind)])
 
@@ -1463,7 +1470,6 @@ class application:
                     if '>' in keycode and keycode != "'>' ":
                         if keycode not in keycode_define:
                             keycode_define.append(keycode)
-                        #keycode = "'"+keycode+"'"
 
                     layout += keycode+', '
             layout +='\n        ]\n      ],\n'
@@ -1533,5 +1539,6 @@ def q2keyplus_gui(keyboard, rev, keymap, template):
     q2k.set_kb(keyboard, rev, keymap, template)
     q2k.execute()
 '''
+# Uncomment this to run as a traditional python script (Commnand Line Interface)
 #if __name__ == '__main__':
     #q2keyplus()
