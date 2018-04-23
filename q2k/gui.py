@@ -6,7 +6,7 @@ import platform
 import traceback
 import yaml
 
-from tkinter import filedialog, Tk, E, W, LEFT, INSERT, NORMAL, ttk, Menu, Text, scrolledtext, messagebox, Button, Entry, StringVar, LabelFrame, Label, Frame
+from tkinter import filedialog, Tk, E, W, LEFT, CENTER, INSERT, NORMAL, ttk, Menu, Text, scrolledtext, messagebox, Button, Entry, StringVar, LabelFrame, Label, Frame
 from tkinter.ttk import Combobox
 
 class ConsoleText(Text):
@@ -81,20 +81,20 @@ class ConsoleText(Text):
 class Window():
 
     def __init__(self):
-        # ───────────────────────────────────────────────────────────────────────────────────────────       
+       # =============================================================================================================       
         # init Q2K tkinter GUI
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         self.init_q2k_gui()  
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         # Load Core Q2K
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         self.output.start() # Ensure output from loading q2k gets printed to console
         self.q2k_app = core.application('keyplus', is_gui=True)
         self.dirs    = self.q2k_app.dirs
         self.output.stop() # Stop output printing
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         # Set dynamic lists and enter main loop
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         self.set_dirs()
         self.window.mainloop()
 
@@ -104,7 +104,7 @@ class Window():
         if platform.system()   == 'Linux':
             self.window.option_add('*font', ('Liberation Sans', '-12'))
         if platform.system() == 'Windows':
-            self.window.option_add('*font', ('Segoe UI', '11'))
+            self.window.option_add('*font', ('Arial', '9'))
         self.window.title("Q2K Keymap Utility")
         self.window.geometry('380x560')
 
@@ -115,20 +115,20 @@ class Window():
         menu.add_command(label='About',command=self.show_about)
         self.window.config(menu=menu)
 
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         # Tabs
-        # ──────────────────────────────────────────────────────────────────────────────────────────
+       # ===========================================================================================──────
 
         tab_control = ttk.Notebook(self.window)
         tab1        = ttk.Frame(tab_control)
         #tab2       = ttk.Frame(tab_control)
         tab_control.add(tab1, text='Keyplus')
         #tab_control.add(tab2, text='KBfirmware')
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         # KEYPLUS TAB
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         #   Frame 1 - Combo Boxes
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         # Label
         keyplus_lbl = Label(tab1, text= 'Convert to Keyplus YAML')
         keyplus_lbl.grid(column=0, row=0, sticky=W+E)
@@ -136,9 +136,9 @@ class Window():
         top_frame = LabelFrame(tab1, text='', bd=0, padx=15, pady=2)
         top_frame.grid(sticky=W+E)
 
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         #       QMK Firmware Directory Entry
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         # Label
         qmk_lbl           = Label(top_frame, text='QMK Firmware Directory:')
         # Text Box
@@ -147,9 +147,9 @@ class Window():
         # Button
         qmk_dir_btn       = Button(top_frame, width=2, text="..", command=lambda:self.find_directory(self.qmk_dir))
 
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         #      Keyplus Output Directory Entry
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         # Label
         keyplus_lbl       = Label(top_frame, text='Output Directory:')
         # Text Box
@@ -167,16 +167,16 @@ class Window():
         qmk_dir_btn.grid      (row=1, column=1)
         keyplus_dir_entry.grid(row=3, column=0, sticky=W+E)
         keyplus_dir_btn.grid  (row=3, column=1)
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         #   Frame 2 - Combo Boxes
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         kb_opts = LabelFrame(tab1, text='', bd=0, padx=15, pady=5, height=50)
         kb_opts.grid(sticky=E+W)
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         #       Dynamic Combo Boxes
         #          | Keyboard               |  Rev                 |  
         #          | Keymap                 |  Template            | 
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         # Labels
         kb_lbl       = Label(kb_opts, text='Keyboard:')
         rev_lbl      = Label(kb_opts, text='Rev:')
@@ -202,39 +202,43 @@ class Window():
         rev_lbl.grid       (row=0, column=1, sticky=W)
         keymap_lbl.grid    (row=2, column=0, sticky=W)
         template_lbl.grid  (row=2, column=1, sticky=W)
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         # Frame 3 - Buttons 
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         kb_opts2 = LabelFrame(tab1, text='', bd=0, padx=15, pady=5, height=50, width=100)
         kb_opts2.grid(sticky=E+W)
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         #     Buttons:  | Convert | Generate Keyboard List | Reset |
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
 
-        convert_btn = Button(kb_opts2, text='Convert', command=lambda:self.btn_execute())
-        gen_btn     = Button(kb_opts2, text='Generate Keyboard List', command=lambda:self.btn_generate_lists())
-        reset_btn   = Button(kb_opts2, text='Reset', command=lambda:self.btn_reset())
+        convert_btn = Button(kb_opts2, width='10', text='Convert', command=lambda:self.btn_execute())
+        gen_btn     = Button(kb_opts2, width='20', text='Generate Keyboard List', command=lambda:self.btn_generate_lists())
+        reset_btn   = Button(kb_opts2, width='10', text='Reset', command=lambda:self.btn_reset())
 
-        convert_btn.grid(row=0, column=0)
-        gen_btn.grid    (row=0, column=1, padx=5)
-        reset_btn.grid  (row=0, column=2)
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+        convert_btn.grid(row=0, column=0, sticky=W+E)
+        gen_btn.grid    (row=0, column=1, padx=5, sticky=W+E)
+        reset_btn.grid  (row=0, column=2, sticky=W+E)
+       # =============================================================================================================
         # Frame 4 - Output 
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         console = LabelFrame(tab1, text='', bd=0, padx=15, pady=5, height=50)
         console.grid(sticky=W+E)
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         #   Console
-        # ───────────────────────────────────────────────────────────────────────────────────────────
+       # =============================================================================================================
         # Label
         con_lbl = Label(console, text='Console')
         con_lbl.grid(padx=5, row=0, column=0)
         # Text Box
-        self.output = ConsoleText(console, height=27, width=56, bd=0, bg='black', fg='white')
+        self.output = ConsoleText(console, bd=0, bg='black', fg='white')
         if platform.system()   == 'Linux':
-            self.output['font'] = ('Consolas', '8')
+            self.output['height'] = 27
+            self.output['width']  = 56
+            self.output['font']   = ('Consolas', '8')
         elif platform.system() == 'Windows':
-            self.output['font'] = ('Segoe UI Mono', '8')
+            self.output['height'] = 19
+            self.output['width']  = 58
+            self.output['font']   = ('Consolas', '8')
 
         self.output.grid(padx=5, row=1, column=0, sticky=W+E)
 
@@ -261,7 +265,8 @@ class Window():
         dir_btn.grid(column=1, row=0)
         '''
 
-        tab_control.pack(expand=1, fill='both')
+        #tab_control.pack(expand=1, fill='both')
+        tab_control.grid()
 
     def set_dirs(self):
 
@@ -275,6 +280,7 @@ class Window():
 
     def find_directory(self, string):
         folder_selected = filedialog.askdirectory()
+        folder_selected = os.path.normpath(folder_selected)
         string.set(folder_selected)
 
     def show_about(self):

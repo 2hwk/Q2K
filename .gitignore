@@ -114,3 +114,4 @@ MANIFEST.in
 execute.py
 avr-gcc/
 
+q2k/BUILD EXEC.lnk
