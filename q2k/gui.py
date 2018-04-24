@@ -104,7 +104,7 @@ class Window():
         self.window.title("Q2K Keymap Utility")
         if platform.system()   == 'Linux':
             self.window.option_add('*font', ('Liberation Sans', '-12'))
-            self.window.geometry('380x560')
+            self.window.geometry('490x700')
         if platform.system() == 'Windows':
             self.window.option_add('*font', ('Calibri', '-13'))
             self.window.geometry('496x700')
@@ -169,11 +169,10 @@ class Window():
         keyplus_dir_entry.grid(row=3, column=0, sticky=W+E)
         keyplus_dir_btn.grid  (row=3, column=1)
 
-        
         if platform.system()   == 'Linux':
-            qmk_dir_entry['width']     = 44
+            qmk_dir_entry['width']     = 59
             qmk_dir_btn['width']       = 2
-            keyplus_dir_entry['width'] = 44
+            keyplus_dir_entry['width'] = 59
             keyplus_dir_btn['width']   = 2
         if platform.system() == 'Windows':
             qmk_dir_entry['width']     = 60
@@ -203,10 +202,10 @@ class Window():
         self.kb       = Combobox(kb_opts, state='readonly')
 
         if platform.system()   == 'Linux':
-            self.template['width'] = 22
-            self.keymap['width']   = 22
-            self.rev['width']      = 22
-            self.kb['width']       = 22
+            self.template['width'] = 30
+            self.keymap['width']   = 30
+            self.rev['width']      = 30
+            self.kb['width']       = 30
 
         elif platform.system() == 'Windows':
             self.template['width'] = 30
@@ -245,9 +244,9 @@ class Window():
         reset_btn.grid  (row=0, column=2, sticky=W+E)
 
         if platform.system()   == 'Linux':
-            convert_btn['width']     = 10
+            convert_btn['width']     = 16
             gen_btn['width']         = 20
-            reset_btn['width']       = 10
+            reset_btn['width']       = 16
         if platform.system() == 'Windows':
             convert_btn['width']     = 20
             gen_btn['width']         = 20
@@ -266,9 +265,9 @@ class Window():
         # Text Box
         self.output = ConsoleText(console, bd=0, bg='black', fg='white')
         if platform.system()   == 'Linux':
-            self.output['height'] = 27
-            self.output['width']  = 56
-            self.output['font']   = ('Consolas', '8')
+            self.output['height'] = 35
+            self.output['width']  = 75
+            self.output['font']   = ('Consolas', '9')
         elif platform.system() == 'Windows':
             self.output['height'] = 27
             self.output['width']  = 65

@@ -116,6 +116,6 @@ avr-gcc/
 *.lnk
 *.tar.gz
 *.zip
-q2k/BUILD EXEC.lnk
+*BUILD EXEC.lnk
 bin/*/q2k_out
 *.7z

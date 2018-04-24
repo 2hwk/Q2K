@@ -59,7 +59,7 @@ class defaults:
     invalid_kc = 'trns'                                       # What to set invalid KC codes to
 
     if platform.system() == 'Linux':
-        print_lines = '─────────────────────────────────────────────────────────────────'
+        print_lines = '────────────────────────────────────────────────────────────────────────'
     elif platform.system() == 'Windows':
         print_lines = '──────────────────────────────────────────────────────────────'
 
@@ -183,7 +183,7 @@ class _parse_txt:
         name       = pp.Word(pp.alphanums+'_')
         macrovar   = pp.Word(pp.alphanums+'_#')
         layout_row = pp.Group(pp.OneOrMore(macrovar + pp.Optional(COMMA)) + pp.ZeroOrMore(BSLASH))
-        layout     =  LPAREN + pp.ZeroOrMore(BSLASH) + pp.OneOrMore(layout_row) + RPAREN
+        layout     = LPAREN + pp.ZeroOrMore(BSLASH) + pp.OneOrMore(layout_row) + RPAREN
         matrix_row = pp.ZeroOrMore(BSLASH) + pp.Optional(LBRAC) +  pp.ZeroOrMore(BSLASH) + pp.OneOrMore(macrovar + pp.Optional(COMMA)) + pp.ZeroOrMore(RBRAC) + pp.Optional(COMMA) + pp.ZeroOrMore(BSLASH)
         matrix     = pp.ZeroOrMore(BSLASH) + LBRAC +  pp.ZeroOrMore(BSLASH) + pp.OneOrMore(matrix_row) +  pp.ZeroOrMore(BSLASH) + RBRAC +  pp.ZeroOrMore(BSLASH)
 
@@ -311,18 +311,14 @@ class _cpp:
         if DEBUG: print(' '.join(argv))
 
         try:
-            #app_stdout = sys.stdout
-            #app_stderr = sys.stderr
-            #sys.stdout = sys.__stdout__
-            #sys.stderr = sys.__stderr__
+            if platform.system() == 'Linux':
+                output = subprocess.check_output(argv)
 
-            #sys.stdout = app_stdout
-            #sys.stderr = app_stderr
+            elif platform.system() == 'Windows':
+                si = subprocess.STARTUPINFO()
+                si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
-            si = subprocess.STARTUPINFO()
-            si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-
-            output = subprocess.check_output(argv, stdin=subprocess.PIPE, stderr=subprocess.PIPE, startupinfo=si)
+                output = subprocess.check_output(argv, stdin=subprocess.PIPE, stderr=subprocess.PIPE, startupinfo=si)
 
             return output
         except subprocess.CalledProcessError as e:
@@ -712,30 +708,42 @@ class _cache:
         keymaplist = []
         qdir = os.path.join(self.__qmk, 'keyboards')
 
+        # List of... stuff. Anything with a rules.mk file is considered 'valid' for now.
+        # This is the exact same logic used by QMK.
+        # Format: qmk/keyboards/ ...    [ <anything> / ] rules.mk  => templist
         for fn in glob.glob( os.path.join(qdir, '**', 'rules.mk'), recursive=True ):
             fn = os.path.split(fn)[0]
             templist.append(fn)
 
+        # List of keymap folders
+        # Format: qmk/keyboards/ ...    [ <anything>  / keymaps / <any keymap> ] / keymap.c 
         for fn in glob.glob( os.path.join(qdir, '**', 'keymaps', '**', 'keymap.c'), recursive=True):
             fn = os.path.split(fn)[0]
+            # Important: If this exists in templist, then REMOVE it from templist.
+            # i.e. targets  [ <? ... >/<keyboard>/<revisions>/keymaps/<any keymap> ]
+            # templist should now only contain [ <? ... > / <keyboard> / <revision> / ]
             if fn in templist:
                 templist.remove(fn)
             fn = fn.replace(qdir+os.sep, '', 1)
             keymaplist.append(fn)
 
-        for child in templist:
-            p_path = str(pathlib.Path(child).parent)
-            p_name = p_path.replace(qdir+os.sep, '', 1)
 
+        for child in templist:
+            p_path = str(pathlib.Path(child).parent)            # Path of the parent directory of this child
+            p_name = p_path.replace(qdir+os.sep, '', 1)        
+
+            # If parent directory of this child is NOT a keyboard or a revision directory (and not a non-standard (i.e. manufacturer) directory)
             if p_path not in templist and p_name not in defaults.qmk_nonstd_dir:
                 name = child.replace(qdir+os.sep, '', 1)
-                # If in special dir list, then is part of the directory not keyboard
+                # Assume for now that child is a KEYBOARD
+                # Check if child is a non-standard/manufacturer directory. (if it is then just continue)
                 if name not in defaults.qmk_nonstd_dir:
-                   # This is a keyboard, not revision
+                   # Thus this is a keyboard, not revision
                    kbo      = kb_info(name)
                    kblibs   = name.split(os.sep)
                    kbo.libs = kblibs
                    self.kbo_list.append(kbo)
+            # If parent directory is a manufacturer/non-standard directory
             elif p_name in defaults.qmk_nonstd_dir:
                 name = child.replace(qdir+os.sep, '', 1)
                 # This is a keyboard, not revision
@@ -743,6 +751,7 @@ class _cache:
                 kblibs      = name.split(os.sep)
                 kbo.libs    = kblibs
                 self.kbo_list.append(kbo)
+            # If parent directory IS a keyboard directory.
             else:
                 # This is a 'revision' of an existing keyboard
                 rev = child.replace(p_path+os.sep, '', 1)
@@ -751,35 +760,54 @@ class _cache:
                         kbo.add_rev_list(rev)
                         break
 
+        # Add ing default n/a revisions for keyboards with no revisions
         for kbo in self.kbo_list:
             if not kbo.rev_list:
                 kbo.add_rev_list('n/a', True)
             self.__find_layout_names(kbo)
 
+        # Processing keymaps
         for km_path in keymaplist:
+            # info list = [ <keyboard> / <rev> ] /keymaps/ [ <keymap> ]
             info_list = km_path.split(os.sep+'keymaps'+os.sep)
-            kb_name   = info_list[0]
-            km_name   = info_list[-1]
-            namelist  = kb_name.split(os.sep)
+            kb_name   = info_list[0]            # <keyboard>/<rev>
+            km_name   = info_list[-1]           # <keymap>
+            namelist  = kb_name.split(os.sep)   # [<keyboard>] [<rev>]
             match = False
-            prev = 'n/a'
+
+            # Attach keymaps to revisions (if they are revision specific)
+            # OR attach them to all revisions (if they are universal)
+            #   - Assume the format <keyboard>/<revision> 
+            #   - i.e. <revision> will be seen just before <keyboard>.
+            #   - Go through namelist backwards. Cursor stores 2 values, current name and previous name.
+            #   for example: keyboard/rev/??
+            #       0 = [??], 1* = [rev] 2* = [keyboard]
+            #       2* matches a keyboard, so 1* is revision.
+            # TODO: Currently breaks if  <keyboard/??/revision>
+            prev = 'n/a'                        # previous variable - init as n/a
             for i in range(0, len(namelist)):
                 if i > 0:
+                    # Ignore first iteration of this loop
+                    # Rebuild full path - (can't use os.path.join here)
                     kb_name = (os.sep).join( namelist )
 
+                # Go through our final kbo_list output list, find matching kb object.
                 for kbo in self.kbo_list:
                     if kbo.name == kb_name:
+                        # If rev_list has n/a - i.e. no revisions
                         if prev in kbo.rev_list:
+                            # Tag keymap to this revision
                             revo = kbo.get_rev_info(prev)
                             revo.keymap_list.append(km_name)
+                        # Keyboard has revisions - Add keymap to all of these revisions.
                         else:
                             for revo in kbo.rev_info:
                                 revo.keymap_list.append(km_name)
-                        match = True
+                        match = True                   # If match found break out of loop
                         break
                 if match:
                     break
-                prev = namelist.pop()
+                prev = namelist.pop()                  # End of loop, pop last element from list.
 
         if self.kbo_list:
             # Dump cache info to text file for faster processing in future
@@ -799,32 +827,41 @@ class _cache:
             found    = False
             revo     = kbo.get_rev_info(rev)
             kblibs   = list(kbo.libs)
+            # Kblibs defines the search boundary for *.h and *.c files for the preprocessor.
 
             if rev != '':
                 kblibs.append(rev)
-            qdir = os.path.join(self.__qmk, 'keyboards')
+                # Add revision directory to search path if this keyboard has revisions.
+
+            qdir = os.path.join(self.__qmk, 'keyboards') # qmk/keyboards
 
             folders  = []
             path     = ''
             for kbl in kblibs:
                 path = os.path.join(path, kbl)
                 folders.append(path)
-
+            # Search in REVERSED order - i.e. revisions first, then keyboards.
+            # Prioritises config.h data in revisions first.
             for kbl in reversed(folders):
                 kb_h = os.path.split(kbl)[-1]+'.h'
                 path = os.path.join(qdir, kbl, kb_h)
-
                 try:
-                    with open(path, 'r', encoding='utf8') as f:
+                    # Open config.h file, if it exists
+                    with open(path, 'r', encoding='ut8') as f:
                         data = str(f.read())
                 except FileNotFoundError:
                     #self.__console.warning(['Layout header not found in '+path, 'Trying a different path...'])
                     continue
 
+                # Parse it for LAYOUT/KEYMAP macro templates
                 token_list = _parse_txt.layout_headers(data)
                 for tokens, start, end in token_list:
                     revo.template_list.append(tokens.name)
 
+                # If LAYOUT/KEYMAP templates found, break from loop
+                # Note: This means that some layouts will be missed. 
+                # However we wish to be paranoid about 'collisions' and duplicate KEYMAP macros.
+                # Might be possible to pull data from rules.mk? - Limited in usefulness right now
                 if revo.template_list:
                     #self.__console.note(['Layout header found @ '+path])
                     found = True
@@ -1210,10 +1247,10 @@ class application:
 
     def __get_keycodes(self, DEBUG=False):
 
-        rev         = self.build_rev.name
-        revo        = self.build_rev
-        data        = self.__cpp.preproc_keymap()
-        token_list  = _parse_txt.keymaps(data)
+        rev                 = self.build_rev.name
+        revo                = self.build_rev
+        data                = self.__cpp.preproc_keymap()
+        token_list          = _parse_txt.keymaps(data)
         function_token_list = _parse_txt.keymap_functions(data)
 
         layer_list  = []
@@ -1232,7 +1269,8 @@ class application:
                 layer_names.append(name)
 
             for row in tokens.layer:
-                # Annoying fix for problem with QMK functions X(x,y)
+                # Hotfix for problem with QMK functions X(x,y) splitting into [ X(x, ] [ y) ] 
+                # Todo: Implement in pyparsing instead (proper fix)
                 for i, element in enumerate(row):
                     if ')' in element and '(' not in element:
                         func = ''
