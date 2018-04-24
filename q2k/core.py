@@ -271,8 +271,8 @@ class _parse_txt:
 class _cpp:
 
     def __init__(self, kbo, dirs, console):
-        self.__kb = kbo
-        self.__dirs = dirs
+        self.__kb      = kbo
+        self.__dirs    = dirs
         self.__console = console
 
     def __preproc(self, kblibs, arg_list, DEBUG=False):
@@ -280,19 +280,22 @@ class _cpp:
         qdir = os.path.join(self.__dirs['QMK dir'], 'keyboards')
         kb = self.__kb.name
         if platform.system() == 'Linux':
-            cc = ['avr-gcc', '-E']
+            cc         = ['avr-gcc', '-E']
         elif platform.system() == 'Windows':
-            avr_gcc = os.path.join(defaults.src, 'avr-gcc', 'bin', 'avr-gcc.exe')
-            cc = [avr_gcc, '-E']
-        kbdefine = 'KEYBOARD_'+'_'.join(kblibs)
+            avr_gcc    = os.path.join(defaults.src, 'avr-gcc', 'bin', 'avr-gcc.exe')
+            cc         = [avr_gcc, '-E']
+
+        kbdefine       = 'KEYBOARD_'+'_'.join(kblibs)
         QMK_KEYBOARD_H = 'QMK_KEYBOARD_H=\"'+kb+'.h\"'
-        libs = ['-D', kbdefine, '-D', QMK_KEYBOARD_H, '-I'+self.__dirs['Local libs']]
-        path = qdir
+        libs           = ['-D', kbdefine, '-D', QMK_KEYBOARD_H, '-I'+self.__dirs['Local libs']]
+        path           = qdir
         for kbl in kblibs:
-            path = os.path.join(path, kbl)
+            path       = os.path.join(path, kbl)
             libs.append('-I'+path+os.sep)
-        argv = cc + libs + arg_list
+
+        argv           = cc + libs + arg_list
         if DEBUG: print(' '.join(argv))
+
         try:
             output = subprocess.check_output(argv)
             return output
@@ -319,11 +322,11 @@ class _cpp:
 
     def preproc_keymap(self):
 
-        qdir = os.path.join(self.__dirs['QMK dir'], 'keyboards')
-        kb = self.__kb.name
-        km = os.path.join(self.__kb.build_keymap, 'keymap.c')
+        qdir   = os.path.join(self.__dirs['QMK dir'], 'keyboards')
+        kb     = self.__kb.name
+        km     = os.path.join(self.__kb.build_keymap, 'keymap.c')
         kblibs = list(self.__kb.libs)
-        rev = self.__kb.build_rev
+        rev    = self.__kb.build_rev
         if rev != '':
             kblibs.append(rev)
 
@@ -557,14 +560,14 @@ class keycode_layer:
                 functions = ref.keyp_mods[qfunc]
                 # Recursively pipe func into functions until no more functions are left.
                 while ')' in target:
-                    br = target.index('(')+1
-                    func = target[:br]
-                    target = target[br:-1]
+                    br        = target.index('(')+1
+                    func      = target[:br]
+                    target    = target[br:-1]
                     if func in ref.keyp_mods.keys():
                         functions += ref.keyp_mods[func]
                 # Check that this LAST element is a keycode
-                if target in ref.keyp_kc.keys():
-                    final_kc = self.__keycode(target, functions, console, allow_quotes=False)
+                if target in  ref.keyp_kc.keys():
+                    final_kc  = self.__keycode(target, functions, console, allow_quotes=False)
                     # Wrap with quotes -> '[func]' - note: keyplus Format is [TAP]>[HOLD]
                     keyp_func = "'"+functions+'-'+final_kc+"'"
                     return keyp_func
@@ -592,8 +595,8 @@ class keycode_layer:
                     console.bad_kc('FN','['+qmk_func+'] - set to '+invalid)
                     return invalid
                 else:
-                    modifier = split[0]
-                    keycode = split[1]
+                    modifier  = split[0]
+                    keycode   = split[1]
 
                 if modifier in ref.qmk_legacy_mod.keys() and keycode in ref.keyp_kc.keys():
                     mod = ref.qmk_legacy_mod[modifier]
@@ -649,10 +652,10 @@ class _cache:
 
     def __init__(self, dirs, console, f_cache=False):
 
-        self.kbo_list = []
+        self.kbo_list  = []
 
-        self.__loc = dirs['Cache']
-        self.__qmk = dirs['QMK dir']
+        self.__loc     = dirs['Cache']
+        self.__qmk     = dirs['QMK dir']
         self.__console = console
 
         if not f_cache: 
@@ -698,16 +701,16 @@ class _cache:
                 # If in special dir list, then is part of the directory not keyboard
                 if name not in defaults.qmk_nonstd_dir:
                    # This is a keyboard, not revision
-                   kbo = kb_info(name)
-                   kblibs = name.split(os.sep)
+                   kbo      = kb_info(name)
+                   kblibs   = name.split(os.sep)
                    kbo.libs = kblibs
                    self.kbo_list.append(kbo)
             elif p_name in defaults.qmk_nonstd_dir:
                 name = child.replace(qdir+os.sep, '', 1)
                 # This is a keyboard, not revision
-                kbo = kb_info(name)
-                kblibs = name.split(os.sep)
-                kbo.libs = kblibs
+                kbo         = kb_info(name)
+                kblibs      = name.split(os.sep)
+                kbo.libs    = kblibs
                 self.kbo_list.append(kbo)
             else:
                 # This is a 'revision' of an existing keyboard
@@ -724,9 +727,9 @@ class _cache:
 
         for km_path in keymaplist:
             info_list = km_path.split(os.sep+'keymaps'+os.sep)
-            kb_name = info_list[0]
-            km_name = info_list[-1]
-            namelist = kb_name.split(os.sep)
+            kb_name   = info_list[0]
+            km_name   = info_list[-1]
+            namelist  = kb_name.split(os.sep)
             match = False
             prev = 'n/a'
             for i in range(0, len(namelist)):
@@ -762,15 +765,16 @@ class _cache:
             rev_list.append('')
         
         for rev in rev_list:
-            found = False
-            revo = kbo.get_rev_info(rev)
-            kblibs = list(kbo.libs)
+            found    = False
+            revo     = kbo.get_rev_info(rev)
+            kblibs   = list(kbo.libs)
+
             if rev != '':
                 kblibs.append(rev)
             qdir = os.path.join(self.__qmk, 'keyboards')
 
-            folders = []
-            path = ''
+            folders  = []
+            path     = ''
             for kbl in kblibs:
                 path = os.path.join(path, kbl)
                 folders.append(path)
@@ -865,9 +869,9 @@ class application:
 
     def __init__(self, app_type, is_gui=False):
         self.__output = en.Enum('output', 'keyplus kbfirmware')
-        self.format = self.__output[app_type]
-        self.is_gui = is_gui
-        self.console = _console(is_gui)
+        self.format   = self.__output[app_type]
+        self.is_gui   = is_gui
+        self.console  = _console(is_gui)
         # self.dirs      # directories
         # self.build_kb  # kb_info for build
         # self.build_rev # rev_info for build
@@ -1099,9 +1103,9 @@ class application:
 
     def __get_mcu(self):
 
-        rev = self.build_rev.name
-        revo = self.build_rev
-        kblibs = list(self.build_kb.libs)
+        rev     = self.build_rev.name
+        revo    = self.build_rev
+        kblibs  = list(self.build_kb.libs)
         if rev != 'n/a':
             kblibs.append(rev)
 
@@ -1142,14 +1146,14 @@ class application:
 
     def __get_config_header(self):
 
-        rev = self.build_rev.name
-        revo = self.build_rev
-        kblibs = list(self.build_kb.libs)
+        rev      = self.build_rev.name
+        revo     = self.build_rev
+        kblibs   = list(self.build_kb.libs)
         if rev != 'n/a':
             kblibs.append(rev)
 
         qdir = os.path.join(self.dirs['QMK dir'], 'keyboards')
-        folders = []
+        folders  = []
         path = ''
 
         for kbl in kblibs:
@@ -1178,13 +1182,13 @@ class application:
 
     def __get_keycodes(self, DEBUG=False):
 
-        rev = self.build_rev.name
-        revo = self.build_rev
-        data = self.__cpp.preproc_keymap()
-        token_list = _parse_txt.keymaps(data)
+        rev         = self.build_rev.name
+        revo        = self.build_rev
+        data        = self.__cpp.preproc_keymap()
+        token_list  = _parse_txt.keymaps(data)
         function_token_list = _parse_txt.keymap_functions(data)
 
-        layer_list = []
+        layer_list  = []
         layer_names = []
         num_col = 0
         layer_index = -1
@@ -1270,7 +1274,7 @@ class application:
 
     def __get_templates(self, DEBUG=False):
 
-        rev = self.build_rev.name
+        rev  = self.build_rev.name
         revo = self.build_rev
 
         if revo.template_list:
@@ -1309,9 +1313,9 @@ class application:
 
     def __generate_matrix_template(self, index=0):
 
-        rev = self.build_rev.name
-        revo = self.build_rev
-        layer = revo.build_layout[index]
+        rev       = self.build_rev.name
+        revo      = self.build_rev
+        layer     = revo.build_layout[index]
 
         col_limit = layer.matrix_cols
         matrix = []
@@ -1424,15 +1428,16 @@ class application:
     def __create_keyplus_yaml(self, DEBUG=False):
 
         # Can't simply dump to yaml as we want to keep layout (array) as a human readable matrix (2D 'array').
-        out_dir = self.dirs['Keyplus YAML output']
-        kb_n = self.build_kb.name
-        rev_n = self.build_rev.name
+        out_dir  = self.dirs['Keyplus YAML output']
+        kb_n     = self.build_kb.name
+        rev_n    = self.build_rev.name
         if rev_n == 'n/a': rev_n = ''
-        keymap = self.build_kb.build_keymap
+        keymap   = self.build_kb.build_keymap
 
-        rev = self.build_rev
-        layers = rev.build_layout
-        errors = ''
+        rev      = self.build_rev
+        layers   = rev.build_layout
+
+        errors   = ''
         for error in self.console.errors:
             errors += '# '+error+'\n'
 
@@ -1456,7 +1461,7 @@ class application:
             if i+1 < len(template_matrix):
                 template += '\n        '
 
-        layout = ''
+        layout   = ''
         keycode_define = []
         for i, layer in enumerate(layers):
             layout += '      [ # layer '+str(i)+'\n        ['
@@ -1504,8 +1509,8 @@ class application:
             path_list = kblibs + [rev_n, keymap]
         else:
             path_list = kblibs + [keymap]
-        output_path = '_'.join(path_list)
-        output_yaml = out_dir+output_path+'.yaml'
+        output_path   = '_'.join(path_list)
+        output_yaml   = out_dir+output_path+'.yaml'
         if not os.path.exists(out_dir):
             try:
                 os.makedirs(out_dir)
