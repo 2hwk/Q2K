@@ -847,7 +847,7 @@ class _cache:
                 path = os.path.join(qdir, kbl, kb_h)
                 try:
                     # Open config.h file, if it exists
-                    with open(path, 'r', encoding='ut8') as f:
+                    with open(path, 'r', encoding='utf8') as f:
                         data = str(f.read())
                 except FileNotFoundError:
                     #self.__console.warning(['Layout header not found in '+path, 'Trying a different path...'])

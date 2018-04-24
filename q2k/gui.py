@@ -322,7 +322,7 @@ class Window():
         self.q2k_app.dirs['QMK dir'] = dir_select
         self.save_pref()
 
-    def set_keyp_directory(self):
+    def set_keyplus_directory(self):
         dir_select = os.path.normpath( filedialog.askdirectory() )
         self.keyplus_dir.set(dir_select)
         self.q2k_app.dirs['Keyplus YAML output'] = dir_select
