@@ -6,7 +6,8 @@ by 2Cas (c) 2018
 ```
 
 For parsing keymaps from QMK Firmware style keymap.c files to Keyplus YAML format.
-!!! PRE-ALPHA AND WIP !!! 
+
+!!! PRE-ALPHA AND VERY MUCH WIP !!! 
 
 ## Requirements
 
@@ -18,7 +19,17 @@ Requires (exec): ``avr-gcc``
 Tested on bash on Windows 10 (q2k-cli only), Windows 10 and Ubuntu Linux
 
 ## Setup
-**Using PyPI and pip**
+
+**Using Executables (WIN/Linux)**
+
+Go to the releases tab (or /bin) and get the latest executable ``q2k_util`` zip folder and extract.
+
+Run like a traditional program (Click ``q2k_util.exe`` (windows)/ ``q2k_util`` (Linux) or use terminal/cmd ``./q2k_util.exe`` (windows) / ``./q2k_util``(linux))
+
+For the windows version, you will need [this avr-gcc compiler](http://andybrown.me.uk/2015/03/08/avr-gcc-492/) installed in the avr-gcc folder at the same level as ``q2k_util.exe``
+
+**Using PyPI and pip to install q2k module (Optional)**
+
 Install the required dependencies, then run
 
 `pip3 install q2k`
@@ -29,14 +40,10 @@ GUI: run with `q2k`, point to qmk root and final output directories, then hit Ge
 
 Command Line: `cd` into your local qmk directory and run with `q2k-cli [options]`
 
-**Using Executables (WIN/Linux)**
 
-Go to the releases tab (or /bin) and get the latest executable q2k_util file. Run like a traditional program (Click/Use terminal ./q2k_util)
+## Run (package)
 
-For the windows version, you will need [http://andybrown.me.uk/2015/03/08/avr-gcc-492/](this avr-gcc compiler installed in the avr-gcc folder at the same level as q2k_util.exe
-
-## Run
-`q2k` for simple tkinter based GUI
+``./q2k_util`` (binary) or `q2k` (python package) for simple tkinter based GUI
 
 OR
 
@@ -56,25 +63,30 @@ q2k-cli k_type -m default => keyplus_out/k_type_default.yaml
 ## Commands
 
 ```
-Usage: q2k-cli [KEYBOARD] [-h] [-m keymap] [-r ver] [-L] [-M] [-R] [-S string] [-c keymap] 
+usage: q2k-cli [KEYBOARD] [-r REV] [-m KEYMAP] [-t LAYOUT]  [-h] [--cache] [--reset]
+               [--debug] [-l] [-M] [-T] [-R] [-S string]
+               
 
 positional arguments:
-
-  KEYBOARD    The name of the keyboard whose keymap you wish to convert
+  KEYBOARD              The name of the keyboard whose keymap you wish to
+                        convert
 
 optional arguments:
-
-  -h, --help  show this help message and exit
-  -m keymap   The keymap folder to reference - default is /default/
-  -r ver      Revision of layout - default is n/a
-  -d          Append results to cache/kb_info.yaml file. For debugging, may cause
-              performance loss
-  -L          List all valid KEYBOARD inputs
-  -M          List all valid KEYMAPS for the current keyboard
-  -R          List all valid REVISIONS for the current keyboard
-  -S string   Search valid KEYBOARD inputs
-  -P          Print result of keymap conversion to terminal
-  -c layout   Select keymap template index. (Skips prompt for keymap selection)
+  -h, --help            show this help message and exit
+  -m KEYMAP, --keymap KEYMAP
+                        The keymap folder to reference - default is [default]
+  -t LAYOUT, --template LAYOUT
+                        The layout template to reference
+  -r ver, --rev REV     Revision of layout - default is n/a
+  --cache               Clear cached data (cache_kb.yaml)
+  --reset               Restore preferences in pref.yaml to default
+  --debug               See debugging information
+  -l, -L, --list        List all valid KEYBOARD inputs
+  -M, --keymaps         List all valid KEYMAPS for the current keyboard
+  -T, --templatelist    List all valid LAYOUTS for the current keyboard
+  -R, --revlist         List all valid REVISIONS for the current keyboard
+  -S string, --search string
+                        Search valid KEYBOARD inputs
 ```
 
 ## Understanding QMK's Keymap/Layout Structure - How this works
