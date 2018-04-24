@@ -50,6 +50,7 @@ class ConsoleText(Text):
 
         self.started = True
 
+        
         self.original_stdout = sys.stdout
         self.original_stderr = sys.stderr
 
@@ -90,23 +91,23 @@ class Window():
        # =============================================================================================================
         self.output.start() # Ensure output from loading q2k gets printed to console
         self.q2k_app = core.application('keyplus', is_gui=True)
-        self.dirs    = self.q2k_app.dirs
         self.output.stop() # Stop output printing
        # =============================================================================================================
         # Set dynamic lists and enter main loop
        # =============================================================================================================
-        self.set_dirs()
+        self.set_lists()
         self.window.mainloop()
 
     def init_q2k_gui(self):
         self.window = Tk()
         self.window.resizable(width=False, height=False)
+        self.window.title("Q2K Keymap Utility")
         if platform.system()   == 'Linux':
             self.window.option_add('*font', ('Liberation Sans', '-12'))
+            self.window.geometry('380x560')
         if platform.system() == 'Windows':
-            self.window.option_add('*font', ('Arial', '9'))
-        self.window.title("Q2K Keymap Utility")
-        self.window.geometry('380x560')
+            self.window.option_add('*font', ('Calibri', '-13'))
+            self.window.geometry('496x700')
 
         menu     = Menu(self.window)
         new_item = Menu(menu, tearoff=0)
@@ -117,7 +118,7 @@ class Window():
 
        # =============================================================================================================
         # Tabs
-       # ===========================================================================================──────
+       # =============================================================================================================
 
         tab_control = ttk.Notebook(self.window)
         tab1        = ttk.Frame(tab_control)
@@ -140,33 +141,45 @@ class Window():
         #       QMK Firmware Directory Entry
        # =============================================================================================================
         # Label
-        qmk_lbl           = Label(top_frame, text='QMK Firmware Directory:')
+        qmk_lbl           = Label(top_frame, text='QMK Firmware Directory')
         # Text Box
         self.qmk_dir      = StringVar()
-        qmkdir_entry      = Entry(top_frame, width=44, textvariable=self.qmk_dir)
+        qmk_dir_entry      = Entry(top_frame, textvariable=self.qmk_dir)
         # Button
-        qmk_dir_btn       = Button(top_frame, width=2, text="..", command=lambda:self.find_directory(self.qmk_dir))
+        qmk_dir_btn       = Button(top_frame, text="..", command=lambda:self.set_qmk_directory())
 
        # =============================================================================================================
         #      Keyplus Output Directory Entry
        # =============================================================================================================
         # Label
-        keyplus_lbl       = Label(top_frame, text='Output Directory:')
+        keyplus_lbl       = Label(top_frame, text='Output Directory')
         # Text Box
         self.keyplus_dir  = StringVar()
-        keyplus_dir_entry = Entry(top_frame,  width=44, textvariable=self.keyplus_dir)
+        keyplus_dir_entry = Entry(top_frame, textvariable=self.keyplus_dir)
 
         # Button
-        keyplus_dir_btn   = Button(top_frame, width=2, text="..", command=lambda:self.find_directory(self.keyplus_dir))
+        keyplus_dir_btn   = Button(top_frame, text="..", command=lambda:self.set_keyplus_directory())
 
         # Settings / Positioning
         qmk_lbl.grid          (row=0, column=0,   sticky=W)
         keyplus_lbl.grid      (row=2, column=0,   sticky=W)
 
-        qmkdir_entry.grid     (row=1, column=0, sticky=W+E)
+        qmk_dir_entry.grid     (row=1, column=0, sticky=W+E)
         qmk_dir_btn.grid      (row=1, column=1)
         keyplus_dir_entry.grid(row=3, column=0, sticky=W+E)
         keyplus_dir_btn.grid  (row=3, column=1)
+
+        
+        if platform.system()   == 'Linux':
+            qmk_dir_entry['width']     = 44
+            qmk_dir_btn['width']       = 2
+            keyplus_dir_entry['width'] = 44
+            keyplus_dir_btn['width']   = 2
+        if platform.system() == 'Windows':
+            qmk_dir_entry['width']     = 60
+            qmk_dir_btn['width']       = 4
+            keyplus_dir_entry['width'] = 60
+            keyplus_dir_btn['width']   = 4
        # =============================================================================================================
         #   Frame 2 - Combo Boxes
        # =============================================================================================================
@@ -178,16 +191,28 @@ class Window():
         #          | Keymap                 |  Template            | 
        # =============================================================================================================
         # Labels
-        kb_lbl       = Label(kb_opts, text='Keyboard:')
-        rev_lbl      = Label(kb_opts, text='Rev:')
-        keymap_lbl   = Label(kb_opts, text='Keymap:')
-        template_lbl = Label(kb_opts, text='Template:')
+        kb_lbl       = Label(kb_opts, text='Keyboard')
+        rev_lbl      = Label(kb_opts, text='Rev')
+        keymap_lbl   = Label(kb_opts, text='Keymap')
+        template_lbl = Label(kb_opts, text='Template')
 
         # Combo Boxes
-        self.template = Combobox(kb_opts, width=22, state='readonly')
-        self.keymap   = Combobox(kb_opts, width=22, state='readonly')
-        self.rev      = Combobox(kb_opts, width=22, state='readonly')
-        self.kb       = Combobox(kb_opts, width=22,  state='readonly')
+        self.template = Combobox(kb_opts, state='readonly')
+        self.keymap   = Combobox(kb_opts, state='readonly')
+        self.rev      = Combobox(kb_opts, state='readonly')
+        self.kb       = Combobox(kb_opts, state='readonly')
+
+        if platform.system()   == 'Linux':
+            self.template['width'] = 22
+            self.keymap['width']   = 22
+            self.rev['width']      = 22
+            self.kb['width']       = 22
+
+        elif platform.system() == 'Windows':
+            self.template['width'] = 30
+            self.keymap['width']   = 30
+            self.rev['width']      = 30
+            self.kb['width']       = 30
 
         self.rev.bind('<<ComboboxSelected>>', self.event_rev_selected) # Updating list triggers event rev_select
         self.kb.bind( '<<ComboboxSelected>>', self.event_kb_selected)   # Updating list triggers event kb_select
@@ -218,6 +243,15 @@ class Window():
         convert_btn.grid(row=0, column=0, sticky=W+E)
         gen_btn.grid    (row=0, column=1, padx=5, sticky=W+E)
         reset_btn.grid  (row=0, column=2, sticky=W+E)
+
+        if platform.system()   == 'Linux':
+            convert_btn['width']     = 10
+            gen_btn['width']         = 20
+            reset_btn['width']       = 10
+        if platform.system() == 'Windows':
+            convert_btn['width']     = 20
+            gen_btn['width']         = 20
+            reset_btn['width']       = 20
        # =============================================================================================================
         # Frame 4 - Output 
        # =============================================================================================================
@@ -236,9 +270,9 @@ class Window():
             self.output['width']  = 56
             self.output['font']   = ('Consolas', '8')
         elif platform.system() == 'Windows':
-            self.output['height'] = 19
-            self.output['width']  = 58
-            self.output['font']   = ('Consolas', '8')
+            self.output['height'] = 27
+            self.output['width']  = 65
+            self.output['font']   = ('Consolas', '9')
 
         self.output.grid(padx=5, row=1, column=0, sticky=W+E)
 
@@ -268,38 +302,45 @@ class Window():
         #tab_control.pack(expand=1, fill='both')
         tab_control.grid()
 
-    def set_dirs(self):
-
-        self.qmk_dir.set(self.dirs['QMK dir'])
-        self.keyplus_dir.set(self.dirs['Keyplus YAML output'])
+    def set_lists(self):
+        self.qmk_dir.set(self.q2k_app.dirs['QMK dir'])
+        self.keyplus_dir.set(self.q2k_app.dirs['Keyplus YAML output'])
 
         kb_list = self.q2k_app.keyboard_list()
         kb_list.sort()
 
         self.kb['values'] = kb_list
 
-    def find_directory(self, string):
-        folder_selected = filedialog.askdirectory()
-        folder_selected = os.path.normpath(folder_selected)
-        string.set(folder_selected)
+    def save_pref(self):
+        pref_yaml = os.path.join(core.defaults.src, 'pref.yaml')
+        with open(pref_yaml, 'w') as f:
+            f.write('# Q2K Folder Locations\n')
+            yaml.dump(self.q2k_app.dirs, f, default_flow_style = False)
+
+    def set_qmk_directory(self):
+        dir_select = os.path.normpath( filedialog.askdirectory() )
+        self.qmk_dir.set(dir_select)
+        self.q2k_app.dirs['QMK dir'] = dir_select
+        self.save_pref()
+
+    def set_keyp_directory(self):
+        dir_select = os.path.normpath( filedialog.askdirectory() )
+        self.keyplus_dir.set(dir_select)
+        self.q2k_app.dirs['Keyplus YAML output'] = dir_select
+        self.save_pref()
 
     def show_about(self):
         messagebox.showinfo('About', 'Q2K Keymap Utility\nv '+core.defaults.version)
-
 
     def btn_generate_lists(self):
         self.output.start()
 
         # Get dirs from StringVars
-        self.dirs['QMK dir'] = self.qmk_dir.get()
-        self.dirs['Keyplus YAML output'] = self.keyplus_dir.get()
+        self.q2k_app.dirs['QMK dir'] = self.qmk_dir.get()
+        self.q2k_app.dirs['Keyplus YAML output'] = self.keyplus_dir.get()
         # Save to pref.yaml
-        pref_yaml = os.path.join(core.defaults.src, 'pref.yaml')
-        with open(pref_yaml, 'w') as f:
-            f.write('# Q2K Folder Locations\n')
-            yaml.dump(self.dirs, f, default_flow_style = False)
-        # Refresh Q2K App variables
-        self.q2k_app.refresh_dir()
+        self.save_pref()
+        #self.q2k_app.refresh_dir()
         self.q2k_app.refresh_cache()
         # Get KB list, sort and set combobox to this list.
         kb_list = self.q2k_app.keyboard_list()
@@ -326,10 +367,11 @@ class Window():
         self.rev.set('')
         self.keymap.set('')
         self.template.set('')
-        # Get KB list, sort and set combobox to this list.
-        kb_list = self.q2k_app.keyboard_list()
-        kb_list.sort()
-        self.kb['values'] = kb_list
+
+        self.kb['values'] = []
+        self.rev['values'] = []
+        self.keymap['values'] = []
+        self.template['values'] = []
 
         self.output.stop()
 

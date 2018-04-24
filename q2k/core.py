@@ -1,14 +1,16 @@
 import argparse
+import copy
+import errno
 import glob
+import os
 import pathlib
 import platform
-import errno
-import os
-import yaml
-import sys
 import re
-import copy
 import subprocess
+import sys
+import traceback
+import yaml
+import tempfile
 import pyparsing as pp
 import termcolor as tc
 import enum as en
@@ -22,19 +24,31 @@ from q2k.version import q2kversion
 class defaults:
 
     if getattr(sys, 'frozen', False):
-        src = os.getcwd()                                     # If Frozen - $Q2K = [cwd]
+        frozen = True
+        src = ''       #os.getcwd()                           # If Frozen - $Q2K = [cwd]
     else:                                                     # If Live, use bundle_dir
         frozen = False
         src = os.path.dirname(os.path.abspath(__file__))      # else $Q2K is its own install dir, seperate from working directory
 
     version = q2kversion
-    # Directories
+    # Directories 
+    libs    = os.path.join(src, 'lib')                            # Local Libs                                              Default is $Q2K/libs/
+    cache   = os.path.join(src, '.cache','cache_kb.yaml')         # Cache                                                   Default is $Q2K/.cache/cache_kb.yaml
+
+    if frozen:
+        qmk   = os.path.join(src, 'qmk_firmware')                 # QMK Directory - To be provided by user                  Default is $Q2K/qmk_firmware/
+        keyp  = os.path.join(src, 'q2k_out','keyplus')            # Output. This is a relative directory (default)          Default is $Q2K/q2k_out/keyplus/ (Frozen)
+        kbf   = os.path.join(src, 'q2k_out','kbfirmware')
+    else:
+        qmk   = os.path.join(os.getcwd(), 'qmk_firmware')         # QMK Directory - To be provided by user                  Default is $Q2K/qmk_firmware/
+        keyp  = os.path.join(os.getcwd(),'q2k_out','keyplus')     # Output. This is a relative directory.                   Default is [cwd]/q2k_out/keyplus/ (Live)
+        kbf   = os.path.join(os.getcwd(),'q2k_out','kbfirmware')
+
+    if platform.system() == 'Linux':                              # AVR-GCC Compiler.                                                                            
+        avr_gcc = 'avr-gcc'                                       # avr-gcc for linux                                       Default is avr-gcc (Linux)                
+    elif platform.system() == 'Windows':
+        avr_gcc = os.path.join(src, 'avr-gcc', 'bin', 'avr-gcc.exe') # avr-gcc.exe for Windows                              Default is $Q2K/avr-gcc/bin/avr-gcc.exe (Windows)
     
-    libs  = os.path.join(src, 'lib')                          # Local Libs - We want these to be in a single, FIXED directory. [Avoid using relative directories]              Default is $Q2K/libs
-    cache = os.path.join(src, '.cache','cache_kb.yaml')       # Cache -  We want this to be in a single, FIXED directory. [Avoid using relative directories]                   Default is $Q2K/.cache/cache_kb.yaml
-    qmk   = os.path.join(src, 'qmk')                          # QMK Directory - To be provided by user                                                                         Default is [cwd]/qmk
-    keyp  = os.path.join(os.getcwd(),'q2k_out','keyplus')     # Output. This can either be fixed in one location (defined by user) or be a relative directory (default)        Default is [cwd]/q2k_out/keyplus
-    kbf   = os.path.join(os.getcwd(),'q2k_out','kbfirmware')
     # Lists
     qmk_nonstd_dir = ['handwired', 'converter', 
                       'clueboard', 'lfkeyboards']             # Currently only lfkeyboards causes any issues, however it is good to be verbose here
@@ -43,6 +57,11 @@ class defaults:
                       'at90usb1286']
     # Misc
     invalid_kc = 'trns'                                       # What to set invalid KC codes to
+
+    if platform.system() == 'Linux':
+        print_lines = '─────────────────────────────────────────────────────────────────'
+    elif platform.system() == 'Windows':
+        print_lines = '──────────────────────────────────────────────────────────────'
 
 # ===========================================================================================
 # Console Output
@@ -279,12 +298,7 @@ class _cpp:
         # Setting up -I and custom define options
         qdir = os.path.join(self.__dirs['QMK dir'], 'keyboards')
         kb = self.__kb.name
-        if platform.system() == 'Linux':
-            cc         = ['avr-gcc', '-E']
-        elif platform.system() == 'Windows':
-            avr_gcc    = os.path.join(defaults.src, 'avr-gcc', 'bin', 'avr-gcc.exe')
-            cc         = [avr_gcc, '-E']
-
+        cc             = [defaults.avr_gcc, '-E']
         kbdefine       = 'KEYBOARD_'+'_'.join(kblibs)
         QMK_KEYBOARD_H = 'QMK_KEYBOARD_H=\"'+kb+'.h\"'
         libs           = ['-D', kbdefine, '-D', QMK_KEYBOARD_H, '-I'+self.__dirs['Local libs']]
@@ -297,17 +311,34 @@ class _cpp:
         if DEBUG: print(' '.join(argv))
 
         try:
-            output = subprocess.check_output(argv)
+            #app_stdout = sys.stdout
+            #app_stderr = sys.stderr
+            #sys.stdout = sys.__stdout__
+            #sys.stderr = sys.__stderr__
+
+            #sys.stdout = app_stdout
+            #sys.stderr = app_stderr
+
+            si = subprocess.STARTUPINFO()
+            si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+
+            output = subprocess.check_output(argv, stdin=subprocess.PIPE, stderr=subprocess.PIPE, startupinfo=si)
+
             return output
         except subprocess.CalledProcessError as e:
             err_num = e.returncode
-            if err_num == 1:
-                print(err_num)
+            if err_num == errno.EPERM:
+                self.__console.warning(['Compiler failed to read '+argv[-1]])
                 output = e.output
                 return output
             else:
-                self.console.warning(['Potentially catastrophic segfault related compilation error'])
+                print(traceback.format_exc(), file=sys.stderr)
                 return
+        except OSError as e:
+            if e.errno == errno.ENOEXEC:
+                self.__console.error(['Could not find avr-gcc compiler', 'Check if avr-gcc is installed in',defaults.avr_gcc])
+            else:
+                print(traceback.format_exc(), file=sys.stderr)
     
     def preproc_header(self, path):
 
@@ -375,7 +406,7 @@ class kb_info:
                return r
             if r.name == 'n/a':
                return r
-#───────────────────────────────────────────────────────────────────────────────────────────
+# ===========================================================================================
 # KB and revision Information
 # ===========================================================================================
 class rev_info:
@@ -668,7 +699,7 @@ class _cache:
             try:
                 with open(self.__loc, 'r') as f:
                     self.kbo_list = yaml.load(f)
-                    self.__console.note(['Using cached list from '+self.__loc, '--cache to reset'])
+                    self.__console.note(['Using cached list from '+self.__loc, '--cache to reset', defaults.print_lines])
             except:
                 self.__console.warning(['Failed to load from '+self.__loc, 'Generating new cache_kb.yaml...'])
                 self.__write()
@@ -753,9 +784,9 @@ class _cache:
         if self.kbo_list:
             # Dump cache info to text file for faster processing in future
             self.__save_cache()
-            self.__console.note(['New cache_kb.yaml successfully generated', 'Location: '+self.__loc])
+            self.__console.note(['New cache_kb.yaml successfully generated', 'Location: '+self.__loc, defaults.print_lines])
         else:
-            self.__console.warning(['No keyboard information found', 'Check QMK directory location in pref.yaml : '+self.__qmk])
+            self.__console.warning(['No keyboard information found', 'Check QMK directory location in pref.yaml : '+self.__qmk, defaults.print_lines])
         
 
     def __find_layout_names(self, kbo):
@@ -806,15 +837,12 @@ class _cache:
 
     def __save_cache(self):
         path = os.path.split(self.__loc)[0]
-        print(self.__loc)
-        print(path)
-        #======================================================================================================================
         if not os.path.exists(path):
             try:
                 os.makedirs(path)
             except OSError as e:
                 if e.errno != errno.EEXIST and os.path.isdir(path):
-                    raise
+                    raise 
         try:
             with open(self.__loc, 'w') as f:
                 yaml.dump(self.kbo_list, f)
@@ -824,6 +852,7 @@ class _cache:
     def _clear_cache(self):
         if os.path.isfile(self.__loc):
             os.remove(self.__loc)
+        self.kbo_list = []
 
     def _keyboard_list(self,):
         kb_names = []
@@ -913,8 +942,7 @@ class application:
                 pref_yaml = os.path.join(defaults.src, 'pref.yaml')
                 with open(pref_yaml, 'r') as f:
                     self.dirs = yaml.load(f)
-
-                    self.console.note(['─────────────────────────────────────────────────────────────────', 'Using preferences from '+pref_yaml, '--reset to reset to defaults'])
+                    self.console.note([defaults.print_lines, 'Using preferences from '+pref_yaml, '--reset to reset to defaults'])
 
             except FileNotFoundError:
                 self.__generate_dirs()
@@ -937,7 +965,7 @@ class application:
             with open(pref_yaml, 'w') as f:
                 f.write('# Q2K Folder Locations\n')
                 yaml.dump(dirs, f, default_flow_style = False)
-                self.console.note(['─────────────────────────────────────────────────────────────────', 'New pref.yaml generated @ '+pref_yaml])
+                self.console.note([defaults.print_lines, 'New pref.yaml generated @ '+pref_yaml])
 
         except FileNotFoundError:
             self.console.error(['Failed to generate '+pref_yaml])
@@ -1025,9 +1053,9 @@ class application:
             self.build_kb = build_kbo
             self.build_rev = build_revo
             if rev:
-                self.console.note(['─────────────────────────────────────────────────────────────────','Building '+keyboard+ os.sep +rev+':'+keymap+':'+template, '─────────────────────────────────────────────────────────────────'])
+                self.console.note([defaults.print_lines, 'Building '+keyboard+os.sep+rev+':'+keymap+':'+template, defaults.print_lines])
             else:
-                self.console.note(['─────────────────────────────────────────────────────────────────','Building '+keyboard+':'+keymap+':'+template, '─────────────────────────────────────────────────────────────────'])
+                self.console.note([defaults.print_lines, 'Building '+keyboard+':'+keymap+':'+template, defaults.print_lines])
         else:
             print_kb_list = ', '.join(self.keyboard_list())
             self.console.error(['Invalid Keyboard Name - '+keyboard, 'Valid Names: '+print_kb_list])
@@ -1510,7 +1538,7 @@ class application:
         else:
             path_list = kblibs + [keymap]
         output_path   = '_'.join(path_list)
-        output_yaml   = out_dir+output_path+'.yaml'
+        output_yaml   = os.path.join(out_dir, output_path+'.yaml')
         if not os.path.exists(out_dir):
             try:
                 os.makedirs(out_dir)
@@ -1548,4 +1576,3 @@ def q2keyplus_gui(keyboard, rev, keymap, template):
 # Uncomment this to run as a traditional python script (Commnand Line Interface)
 #if __name__ == '__main__':
     #q2keyplus()
-
