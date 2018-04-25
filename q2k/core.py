@@ -18,17 +18,31 @@ import tkinter as tk
 
 from q2k.reference import ref
 from q2k.version import q2kversion
-# ===========================================================================================
-# Default Constants for Q2K
-# ===========================================================================================
+
+# TODO: 
+# * Conform to google style python style convention. i.e. http://google.github.io/styleguide/pyguide.html#Classes
+# * More Documentation.
+# * Less shitcode
+
 class defaults:
+    """A class for Q2K constants/default variables
+
+    Attributes:
+        src(str)     : Path to source directory of this application
+        libs(str)    : Path to local libs directory
+        cache(str)   : Path to cache yaml
+        qmk(str)     : Path to qmk directory
+        keyp(str)    : Path to keyplus yaml output directory
+        kbf(str)     : Path to kbfirmware json output directory
+        avr_gcc(str) : Path to avr-gcc compiler dependency
+    """
 
     if getattr(sys, 'frozen', False):
         frozen = True
-        src = ''       #os.getcwd()                           # If Frozen - $Q2K = [cwd]
-    else:                                                     # If Live, use bundle_dir
+        src = ''       #os.getcwd()                               # If Frozen - $Q2K = [cwd]
+    else:                                                         # If Live, use bundle_dir
         frozen = False
-        src = os.path.dirname(os.path.abspath(__file__))      # else $Q2K is its own install dir, seperate from working directory
+        src = os.path.dirname(os.path.abspath(__file__))          # else $Q2K is its own install dir, seperate from working directory
 
     version = q2kversion
     # Directories 
@@ -52,7 +66,7 @@ class defaults:
     # Lists
     qmk_nonstd_dir = ['handwired', 'converter', 
                       'clueboard', 'lfkeyboards']             # Currently only lfkeyboards causes any issues, however it is good to be verbose here
-    mcu_compat     = ['atmega32u4']                           # Compatible MCU types
+    mcu_compat     = ['atmega32u2', 'atmega32u4', 'at90usb1286']  # Compatible MCU types
     kbf_mcu_compat = ['atmega32u4', 'atmega32u2', 
                       'at90usb1286']
     # Misc
@@ -63,16 +77,16 @@ class defaults:
     elif platform.system() == 'Windows':
         print_lines = '──────────────────────────────────────────────────────────────'
 
-# ===========================================================================================
-# Console Output
-# ===========================================================================================
 class _console:
+    """A private class for handling output to application console"""
 
     def __init__(self, gui):
+        """Class constructor"""
         self.gui = gui
         self.errors = []
 
-    def error(self, info):
+    def error(self, info, fatal=True):
+        ''' Prints non-fatal and fatal error messages to console'''
         if self.gui:
             msg = ''
             for info, line in enumerate(info):
@@ -84,9 +98,9 @@ class _console:
                 else:
                     self.errors.append(line)
                     print('• '+line)
-
-            tk.messagebox.showerror('Error', msg)
-            raise RuntimeError(warning)
+            if fatal:
+                tk.messagebox.showerror('Error', msg)
+                raise RuntimeError(warning)
         else:
             error_msg = tc.colored('❌ ERROR:', 'red', attrs=['reverse', 'bold'])
             e_bullet = tc.colored('•', 'red', attrs=['bold'])
@@ -99,9 +113,11 @@ class _console:
                 else:
                     self.errors.append(line)
                     print(e_bullet + ' '+line)
-            exit()
+            if fatal:
+                exit()
 
     def bad_kc(self, kc_type, code):
+        """ Prints bad keycode warnings to console"""
         if self.gui:
             message = 'Invalid '+kc_type+': '+code
             bad_kc_msg = '❌ Invalid '+kc_type+':'
@@ -114,6 +130,7 @@ class _console:
             self.errors.append(message)
 
     def warning(self, info, pause=False):
+        """ Prints warnings and interactive warnings to console"""
     
         if self.gui:
             msg = ''
@@ -148,7 +165,7 @@ class _console:
 
 
     def note(self, info):
-        
+        """ Prints progress and success notification to console"""
         if self.gui:
             for info, line in enumerate(info):
                 if not info:
@@ -168,18 +185,18 @@ class _console:
     def clear(self):
 
         self.errors = []
-# ===========================================================================================
-# Text parsing
-# ===========================================================================================
+
 class _parse_txt:
+    """" A private class containing functions for handling text parsing (with pyparsing) of QMK source files"""
 
     def layout_headers(data):
+        """ Finds LAYOUT templates from QMK <keyboard>.h header"""
 
         if platform.system() == 'Linux':
             data = str(data)
         elif platform.system() == 'Windows':
             data = str(data.replace('\\n', ' ').replace('\\r', ' ').replace('\\t', ' '))
-        
+
         LPAREN, RPAREN, LBRAC, RBRAC, COMMA = map(pp.Suppress, "(){},")
         BSLASH = pp.Suppress(pp.Literal('\\'))
 
@@ -209,37 +226,61 @@ class _parse_txt:
         return hresults
 
     def config_headers(data):
+        """ Finds matrix column and row pins from QMK config.h header"""
 
         if platform.system() == 'Linux':
             data = str(data)
         elif platform.system() == 'Windows':
             data = str(data.replace('\\n', ' ').replace('\\r', ' ').replace('\\t', ' '))
 
-        matrix_pins = []
+        matrix_data = []
         matrix_row_pins = []
         matrix_col_pins = []
         
         LBRAC, RBRAC, COMMA = map(pp.Suppress, "{},")
-        define_rows = pp.Suppress(pp.Literal('#define MATRIX_ROW_PINS'))
-        define_cols = pp.Suppress(pp.Literal('#define MATRIX_COL_PINS'))
-        pincode     = pp.Word(pp.alphanums) | pp.Word(pp.nums)
+        define_rows   = pp.Suppress(pp.Literal('#define MATRIX_ROW_PINS'))
+        define_cols   = pp.Suppress(pp.Literal('#define MATRIX_COL_PINS'))
+        define_diodes = pp.Suppress(pp.Literal('#define DIODE_DIRECTION'))
 
-        array       = LBRAC + pp.ZeroOrMore(pincode + pp.Optional(COMMA)) + RBRAC
-        matrix_rows = define_rows + LBRAC + pp.ZeroOrMore(pincode + pp.Optional(COMMA)) + RBRAC
-        matrix_cols = define_cols + LBRAC + pp.ZeroOrMore(pincode + pp.Optional(COMMA)) + RBRAC
+        pincode       = pp.Word(pp.alphanums) | pp.Word(pp.nums)
+        diode_var     = pp.Word(pp.alphanums+'_')
+
+        array         = LBRAC + pp.ZeroOrMore(pincode + pp.Optional(COMMA)) + RBRAC
+        matrix_rows   = define_rows + LBRAC + pp.ZeroOrMore(pincode + pp.Optional(COMMA)) + RBRAC
+        matrix_rows.ignore(pp.cppStyleComment)
+        matrix_cols   = define_cols + LBRAC + pp.ZeroOrMore(pincode + pp.Optional(COMMA)) + RBRAC
+        matrix_cols.ignore(pp.cppStyleComment)
+        matrix_diodes = define_diodes + diode_var
+        matrix_diodes.ignore(pp.cppStyleComment)
 
         for tokens, start, stop in matrix_rows.scanString(data):
             matrix_row_pins = list(tokens)
+
         for tokens, start, stop in matrix_cols.scanString(data):
             matrix_col_pins = list(tokens)
 
+        for tokens, start, stop in matrix_diodes.scanString(data):
+            matrix_diodes = tokens
+
         if matrix_row_pins and matrix_col_pins:
-            matrix_pins.append(matrix_row_pins)
-            matrix_pins.append(matrix_col_pins)
+            matrix_data.append(matrix_row_pins)
+            matrix_data.append(matrix_col_pins)
+            if len(matrix_diodes) == 1:
+                if matrix_diodes[0] == 'COL2ROW':
+                    matrix_data.append('col_row')
+                elif matrix_diodes[0] == 'ROW2COL':
+                    matrix_data.append('row_col')
+                else:
+                    matrix_data.append('none')
+            else:
+                matrix_data.append('none')
 
-        return matrix_pins
+        return matrix_data
 
-    def rules_mk(data):
+    def rules_mk_mcu(data):
+        """ Finds mcu data from rules.mk"""
+
+        EQ = (pp.Suppress('='))
 
         if platform.system() == 'Linux':
             data = str(data)
@@ -249,19 +290,20 @@ class _parse_txt:
         mcu_tag   = pp.Suppress(pp.Literal('MCU'))
         mcu_type  = pp.Word(pp.alphanums+'_')
 
-        mcu = mcu_tag + EQUALS + mcu_type('mcu')
+        mcu = mcu_tag + EQ + mcu_type('mcu')
         mcu.ignore('#'+pp.restOfLine)
 
         return mcu.scanString(data)
 
     def keymaps(data):
+        """ Finds keycode layers (keymaps) from QMK keymap.c"""
 
         if platform.system() == 'Linux':
             data = str(data)
         elif platform.system() == 'Windows':
             data = str(data.replace('\\n', ' ').replace('\\r', ' ').replace('\\t', ' '))
 
-        LBRAC, RBRAC,EQ, COMMA = map(pp.Suppress,"{}=,")
+        LBRAC, RBRAC, EQ, COMMA = map(pp.Suppress,"{}=,")
 
         integer       = pp.Word(pp.nums)
         keycode       = pp.Word(pp.alphanums+'_'+'('+')')
@@ -279,6 +321,7 @@ class _parse_txt:
         return km_layer.scanString(data)
 
     def keymap_functions(data):
+        """ Finds legacy TMK/QMK style functions from QMK keymap.c"""
 
         if platform.system() == 'Linux':
             data = str(data)
@@ -303,10 +346,9 @@ class _parse_txt:
         results = list(function.scanString(data))
 
         return results
-# ===========================================================================================
-# Pre-processing
-# ===========================================================================================
+
 class _cpp:
+    """" A private class containing functions for opening QMK source files and passing input onto the avr-gcc preprocesso"""
 
     def __init__(self, kbo, dirs, console):
         self.__kb      = kbo
@@ -314,6 +356,7 @@ class _cpp:
         self.__console = console
 
     def __preproc(self, kblibs, arg_list, DEBUG=False):
+        """ Runs AVR-GCC Preprocessor, including all relevant header files and strips layout macros, comments and user-defined macros and defines"""
         # Setting up -I and custom define options
         qdir = os.path.join(self.__dirs['QMK dir'], 'keyboards')
         kb = self.__kb.name
@@ -356,6 +399,7 @@ class _cpp:
                 print(traceback.format_exc(), file=sys.stderr)
     
     def preproc_header(self, path):
+        """ Initialises Preprocessing of QMK config.h files"""
 
         kblibs = list(self.__kb.libs)
         if self.__kb.build_rev:
@@ -367,6 +411,7 @@ class _cpp:
             return output
 
     def preproc_keymap(self):
+        """ Initialises preprocessing QMK keymap.c files"""
 
         qdir   = os.path.join(self.__dirs['QMK dir'], 'keyboards')
         kb     = self.__kb.name
@@ -388,16 +433,15 @@ class _cpp:
             return output
         else:
             self.__console.error(['Keymap cannot be read by preprocessor', 'Failed to parse keymap file'])
-# ===========================================================================================
-# KB Information
-# ===========================================================================================
+
 class kb_info:
+    """" A container class for keyboard information"""
 
     def __init__(self, n=''):
 
         self.name              = n             # Name of keyboard
         self.libs              = []            # Possible QMK lib folders (partly depreciated)
-        self.rev_list          = []            # List of rev obj names
+        self.rev_list          = []            # List of rev obj names TODO: Depreciate this entirely
         self.rev_info          = []            # A list of rev_info objects
 
     def init_build(self):
@@ -406,13 +450,10 @@ class kb_info:
         self.build_keymap      = ''            # What keymap to build with
         self.build_template    = ''            # What layout to build with
 
-        #self.build_m_row_pins = []            # Row pins
-        #self.build_m_col_pins = []            # Column 
-
-    def add_rev_list(self, rev, flag=False):
-        if not flag:
+    def add_rev_list(self, rev, is_rev=True):
+        if is_rev:
             self.rev_list.append(rev)
-        revo = rev_info(rev, flag)
+        revo = rev_info(rev, is_rev)
         self.rev_info.append(revo)
 
     def get_rev_info(self, rev):
@@ -421,33 +462,40 @@ class kb_info:
                return r
             if r.name == 'n/a':
                return r
-# ===========================================================================================
-# KB and revision Information
-# ===========================================================================================
-class rev_info:
 
-    def __init__ (self, n='', flag=False):
+    def del_rev_info(self, rev):
+        for i, r in enumerate(self.rev_info):
+            if r.name == rev:
+                del self.rev_info[i]
+        if rev in self.rev_list:
+            index = self.rev_list.index(rev)
+            del self.rev_list[index]
+
+
+
+class rev_info:
+    """" A container class for keyboard revision information"""
+
+    def __init__ (self, n='', is_rev=True):
 
         self.name             = n                # Name of Revision
+        self.mcu_list         = []               # MCU list
         self.keymap_list      = []               # List of layout NAMES
         self.template_list    = []               # List of template NAMES
         self.template_loc     = ''               # Location of <keyboard>.h
-        self.is_default       = flag             # Does keyboard have revisions? (or just default)
+        self.is_rev           = is_rev           # Does keyboard have revisions? (or just default)
 
     def init_build(self):
 
-        self.build_mcu_list   = []               # MCU list
         self.build_m_row_pins = []               # Row pins
         self.build_m_col_pins = []               # Column  pins
+        self.build_diodes     = 'none'           # Diode Direction
 
         self.build_layout     = []               # list of keycode_layers objects (which form layout) -> Final yaml or json output comes from here
         self.build_templates  = []               # list of layout_template objects
 
-# ===========================================================================================
-# LAYOUT template info
-# A class for linking matrix mapping in <keyboard>.h with (preprocessed) keymap.c keycode layers.
-# ===========================================================================================
 class layout_template:
+    """" A container class for layout templates"""
 
     def __init__(self, n=''):
         self.name             = n                # Name of template : e.g. LAYOUT, KEYMAP, LAYOUT_66_ANSI
@@ -479,11 +527,9 @@ class layout_template:
                     if self.layout[i][j] == col:
                         self.layout[i][j] = -1
                         console.warning(['Array key recovery failed', 'Will assume this corresponds to KC_NO'])
-# ===========================================================================================
-# KEYCODE layers
-# A class for storing keycode layers
-# ===========================================================================================
+
 class keycode_layer:
+    """" A container class for keymap keycode layers"""
 
     def __init__(self, n=''):
 
@@ -521,9 +567,7 @@ class keycode_layer:
     def __func(self, qmk_func, layer_names, functions, console):
         invalid = defaults.invalid_kc
 
-        # ===============================================================================
         # OSM Functions
-        # ===============================================================================
         # OSM keys are defined non-dynamically
         if qmk_func in ref.keyp_mods.keys():
             keyp_func = ref.keyp_mods[qmk_func]
@@ -533,24 +577,21 @@ class keycode_layer:
             br = qmk_func.index('(')+1
             qfunc = qmk_func[:br]
             func_target = qmk_func[br:-1]
-            # ===============================================================================
+
             # Layer Switching Functions e.g. LT(1), TT(2)
-            # ===============================================================================
             if qfunc in ref.keyp_layer_func.keys() and func_target in layer_names:
                 layer = str(layer_names.index(func_target))
                 keyp_func = ref.keyp_layer_func[qfunc]+layer # ' L' + 2
                 return keyp_func
-            # ===============================================================================
+
             # Modifier/Multi-Modifier Functions - e.g. HYPR(KC), LCAG(KC), LCTL(KC)
-            # ===============================================================================
             elif qfunc in ref.keyp_mods.keys() and func_target in ref.keyp_kc.keys():
                 keycode = self.__keycode(func_target, functions, console, allow_quotes=False)
                 # Wrap with quotes -> '[func]' - note: keyplus Format is [TAP]>[HOLD]
                 keyp_func = "'"+(ref.keyp_mods[qfunc]+'-'+keycode)+"'"
                 return keyp_func
-            # ===============================================================================
+
             # For Layer-Tap Keys e.g. LT(1, KC_SPACE), LM(3, MOD_CTL) - Format FN(HOLD,TAP)
-            # ===============================================================================
             # Hold = Layer for these
             elif qfunc in ref.keyp_tap_layer.keys():
 
@@ -571,25 +612,21 @@ class keycode_layer:
                     layer = str(layer_names.index(layer_t))
                     hold = ref.keyp_tap_layer[qfunc]+layer
 
-                    # =======================================================================
                     # For regular QMK Keycodes LT([HOLD],[TAP]) - KC_E, KC_ESC, etc.
-                    # =======================================================================
                     if keycode in ref.keyp_kc.keys():
                         tap = self.__keycode(keycode, functions, console, allow_quotes=False)
                         # Wrap with quotes -> '[func]' - note: Keyplus Format is [TAP]>[HOLD]
                         keyp_func = "'"+tap +'>'+hold+"'"
                         return keyp_func
-                    # =======================================================================
+
                     # [For legacy QMK Keycodes  LM([HOLD],[TAP]) - [TAP]= MOD_LCTL, etc.
-                    # =======================================================================
                     elif keycode in ref.qmk_legacy_mod.keys():
                         tap = ref.qmk_legacy_mod[keycode]+'-none'
                         # Wrap with quotes -> '[func]' - note Keyplus Format is [TAP]>[HOLD]
                         keyp_func = "'"+tap +'>'+hold+"'"
                         return keyp_func
-            # ===============================================================================
+
             # Modifier Tap e.g. RSFT_T(HOLD) - [HOLD]= KC_A, KC_B, etc.  
-            # ===============================================================================
             # Hold = Modifier
             elif qfunc in ref.keyp_tap_mod.keys() and func_target in ref.keyp_kc.keys():
                 hold = ref.keyp_tap_mod[qfunc]+'-none'
@@ -597,9 +634,9 @@ class keycode_layer:
                 # Wrap with quotes -> '[func]' - note: Keyplus Format is [TAP]>[HOLD]
                 keyp_func = "'"+tap+'>'+hold+"'"
                 return keyp_func
-            # ===============================================================================
+
             # Chained Quantum Functions [Legacy] - i.e. LCTL(LALT(KC_DEL))
-            # ===============================================================================
+
             elif qfunc in ref.keyp_mods.keys() and ')' in func_target:
                 target = func_target
                 # Init functions with the first function
@@ -617,9 +654,8 @@ class keycode_layer:
                     # Wrap with quotes -> '[func]' - note: keyplus Format is [TAP]>[HOLD]
                     keyp_func = "'"+functions+'-'+final_kc+"'"
                     return keyp_func
-            # ===============================================================================
+
             # Legacy TMK-style QMK Functions e.g. FUNC(x)
-            # ===============================================================================
             # Sometimes these are used for layer switching, thus why we care.
             elif qfunc in ref.qmk_legacy_func:
                 # Function list cannot be blank (else no func is defined)
@@ -632,9 +668,8 @@ class keycode_layer:
                         if func_action:
                             keyp_func = func_action
                             return keyp_func
-            # ===============================================================================
+
             # Legacy QMK Modkey format e.g. MT(MOD_LCTL, KC_Z) -> Ctrl+Z
-            # ===============================================================================
             elif qfunc == 'MT(':
                 split = func_target.split(',', 1)
                 if len(split) != 2:
@@ -656,15 +691,13 @@ class keycode_layer:
     def __keycode(self, qmk_kc, functions, console, allow_quotes=True):
         invalid = defaults.invalid_kc
         if allow_quotes:
-            # ===============================================================================
+
             # Normal Keycodes
-            # ===============================================================================
             if qmk_kc in ref.keyp_kc.keys():
                 keyp_kc = ref.keyp_kc[qmk_kc]
                 return keyp_kc
-            # ===============================================================================
+
             # Legacy TMK-style QMK FN Keycodes - KC_FNx
-            # ===============================================================================
             # Sometimes these are used for layer switching, thus why we care.
             elif qmk_kc[:5] in ref.qmk_legacy_func:
                 # Function list cannot be blank (else no func is defined)
@@ -687,7 +720,7 @@ class keycode_layer:
                 keyp_kc = keyp_kc.replace(' ','')         # Strip whitespace
                 return keyp_kc
 
-        # Didn't get a match, so return [invalid]
+        # If we didn't get a match, return [invalid]
         console.bad_kc('KC','['+qmk_kc+'] - set to '+invalid)
         return invalid
     
@@ -695,6 +728,7 @@ class keycode_layer:
 # Cached Lists and Dictionaries
 # ===========================================================================================
 class _cache:
+    """" A private class for handling reading and writing from/to the application's cached list of kb_info objects"""
 
     def __init__(self, dirs, console, f_cache=False):
 
@@ -721,6 +755,9 @@ class _cache:
         else:
                 self.__write()
 
+
+    # Writing cache file
+    # We need to find: Keyboard names, Revision names, LAYOUT template names, keymap.c file directories.
     def __write(self):
 
         self.__console.note([defaults.print_lines, 'Generating new cache_kb.yaml in '+self.__loc])
@@ -729,7 +766,9 @@ class _cache:
         keymaplist = []
         qdir = os.path.join(self.__qmk, 'keyboards')
 
-        # List of... stuff. Anything with a rules.mk file is considered 'valid' for now.
+        # Processing keyboard names and revisions
+
+        # List of directories. Anything with a rules.mk file is considered a 'valid' dir for now.
         # This is the exact same logic used by QMK.
         # Format: qmk/keyboards/ ...    [ <anything> / ] rules.mk  => templist
         for fn in glob.glob( os.path.join(qdir, '**', 'rules.mk'), recursive=True ):
@@ -741,13 +780,12 @@ class _cache:
         for fn in glob.glob( os.path.join(qdir, '**', 'keymaps', '**', 'keymap.c'), recursive=True):
             fn = os.path.split(fn)[0]
             # Important: If this exists in templist, then REMOVE it from templist.
-            # i.e. targets  [ <? ... >/<keyboard>/<revisions>/keymaps/<any keymap> ]
+            # i.e. removes  [ <? ... >/<keyboard>/<revisions>/keymaps/<any keymap>]
             # templist should now only contain [ <? ... > / <keyboard> / <revision> / ]
             if fn in templist:
                 templist.remove(fn)
             fn = fn.replace(qdir+os.sep, '', 1)
             keymaplist.append(fn)
-
 
         for child in templist:
             p_path = str(pathlib.Path(child).parent)            # Path of the parent directory of this child
@@ -781,13 +819,36 @@ class _cache:
                         kbo.add_rev_list(rev)
                         break
 
-        # Add ing default n/a revisions for keyboards with no revisions
+        # Per-revision variables - i.e. Templates
+
+        # Adds default n/a revisions for keyboards with no revision
+        total_kb_count = len(self.kbo_list)
+        remove_kbo = []
         for kbo in self.kbo_list:
             if not kbo.rev_list:
-                kbo.add_rev_list('n/a', True)
-            self.__find_layout_names(kbo)
+                kbo.add_rev_list('n/a', is_rev=False)
+
+            remove_revo = []
+            for revo in kbo.rev_info:
+                # Find + validate MCU then layouts while we are doing this.    
+                if self.__find_validate_mcu(kbo, revo):
+                    self.__find_layout_names(kbo, revo)
+                else:
+                    remove_revo.append(revo)
+            # deleting revisions
+            for revo in remove_revo:
+                kbo.del_rev_info(revo.name)
+            # deleting keyboards
+            if (len(kbo.rev_info)) == 0:
+                remove_kbo.append(kbo)
+
+        for kbo in remove_kbo:
+            self.kbo_list.remove(kbo)
+
+        valid_kb_count = len(self.kbo_list)
 
         # Processing keymaps
+
         for km_path in keymaplist:
             # info list = [ <keyboard> / <rev> ] /keymaps/ [ <keymap> ]
             info_list = km_path.split(os.sep+'keymaps'+os.sep)
@@ -804,7 +865,7 @@ class _cache:
             #   for example: keyboard/rev/??
             #       0 = [??], 1* = [rev] 2* = [keyboard]
             #       2* matches a keyboard, so 1* is revision.
-            # TODO: Currently breaks if  <keyboard/??/revision>
+            # TODO: Currently breaks if  <keyboard/??/revision> - no current examples of this occuring however.
             prev = 'n/a'                        # previous variable - init as n/a
             for i in range(0, len(namelist)):
                 if i > 0:
@@ -815,7 +876,6 @@ class _cache:
                 # Go through our final kbo_list output list, find matching kb object.
                 for kbo in self.kbo_list:
                     if kbo.name == kb_name:
-                        # If rev_list has n/a - i.e. no revisions
                         if prev in kbo.rev_list:
                             # Tag keymap to this revision
                             revo = kbo.get_rev_info(prev)
@@ -830,70 +890,162 @@ class _cache:
                     break
                 prev = namelist.pop()                  # End of loop, pop last element from list.
 
+        # After collecting all information, dump kb_info list to text file for faster processing in future
+
         if self.kbo_list:
-            # Dump cache info to text file for faster processing in future
             self.__save_cache()
-            self.__console.note(['New cache_kb.yaml successfully generated', 'Location: '+self.__loc])
+            self.__console.note(['New cache_kb.yaml successfully generated', 'Location: '+self.__loc, 'Processed '+str(total_kb_count)+' keyboards with '+str(valid_kb_count)+' validated for conversion'])
         else:
             self.__console.warning(['No keyboard information found', 'Check QMK directory location in pref.yaml : '+self.__qmk])
         
+    # Finding layout template names
 
-    def __find_layout_names(self, kbo):
-        
-        rev_list = list(kbo.rev_list)
-        if not rev_list:
-            rev_list.append('')
-        
-        for rev in rev_list:
-            found    = False
-            revo     = kbo.get_rev_info(rev)
-            kblibs   = list(kbo.libs)
-            # Kblibs defines the search boundary for *.h and *.c files for the preprocessor.
+    def __find_layout_names(self, kbo, revo):
+        ''' Find and populate layout templates list attribute from QMK source headers -> <keyboard>.h'''
+        found = False
+        rev_n    = revo.name
+        kblibs   = list(kbo.libs)
+        # Kblibs defines the search boundary for *.h and *.c files for the preprocessor.
 
-            if rev != '':
-                kblibs.append(rev)
-                # Add revision directory to search path if this keyboard has revisions.
+        if revo.is_rev:
+            kblibs.append(rev_n)
+            # Add revision directory to search path if this keyboard has revisions.
 
-            qdir = os.path.join(self.__qmk, 'keyboards') # qmk/keyboards
+        qdir = os.path.join(self.__qmk, 'keyboards') # qmk/keyboards
 
-            folders  = []
-            path     = ''
-            for kbl in kblibs:
-                path = os.path.join(path, kbl)
-                folders.append(path)
-            # Search in REVERSED order - i.e. revisions first, then keyboards.
-            # Prioritises config.h data in revisions first.
-            for kbl in reversed(folders):
-                kb_h = os.path.split(kbl)[-1]+'.h'
-                path = os.path.join(qdir, kbl, kb_h)
-                try:
-                    # Open config.h file, if it exists
-                    with open(path, 'r', encoding='utf8') as f:
-                        data = str(f.read())
-                except FileNotFoundError:
-                    #self.__console.warning(['Layout header not found in '+path, 'Trying a different path...'])
-                    continue
+        folders  = []
+        path     = ''
+        for kbl in kblibs:
+            path = os.path.join(path, kbl)
+            folders.append(path)
+        # Search in REVERSED order - i.e. revisions first, then keyboards.
+        # Prioritises config.h data in revisions first.
+        for kbl in reversed(folders):
+            kb_h = os.path.split(kbl)[-1]+'.h'
+            path = os.path.join(qdir, kbl, kb_h)
+            try:
+                # Open config.h file, if it exists
+                with open(path, 'r', encoding='utf8') as f:
+                    data = str(f.read())
+            except FileNotFoundError:
+                #self.__console.warning(['Layout header not found in '+path, 'Trying a different path...'])
+                continue
 
-                # Parse it for LAYOUT/KEYMAP macro templates
-                token_list = _parse_txt.layout_headers(data)
-                for tokens, start, end in token_list:
-                    revo.template_list.append(tokens.name)
+            # Parse it for LAYOUT/KEYMAP macro templates
+            token_list = _parse_txt.layout_headers(data)
+            for tokens, start, end in token_list:
+                revo.template_list.append(tokens.name)
 
-                # If LAYOUT/KEYMAP templates found, break from loop
-                # Note: This means that some layouts will be missed. 
-                # However we wish to be paranoid about 'collisions' and duplicate KEYMAP macros.
-                # Might be possible to pull data from rules.mk? - Limited in usefulness right now
-                if revo.template_list:
-                    #self.__console.note(['Layout header found @ '+path])
-                    found = True
-                    revo.template_loc = path
-                    break
+            # If LAYOUT/KEYMAP templates found, break from loop
+            # Note: This means that some layouts will be missed. 
+            # However we wish to be paranoid about 'collisions' and duplicate KEYMAP macros.
+            # Might be possible to pull data from rules.mk? - Limited in usefulness right now
+            if revo.template_list:
+                #self.__console.note(['Layout header found @ '+path])
+                found = True
+                revo.template_loc = path
+                break
 
-            if not found:
-                self.__console.warning(['Layout templates not found for '+ os.path.join(kbo.name, rev)])
-                revo.template_loc = 'n/a'
+        if not found:
+            if revo.is_rev:
+                self.__console.warning(['Layout templates not found for '+ os.path.join(kbo.name, rev_n)])
+            else:
+                self.__console.warning(['Layout templates not found for '+ kbo.name])
+            revo.template_loc = 'n/a'
+
+    def __find_validate_mcu(self, kbo, revo):
+        ''' Find and populate list of possible mcus from QMK rules.mk file'''
+
+        rev_n   = revo.name
+        kblibs  = list(kbo.libs)
+
+        if revo.is_rev:
+            kblibs.append(rev_n)
+
+        qdir = os.path.join(self.__qmk, 'keyboards')
+
+        folders = []
+        path    = ''
+        for kbl in kblibs:
+            path = os.path.join(path, kbl)
+            folders.append(path)
+
+        for kbl in reversed(folders):
+            rules_mk = 'rules.mk'
+            path = os.path.join(qdir, kbl, rules_mk)
+            mcu_list = []
+            try:
+                with open(path, 'r', encoding='utf8') as f:
+                    data = str(f.read())
+            except FileNotFoundError:
+                #self.console.warning(['Rules.mk not found in '+path, 'Trying a different path...'])
+                continue
+
+            if not data:
+                continue
+
+            token_list = _parse_txt.rules_mk_mcu(data)
+            for tokens, start, end in token_list:
+                mcu_list.append(tokens.mcu)
+
+            if mcu_list:
+                found = True
+                valid_mcu = self.__validate_mcu(mcu_list, kbo, revo)
+                if valid_mcu:
+                    revo.mcu_list = mcu_list
+                    return True
+                else:
+                    return False
+                break
+
+        if revo.is_rev:
+            self.__console.warning(['MCU information not found for '+os.path.join(kbo.name, rev_n)])
+        else:
+            self.__console.warning(['MCU information not found for '+kbo.name])
+        return True
+
+    def __validate_mcu(self, mcu_list, kbo, revo, DEBUG=False):
+        kb_n = kbo.name
+        rev_n = revo.name
+
+        bad_mcu = []
+        found = 0 
+        for mcu in mcu_list:
+            if mcu in defaults.mcu_compat:
+                found += 1
+            else:
+                bad_mcu.append(mcu)
+
+        if found == len(mcu_list):
+            return True
+        elif found > 0:
+            if DEBUG:
+                if revo.is_rev:
+                    self.__console.warning(['Possible Invalid MCU '+', '.join(bad_mcu)+' in '+kb_n+os.sep+rev_n+'rules.mk'])
+                else:
+                    self.__console.warning(['Possible Invalid MCU '+', '.join(bad_mcu)+' in '+kb_n+os.sep+'rules.mk'])
+            else:
+                if revo.is_rev:
+                    self.__console.warning([os.path.join(kb_n, rev_n)+' might have invalid MCU(s) '+', '.join(bad_mcu)])
+                else:
+                    self.__console.warning([kb_n+' might have Invalid MCU(s) '+', '.join(bad_mcu)])
+            return True
+
+        else:
+            if DEBUG:
+                if revo.is_rev:
+                    self.__console.error(['Invalid MCU '+', '.join(bad_mcu)+' in '+kb_n+os.sep+rev_n+'rules.mk'], fatal=False)
+                else:
+                    self.__console.error(['Invalid MCU '+', '.join(bad_mcu)+' in '+kb_n+os.sep+'rules.mk'], fatal=False)
+            else:
+                if revo.is_rev:
+                    self.__console.error([os.path.join(kb_n, rev_n)+' has invalid MCU(s) '+', '.join(bad_mcu)], fatal=False)
+                else:
+                    self.__console.error([kb_n+' has Invalid MCU(s) '+', '.join(bad_mcu)], fatal=False)
+            return False
 
     def __save_cache(self):
+        ''' intended private method to save cache to file'''
         path = os.path.split(self.__loc)[0]
         if not os.path.exists(path):
             try:
@@ -908,17 +1060,20 @@ class _cache:
             self.__console.error(['Failed to create '+self.__loc])
 
     def _clear_cache(self):
+        ''' intended private method to clear cache '''
         if os.path.isfile(self.__loc):
             os.remove(self.__loc)
         self.kbo_list = []
 
     def _keyboard_list(self,):
+        ''' accessor method for obtaining list of keyboard names from kb_list'''
         kb_names = []
         for kbo in self.kbo_list:
             kb_names.append(kbo.name)
         return kb_names
 
     def _keymap_list(self, keyboard, rev=''):
+        ''' accessor method for obtaining list of keymaps of a particular keyboard/revision from kb_list'''
         km_names = []
         for kbo in self.kbo_list:
             if kbo.name == keyboard:
@@ -929,15 +1084,16 @@ class _cache:
                     return km_names
                 else: 
                     print_rev_list = ', '.join(self._rev_list(keyboard))
-                    self.__console.error(['Revision # required - Valid Revisions: '+print_rev_list])
+                    self.__console.error(['Revision required - Valid Revisions: '+print_rev_list])
 
     def _rev_list(self, keyboard):
-
+        ''' accessor method for obtaining list of revisions of a particular keyboard from kb_list'''
         for kbo in self.kbo_list:
             if kbo.name == keyboard:
                 return kbo.rev_list
 
     def _template_list(self, keyboard, rev=''):
+        ''' accessor method for obtaining list of templates of a particular keyboard/revision from kb_list'''
         tp_names = []
         for kbo in self.kbo_list:
             if kbo.name == keyboard:
@@ -948,11 +1104,10 @@ class _cache:
                     return tp_names
                 else:
                     print_rev_list = ', '.join(self._rev_list(keyboard))
-                    self.__console.error(['Revision # required - Valid Revisions: '+print_rev_list])
-# ===========================================================================================
-# Q2K Application
-# ===========================================================================================
+                    self.__console.error(['Revision required - Valid Revisions: '+print_rev_list])
+
 class application:
+    """" A class for the q2k application"""
 
     def __init__(self, app_type, is_gui=False):
         self.__output = en.Enum('output', 'keyplus kbfirmware')
@@ -1000,6 +1155,13 @@ class application:
                 pref_yaml = os.path.join(defaults.src, 'pref.yaml')
                 with open(pref_yaml, 'r') as f:
                     self.dirs = yaml.load(f)
+                    try:
+                        if self.dirs['version'] != defaults.version:
+                            self.__generate_dirs()
+                            self.clear_cache()
+                    except KeyError:
+                        self.__generate_dirs()
+                        self.clear_cache()
                     self.console.note([defaults.print_lines, 'Using preferences from '+pref_yaml, '--reset to reset to defaults'])
 
             except FileNotFoundError:
@@ -1011,11 +1173,12 @@ class application:
     def __generate_dirs(self):
 
         dirs = {
-            'QMK dir' : defaults.qmk,
-            'Keyplus YAML output' : defaults.keyp,
+            'version'                : defaults.version,
+            'QMK dir'                : defaults.qmk,
+            'Keyplus YAML output'    : defaults.keyp,
             'Kbfirmware JSON output' : defaults.kbf,
-            'Local libs' : defaults.libs,
-            'Cache' : defaults.cache,            
+            'Local libs'             : defaults.libs,
+            'Cache'                  : defaults.cache,            
         }
         self.dirs = dirs
         try:
@@ -1167,12 +1330,11 @@ class application:
         self.console.clear()            # Clear console
 
     def __check_mcu(self):
-        self.__get_mcu()
         kb_n = self.build_kb.name
         revo = self.build_rev
         rev_n = self.build_kb.build_rev
 
-        for mcu in revo.build_mcu_list:
+        for mcu in revo.mcu_list:
             if mcu in defaults.mcu_compat:
                 continue
             else:
@@ -1182,54 +1344,11 @@ class application:
                     'Currently, keyplus supports only boards with the following microcontrollers:',
                     ', '.join(defaults.mcu_compat),
                     'If your board has a MCU on this list then ignore this warning as a false positive',
-                    'Else layout files produced will not work with keyplus until your board\'s mcu is supported'], True)
+                    'Else layout files produced will not work with keyplus until your board\'s mcu is supported'], pause=True)
                 return
 
         self.console.note(['No MCU incompatability detected'])
-
-    def __get_mcu(self):
-
-        rev     = self.build_rev.name
-        revo    = self.build_rev
-        kblibs  = list(self.build_kb.libs)
-        if rev != 'n/a':
-            kblibs.append(rev)
-
-        qdir = os.path.join(self.dirs['QMK dir'], 'keyboards')
-        folders = []
-        path = ''
-
-        for kbl in kblibs:
-            path = os.path.join(path, kbl)
-            folders.append(path)
-
-        for kbl in reversed(folders):
-            rules_mk = 'rules.mk'
-            path = os.path.join(qdir, kbl, rules_mk)
-            mcu_list = []
-            try:
-                with open(path, 'r', encoding='utf8') as f:
-                    data = str(f.read())
-            except FileNotFoundError:
-                self.console.warning(['Rules.mk not found in '+path, 'Trying a different path...'])
-                return
-
-            if not data:
-                continue
-
-            token_list = _parse_txt.rules_mk(data)
-            for tokens, start, end in token_list:
-                mcu_list.append(tokens.mcu)
-
-            if mcu_list:
-                revo.build_mcu_list = mcu_list
-                return
-            else:
-                continue
-
-        self.__console.warning(['Rules.mk not found for '+kbo.get_name()])
-        return
-
+    
     def __get_config_header(self):
 
         rev      = self.build_rev.name
@@ -1254,11 +1373,17 @@ class application:
             if not data:
                 continue
 
-            matrix_pins = _parse_txt.config_headers(data)
-            if matrix_pins:
-                revo.build_m_row_pins = matrix_pins[0]
-                revo.build_m_col_pins = matrix_pins[1]  
+            matrix_data = _parse_txt.config_headers(data)
+            if matrix_data:
+                revo.build_m_row_pins = matrix_data[0]
+                revo.build_m_col_pins = matrix_data[1]
+                revo.build_diodes     = matrix_data[2]
+
                 self.console.note(['Matrix pinout data found @ '+path])
+                if revo.build_diodes == 'none':
+                    self.console.warning(['Matrix diode direction not found.'], pause=True)
+                else:
+                    self.console.note(['Matrix diode direction is: '+revo.build_diodes])
                 return
             else:
                 continue
@@ -1535,11 +1660,13 @@ class application:
             name = kb_n
 
         if rev.build_m_row_pins and rev.build_m_col_pins:
-            rows = str(rev.build_m_row_pins)
-            cols = str(rev.build_m_col_pins)
+            rows   = str(rev.build_m_row_pins)
+            cols   = str(rev.build_m_col_pins)
+            diodes = rev.build_diodes
         else:
             rows = '# ------- Input row pins here ------- '
             cols = '# ------- Input col pins here ------- '
+            diodes = rev.build_diodes
        
         template = ''
         for i, row in enumerate(template_matrix):
@@ -1587,6 +1714,7 @@ class application:
         output_yaml_info = output_yaml_info.replace('<LAYOUT_NAME>', keymap)                              
         output_yaml_info = output_yaml_info.replace('<ROWS>', rows)                                 
         output_yaml_info = output_yaml_info.replace('<COLS>', cols)
+        output_yaml_info = output_yaml_info.replace('<DIODES>', diodes)
         output_yaml_info = output_yaml_info.replace('<MATRIX_MAP>', template)
         output_yaml_info = output_yaml_info.replace('<LAYOUT>', layout)
         output_yaml_info = output_yaml_info.replace('<KEYCODES>', keycodes)
@@ -1617,6 +1745,7 @@ class application:
 
 
 def q2keyplus():
+    """" Hook-in function for q2k-cli command line interface"""
     q2k = application('keyplus')
     q2k.execute()
 '''
