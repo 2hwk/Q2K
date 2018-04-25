@@ -250,7 +250,7 @@ class _parse_txt:
         matrix_rows.ignore(pp.cppStyleComment)
         matrix_cols   = define_cols + LBRAC + pp.ZeroOrMore(pincode + pp.Optional(COMMA)) + RBRAC
         matrix_cols.ignore(pp.cppStyleComment)
-        matrix_diodes = define_diodes + diode_var
+        matrix_diodes = define_diodes + diode_var('diodes')
         matrix_diodes.ignore(pp.cppStyleComment)
 
         for tokens, start, stop in matrix_rows.scanString(data):
@@ -260,12 +260,14 @@ class _parse_txt:
             matrix_col_pins = list(tokens)
 
         for tokens, start, stop in matrix_diodes.scanString(data):
-            matrix_diodes = tokens
+            matrix_diodes = list(tokens)
 
         if matrix_row_pins and matrix_col_pins:
+            # TODO: Needs to be more robust
             matrix_data.append(matrix_row_pins)
             matrix_data.append(matrix_col_pins)
-            if len(matrix_diodes) == 1:
+
+            if matrix_diodes is list and len(matrix_diodes) == 1:
                 if matrix_diodes[0] == 'COL2ROW':
                     matrix_data.append('col_row')
                 elif matrix_diodes[0] == 'ROW2COL':
@@ -1377,7 +1379,8 @@ class application:
             if matrix_data:
                 revo.build_m_row_pins = matrix_data[0]
                 revo.build_m_col_pins = matrix_data[1]
-                revo.build_diodes     = matrix_data[2]
+                if len(matrix_data) > 2:
+                    revo.build_diodes     = matrix_data[2]
 
                 self.console.note(['Matrix pinout data found @ '+path])
                 if revo.build_diodes == 'none':
