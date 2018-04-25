@@ -175,7 +175,11 @@ class _parse_txt:
 
     def layout_headers(data):
 
-        data = str(data.replace('\\n', ' '))
+        if platform.system() == 'Linux':
+            data = str(data)
+        elif platform.system() == 'Windows':
+            data = str(data.replace('\\n', ' ').replace('\\r', ' ').replace('\\t', ' '))
+        
         LPAREN, RPAREN, LBRAC, RBRAC, COMMA = map(pp.Suppress, "(){},")
         BSLASH = pp.Suppress(pp.Literal('\\'))
 
@@ -206,7 +210,11 @@ class _parse_txt:
 
     def config_headers(data):
 
-        data = str(data.replace('\\n', ' '))
+        if platform.system() == 'Linux':
+            data = str(data)
+        elif platform.system() == 'Windows':
+            data = str(data.replace('\\n', ' ').replace('\\r', ' ').replace('\\t', ' '))
+
         matrix_pins = []
         matrix_row_pins = []
         matrix_col_pins = []
@@ -233,8 +241,11 @@ class _parse_txt:
 
     def rules_mk(data):
 
-        data = str(data.replace('\\n', ' '))
-        EQUALS    = pp.Suppress('=')
+        if platform.system() == 'Linux':
+            data = str(data)
+        elif platform.system() == 'Windows':
+            data = str(data.replace('\\n', ' ').replace('\\r', ' ').replace('\\t', ' '))
+
         mcu_tag   = pp.Suppress(pp.Literal('MCU'))
         mcu_type  = pp.Word(pp.alphanums+'_')
 
@@ -245,7 +256,11 @@ class _parse_txt:
 
     def keymaps(data):
 
-        data = str(data.replace('\\n', ' '))
+        if platform.system() == 'Linux':
+            data = str(data)
+        elif platform.system() == 'Windows':
+            data = str(data.replace('\\n', ' ').replace('\\r', ' ').replace('\\t', ' '))
+
         LBRAC, RBRAC,EQ, COMMA = map(pp.Suppress,"{}=,")
 
         integer       = pp.Word(pp.nums)
@@ -265,7 +280,11 @@ class _parse_txt:
 
     def keymap_functions(data):
 
-        data = str(data.replace('\\n', ' '))
+        if platform.system() == 'Linux':
+            data = str(data)
+        elif platform.system() == 'Windows':
+            data = str(data.replace('\\n', ' ').replace('\\r', ' ').replace('\\t', ' '))
+
         LSQBRAC, RSQBRAC, EQ, COMMA = map(pp.Suppress,"[]=,")
 
         words       = pp.Word(pp.alphanums+'_')
@@ -1189,7 +1208,7 @@ class application:
             path = os.path.join(qdir, kbl, rules_mk)
             mcu_list = []
             try:
-                with open(path, 'r') as f:
+                with open(path, 'r', encoding='utf8') as f:
                     data = str(f.read())
             except FileNotFoundError:
                 self.console.warning(['Rules.mk not found in '+path, 'Trying a different path...'])
@@ -1348,7 +1367,7 @@ class application:
         if revo.template_list:
             keyboard_h = revo.template_loc
 
-            with open(keyboard_h, 'r') as f:
+            with open(keyboard_h, 'r', encoding='utf8') as f:
                 data = str(f.read())
             
             token_list = _parse_txt.layout_headers(data)
