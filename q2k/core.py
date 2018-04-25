@@ -695,14 +695,16 @@ class _cache:
             try:
                 with open(self.__loc, 'r') as f:
                     self.kbo_list = yaml.load(f)
-                    self.__console.note(['Using cached list from '+self.__loc, '--cache to reset', defaults.print_lines])
+                    self.__console.note(['Using cached list from '+self.__loc, '--cache to reset'])
             except:
-                self.__console.warning(['Failed to load from '+self.__loc, 'Generating new cache_kb.yaml...'])
+                self.__console.warning(['Failed to load from '+self.__loc])
                 self.__write()
         else:
                 self.__write()
 
     def __write(self):
+
+        self.__console.note([defaults.print_lines, 'Generating new cache_kb.yaml in '+self.__loc])
 
         templist = []
         keymaplist = []
@@ -812,9 +814,9 @@ class _cache:
         if self.kbo_list:
             # Dump cache info to text file for faster processing in future
             self.__save_cache()
-            self.__console.note(['New cache_kb.yaml successfully generated', 'Location: '+self.__loc, defaults.print_lines])
+            self.__console.note(['New cache_kb.yaml successfully generated', 'Location: '+self.__loc])
         else:
-            self.__console.warning(['No keyboard information found', 'Check QMK directory location in pref.yaml : '+self.__qmk, defaults.print_lines])
+            self.__console.warning(['No keyboard information found', 'Check QMK directory location in pref.yaml : '+self.__qmk])
         
 
     def __find_layout_names(self, kbo):

@@ -633,41 +633,41 @@ class ref:
 ---
 <ERRORS>
 
-report_mode: auto_nkro # options: auto_nkro, 6kro, nkro
+report_mode : auto_nkro # options: auto_nkro, 6kro, nkro
 
-devices:
-  <KB_NAME>:
-    id: 0
-    layout: <LAYOUT_NAME>
-    layout_offset: 0
-    scan_mode:
-      mode: col_row # options: col_row, pins, none
-      rows: <ROWS>
-      cols: <COLS>
+devices :
+  <KB_NAME> :
+    id : 0
+    layout : <LAYOUT_NAME>
+    layout_offset : 0
+    scan_mode :
+      mode : col_row # options:  col_row, row_col, pins, none
+      rows : <ROWS>
+      cols : <COLS>
       # Maps how keys are physically wired, to how they appear visually
-      matrix_map: [
+      matrix_map : [
         <MATRIX_MAP>
       ]
       # Debounce settings
-      debounce:
-         debounce_time_press: 5
-         debounce_time_release: 5
-         trigger_time_press: 1
-         trigger_time_release: 1
-         parasitic_discharge_delay_idle: 10.0
-         parasitic_discharge_delay_debouncing: 10.0
+      debounce :
+         debounce_time_press : 5
+         debounce_time_release : 5
+         trigger_time_press : 1
+         trigger_time_release : 1
+         parasitic_discharge_delay_idle : 10.0
+         parasitic_discharge_delay_debouncing : 10.0
 <KEYCODES>
-layouts:
+layouts :
   <LAYOUT_NAME> :
-    default_layer: 0
-    layers: [
+    default_layer : 0
+    layers : [
 <LAYOUT>    ]
 '''
 
     keyplus_yaml_keycode_template = '''
-  <KEYCODE>:
-    keycode: hold
-    delay: 200
-    tap_key: <TAP>
-    hold_key: <HOLD>
+  <KEYCODE> :
+    keycode : hold
+    delay : 200
+    tap_key : <TAP>
+    hold_key : <HOLD>
 '''
