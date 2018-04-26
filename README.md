@@ -10,10 +10,10 @@ For parsing keymaps from QMK Firmware style keymap.c files to Keyplus YAML forma
 
 ## Requirements
 
-Requires (pip): `python3-pip` `python3-tkinter` `avr-gcc` 
+pip requires : `python3-pip` `python3-tkinter` `avr-gcc` 
           `pyyaml` `pyparsing` `termcolor`
 
-Requires (exec): ``avr-gcc``
+binary requires : ``avr-gcc``
 
 Tested on bash on Windows 10 (q2k-cli only), Windows 10 and Ubuntu Linux
 
@@ -21,13 +21,11 @@ Tested on bash on Windows 10 (q2k-cli only), Windows 10 and Ubuntu Linux
 
 **Using Executables (WIN/Linux)**
 
-Go to the releases tab (or /bin) and get the latest executable ``q2k_util`` zip folder and extract.
-
-Run like a traditional program (Click ``q2k_util.exe`` (windows)/ ``q2k_util`` (Linux) or use terminal/cmd ``./q2k_util.exe`` (windows) / ``./q2k_util``(linux))
+Go to the releases tab (or /bin) and get the latest executable ``q2k_util`` zip folder and extract, then run ``./q2k_util``
 
 For the windows version, you will need [this avr-gcc compiler](http://andybrown.me.uk/2015/03/08/avr-gcc-492/) installed in the avr-gcc folder at the same level as ``q2k_util.exe``
 
-**Using PyPI and pip to install q2k module (Optional)**
+**Using PyPI and pip to install q2k module (for developers)**
 
 Install the required dependencies, then run
 
