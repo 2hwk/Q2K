@@ -61,8 +61,7 @@ class defaults:
     if platform.system() == 'Linux':                              # AVR-GCC Compiler.                                                                            
         avr_gcc = 'avr-gcc'                                       # avr-gcc for linux                                       Default is avr-gcc (Linux)                
     elif platform.system() == 'Windows':
-        avr_gcc = os.path.join(src, 'avr-gcc', 'bin', 'avr-gcc.exe') # avr-gcc.exe for Windows                              Default is $Q2K/avr-gcc/bin/avr-gcc.exe (Windows)
-    
+        avr_gcc = os.path.join(src, 'avr-gcc', 'bin', 'avr-gcc.exe') # avr-gcc.exe for Windows   
     # Lists
     qmk_nonstd_dir = ['handwired', 'converter', 
                       'clueboard', 'lfkeyboards']             # Currently only lfkeyboards causes any issues, however it is good to be verbose here
@@ -236,11 +235,12 @@ class _parse_txt:
         matrix_data = []
         matrix_row_pins = []
         matrix_col_pins = []
+        matrix_diode_dir = []
         
         LBRAC, RBRAC, COMMA = map(pp.Suppress, "{},")
-        define_rows   = pp.Suppress(pp.Literal('#define MATRIX_ROW_PINS'))
-        define_cols   = pp.Suppress(pp.Literal('#define MATRIX_COL_PINS'))
-        define_diodes = pp.Suppress(pp.Literal('#define DIODE_DIRECTION'))
+        define_rows   = pp.Suppress(pp.Literal('define MATRIX_ROW_PINS'))
+        define_cols   = pp.Suppress(pp.Literal('define MATRIX_COL_PINS'))
+        define_diodes = pp.Suppress(pp.Literal('define DIODE_DIRECTION'))
 
         pincode       = pp.Word(pp.alphanums) | pp.Word(pp.nums)
         diode_var     = pp.Word(pp.alphanums+'_')
@@ -253,29 +253,30 @@ class _parse_txt:
         matrix_diodes = define_diodes + diode_var('diodes')
         matrix_diodes.ignore(pp.cppStyleComment)
 
-        for tokens, start, stop in matrix_rows.scanString(data):
-            matrix_row_pins = list(tokens)
+        # Note: A lot of this code is superfluous as we run config.h through cpp, but it does not cost much to be robust.
+        for token, start, stop in matrix_rows.scanString(data):
+            matrix_row_pins.append(list(token))
 
-        for tokens, start, stop in matrix_cols.scanString(data):
-            matrix_col_pins = list(tokens)
+        for token, start, stop in matrix_cols.scanString(data):
+            matrix_col_pins.append(list(token))
 
-        for tokens, start, stop in matrix_diodes.scanString(data):
-            matrix_diodes = list(tokens)
+        for token, start, stop in matrix_diodes.scanString(data):
+            matrix_diode_dir.append(token.diodes)
 
-        if matrix_row_pins and matrix_col_pins:
-            # TODO: Needs to be more robust
-            matrix_data.append(matrix_row_pins)
-            matrix_data.append(matrix_col_pins)
-
-            if matrix_diodes is list and len(matrix_diodes) == 1:
-                if matrix_diodes[0] == 'COL2ROW':
-                    matrix_data.append('col_row')
-                elif matrix_diodes[0] == 'ROW2COL':
-                    matrix_data.append('row_col')
+        if len(matrix_row_pins) == 1 and len(matrix_col_pins) == 1:
+            matrix_data.append(matrix_row_pins[0])
+            matrix_data.append(matrix_col_pins[0])
+            diode_result = 'none'
+            if len(matrix_diode_dir) == 1:
+                if matrix_diode_dir[0] == 'COL2ROW':
+                    diode_result = 'col_row'
+                elif matrix_diode_dir[0] == 'ROW2COL':
+                    diode_result = 'row_col'
                 else:
-                    matrix_data.append('none')
-            else:
-                matrix_data.append('none')
+                    diode_result = 'none'
+            elif not len(matrix_diode_dir):
+                diode_result = 'col_row' # Assume if there is no definition that it uses default COL2ROW setting
+            matrix_data.append(diode_result)
 
         return matrix_data
 
@@ -379,6 +380,10 @@ class _cpp:
                 output = subprocess.check_output(argv)
 
             elif platform.system() == 'Windows':
+                if not defaults.frozen:
+                    for i, arg in enumerate(argv):
+                         argv[i] = arg.replace('\\', '/')
+
                 si = subprocess.STARTUPINFO()
                 si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
@@ -388,9 +393,8 @@ class _cpp:
         except subprocess.CalledProcessError as e:
             err_num = e.returncode
             if err_num == errno.EPERM:
-                self.__console.warning(['Compiler failed to read '+argv[-1]])
-                output = e.output
-                return output
+                self.__console.warning(['Compiler returned error while reading '+argv[-1]])
+                return 
             else:
                 print(traceback.format_exc(), file=sys.stderr)
                 return
@@ -1380,7 +1384,7 @@ class application:
                 revo.build_m_row_pins = matrix_data[0]
                 revo.build_m_col_pins = matrix_data[1]
                 if len(matrix_data) > 2:
-                    revo.build_diodes     = matrix_data[2]
+                    revo.build_diodes = matrix_data[2]
 
                 self.console.note(['Matrix pinout data found @ '+path])
                 if revo.build_diodes == 'none':

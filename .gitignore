@@ -121,3 +121,4 @@ bin/*/q2k_out
 *.7z
 *.yaml
 *.dll
+q2k/avr-gcc
