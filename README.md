@@ -1,7 +1,6 @@
 ## Description
 ```
-Q2K Keymap Parser 
-ver. 1.1.3.a1 (Pre-Alpha) 
+Q2K Keymap Utility
 by 2Cas (c) 2018
 ```
 
@@ -89,6 +88,32 @@ optional arguments:
                         Search valid KEYBOARD inputs
 ```
 
+## Changing Firmware
+
+**For boards with the default atmel-dfu bootloader (majority of use cases)**
+
+Changing firmwares from QMK to Keyplus thus involves several more steps than just simply running this utility. 
+
+Layout yaml files can only be updated without flashing after a compiled keyplus firmware hex is flashed onto your board. This process is thankfully a one-off, and once you have successfully flashed the firmware to your board once, you can stop messing with flashing and compiling entirely.
+
+* Ensure you have all the keyplus dependencies listed [here](https://github.com/ahtn/keyplus#building). For building on windows 10, use the bash on windows 10 subsystem or [``msys2``](http://www.msys2.org/). 
+
+* Compile a 32u4 keyplus firmware hex by runnnig `make` (with the correct bootloader type, i.e. `make BOARD=atmel-dfu LAYOUT_FILE=<your_layout>.yaml`). This can have an initial layout if you desire, otherwise can be left blank. (note: right now it is recommended to bake layouts into the initial keyplus firmware hex as bugs can occur otherwise)
+
+* Place your keyboard into bootloader mode. Hit the hardware reset button.
+
+* Use a flashing program of your choice (`QMK Toolbox` being the preferred method) to flash the keyplus hex file.
+
+* (Optional) Update the bootloader to the keyplus bootloader for 100% integration with ``keyplus flasher``, and driverless windows bootloader support.
+
+* Run `keyplus flasher` to either initialise the layout (if none was baked into the firmware) or update the layout. Use either a layout file created by this utility `q2k` or build your own in a text editor (following [these guidelines](https://github.com/ahtn/keyplus/blob/master/doc/layout_format.md)) 
+
+* From now onwards, `keyplus flasher` is all you need to update both the layout information and firmware. The program can also be used to flash updated keyplus firmware hexes if the bootloader was switched to `kp_boot_32u4`, otherwise `QMK toolbox` or `dfu-programmer` is needed to flash keyplus firmware updates.
+
+**For boards with QMK LUFA/LUFA/Caterina or other non-dfu bootloaders (OLKB boards primarily)**
+
+The process here is much the same except the bootloader update step is NOT optional, and you will now have to use the keyplus flasher to flash any hex (no support for it in `QMK Toolbox` yet). Alternatively you can forgo the live layout updating feature and use keyplus much like QMK (having to reflash firmware for layout updates), but this seems redundant. 
+
 ## Understanding QMK's Keymap/Layout Structure - How this works
 
 Keymap.c files, which you may be somewhat familiar with, actually contain only some of the required layout information in QMK.
@@ -115,54 +140,37 @@ The second major difference is how layouts are defined. All (non-wireless) setti
 
 This utility will generate this layout.yaml file automatically for you, however if you don't already have a precompiled hex, you will need to compile a firmware hex file. (Read the keyplus readme for more details.)
 
-## Changing Firmware
-
-Changing firmwares from QMK to Keyplus thus involves several more steps than just simply running this utility. Layouts can be updated without flashing only after a keyplus firmware hex is flashed onto your board. This process is thankfully a one-off, and once you have successfully flashed the firmware to your board once, you can stop messing with flashing and compiling.
-
-* Compile a 32u4 keyplus firmware hex by runnnig `make` (with the correct bootloader type, i.e. `make BOARD=atmel-dfu`). This can have an initial layout if you desire, otherwise can be left blank.
-
-* Place your keyboard into bootloader mode. Hit the hardware reset button.
-
-* Use a flashing program of your choice (`QMK Toolbox` being the preferred method) to flash the keyplus hex file.
-
-* (Optional) Update the bootloader to the keyplus bootloader for 100% integration with keyplus layout and firmware loader, and driverless windows bootloader support.
-
-* Run the keyplus flasher to either initialise the layout (if none was baked into the firmware) or update the layout.
-
-* From now onwards, the keyplus flasher is all you need to update the layout. The program can also update firmware if the bootloader was switched to `kp_boot_32u4`, otherwise `dfu-programmer` and `QMK toolbix` are needed to flash keyplus firmware updates.
-
 ## Limitations
 
 There are several inherent limitations with this bridging utility that you should be aware of. 
 
 **Keyplus**
 
-
-Firstly, keyplus currently ONLY supports atmega and xmega based mcus. 32a and cortex-m4 ARM based keyboards will NOT work with keyplus, although you can still export these as layout files, they will not work without the firmware support.
+Firstly, keyplus currently ONLY supports atmega and xmega based mcus. 32a and cortex-m4 ARM based keyboards will NOT work with keyplus and thus is not supported by q2k.
 
 Keyplus only supports boards running its own kp_32u4 bootloader OR the default atmel-dfu bootloader (>90% of boards). Boards with non-dfu based bootloaders, such as the newer revisions of the planck and OLKB keyboards (LUFA/QMK LUFA) and clone pro micros (Caterina) will have to UPDATE their bootloader, which is usually done with an ardunio ISP. 
 
-Thankfully, there is an included program with keyplus that will attempt to flash the custom kp_32u4 bootloader to your pro micro/device, however it is NOT gaurenteed to work (and obviously entails the risks of messing with the bootloader, which could soft-brick your board) 
+Thankfully, there is an included program with keyplus that will attempt to flash the custom kp_32u4 bootloader to your pro micro/device, however it is NOT gaurenteed to work, i.e. if particular locking fuses have been set.
 
 **Q2K**
 
 For obvious reasons it is impractical to parse through hand-written and custom C code functions and attempt to extract data from this. You may have to recreate such code similarly by hand. i.e. code which turns on particular backlight colours when a particular layer is selected, playing audio through onboard speakers on the keyboard, etc.
 
-If a QMK-exclusive function which is not supported by keyplus is defined in a keymap, an error will be displayed in the console, and the relevant keycode will be transcribed as a blank 'trns' instead, which is displayed in the console. 
+If a QMK-exclusive function which is not supported by keyplus is defined in a keymap, an error will be displayed in the console, and the relevant keycode will be transcribed as a blank 'trns' instead, which is displayed in the console and printed in the final output.
 
-Additionally converting keyboards with an incompatible microcontroller or bootloader will prompt an incompatability warning in the terminal. (This is only partially implemented).
+Additionally converting keyboards with an incompatible microcontroller or bootloader will prompt an incompatability warning in the terminal. (This is not implemented for bootloaders yet).
 
 **QMK**
 
 QMK has a very loose and not well defined folder structure, and does not really impose many rules or guidelines on formatting. It is natural then that as more boards are added to the QMK directory that some boards may have a non-standard enough folder structures/keymap formatting to break this script in various ways, and that config.h and keyboard.h headers may be missed. I'd like to think my code is as robust as it possibly could be to guard against this, but I feel that failure on this front is kind of inevitable.
 
-A failure to read matrix column and pin data from config.h a fairly common problem, which is a fairly trivial but annoying manual fix. In some cases, this matrix row/col pin information is not contained in config.h at all and may need to be pulled from one of many possible locations, including but not limited to keymap.c, matrix.c, matrix.h, keyboard.h, etc, where often board makers will list row/pinout information within either comments or physical code. When this occurs, a warning will be printed to the console.
+A failure to find and read matrix column and pin data from config.h a fairly common problem, which is a fairly trivial but annoying manual fix. In some cases, this matrix row/col pin information is not contained in config.h at all and may need to be pulled from one of many possible locations, including but not limited to keymap.c, matrix.c, matrix.h, keyboard.h, etc, where often board makers will list row/pinout information within either comments or physical code. Please note that it is often (though not always) the case that when this occurs, the keyboard is using some kind of custom matrix code, and thus may not work once converted to keyplus format. A warning is displayed when this occurs.
 
-Missing keyboard.h information whilst also non-fatal and less common than missing config.h data, will result in a compromised layout yaml with only a basic layout template that follows the keyboard matrix exactly. This should still work and function but the output won't be as readable as intended. A warning will be printed to the console when this occurs.
+Failing to find layout templates (read from [keyboard].h) whilst also non-fatal and less common than missing config.h data, will result in a compromised layout yaml with only a basic layout template that follows the keyboard matrix exactly. This should still work and function but the output won't be as readable as intended. A warning is displayed when this occurs.
 
-On the other hand, a failure to read a keymap.c file will always result in a fatal termination. In this case, try converting a different keymap.c file for the same board, as particular keymaps may have unique #define declarations that can throw the script off.
+By contrast, a failure to read a keymap.c file will always result in a fatal termination and a failed conversion. In this case, try converting a different keymap.c file for the same board, as particular keymaps may have unique #define declarations that can throw the script off.
 
-Inevitably as QMK evolves over time, due to the above reasons and more, this script will become more and more broken than it already is (as active maintenace of this in the long run is unlikely). The last version/commit of QMK that has been verified to be (mostly) working will [always be linked here](https://github.com/qmk/qmk_firmware/tree/3bb647910a09146309cef59eedd78be72697c88f) in the worst case scenario that it blows up horribly. 
+It is inevitable that as QMK evolves over time, due to the above reasons and more, this script will become more and more broken than it already is (as active maintenace of this in the long run is unlikely). The last version/commit of QMK that has been verified to be (mostly) working will [always be linked here](https://github.com/qmk/qmk_firmware/tree/3bb647910a09146309cef59eedd78be72697c88f) in the worst case scenario that it blows up horribly. 
 
 ## Other Notes
 
@@ -173,11 +181,10 @@ tl;dr VERY alpha, not gaurenteed to work 100% for every keyboard with QMK suppor
 * KBfirmware support has been dropped indefinitely. (Will focus purely on keyplus for now until everything is fleshed out)
 * The GUI and front end code could be improved (but it's unlikely to change much). 
 * Still a few edge cases where <keyboard>.h files are missed. 
-* Reading of LED/RGB data, Bootloader type, MCU (in anticipation of changes on K+ Layout side) and updating conversion dictionary AND logic for keyplus's implementation of tap and hold, etc.
-* I'd like to be able to export cached kb data (cache_kb.yaml) out into a more readable form - might be useful on QMK side of things.
-* Better documentation of code now that no more major overhauls are pending.
-* Documentation, documentation, documentation.
-* Proper Windows Support? Maybe. For now Bash on Win10 works.
+* Reading of LED/RGB data, Bootloader type (in anticipation of changes on K+ Layout side) and updating conversion dictionary AND logic for keyplus's implementation of tap and hold, etc.
+* Better documentation of code
+* Documentation, documentation, documentation
+* Improve run times - Currently very sluggish on windows.
           
 ## License
 
