@@ -6,42 +6,102 @@ by 2Cas (c) 2018
 
 For parsing keymaps from QMK Firmware style keymap.c files to Keyplus YAML format.
 
-!!! PRE-ALPHA AND VERY MUCH WIP !!! 
-
-## Requirements
-
-pip requires : `python3-pip` `python3-tkinter` `avr-gcc` 
-          `pyyaml` `pyparsing` `termcolor`
-
-binary requires : ``avr-gcc``
-
 Tested on bash on Windows 10 (q2k-cli only), Windows 10 and Ubuntu Linux
 
-## Setup
+!!! PRE-ALPHA AND VERY MUCH WIP !!! 
 
-**Using Executables (WIN/Linux)**
+## Running Executable Binaries (WIN/Linux)
 
-Go to the releases tab (or /bin) and get the latest executable ``q2k_util`` zip folder and extract, then run ``./q2k_util``
+### Requirements
 
-For the windows version, you will need [this avr-gcc compiler](http://andybrown.me.uk/2015/03/08/avr-gcc-492/) installed in the avr-gcc folder at the same level as ``q2k_util.exe``
+`avr-gcc`
 
-**Using PyPI and pip to install q2k module (for developers)**
+### Setup
+
+Before running, please read this [basic guide on converting from QMK->Keyplus](https://github.com/angustrau/keyplus/blob/b86cc28d33f796523717e38e28e8d620d2707778/doc/porting_from_qmk.md).
+
+If your keyboard does NOT have an ATmega based MCU (with native USB support) such as the ATmega32u4 or similar, Keyplus is currently not compatible with your keyboard. Keyplus is also currently in an alpha state, which means that bugs and problems may arise. Be warned. I would highly recommend generating and saving a QMK Firmware based .hex file which you can revert to if this process does not work out for you.
+
+Remember to install the required dependencies, especially the ``avr-gcc`` compiler which this program heavily leans upon to function. 
+
+For Ubuntu Linux, you can install ``avr-gcc`` by running ``apt-get install gcc-avr`` with sudo permissions.
+
+For Windows, you will need [this avr-gcc compiler](http://andybrown.me.uk/2015/03/08/avr-gcc-492/) installed in the avr-gcc folder at the same level as ``q2k_util.exe``
+
+### Instructions
+
+1) Go to the releases tab (or /bin) and get the latest executable ``q2k_util`` zip folder and extract, then run ``./q2k_util``
+
+2) After initialising the program, you will need to select your QMK Firmware Directory folder location. You can either choose to clone or create a symbolic link to your ``qmk_firmware`` directory in the newly extracted ``q2k-<version>`` program directory, OR select your QMK Firmware directory location.
+
+3) You may also choose an output folder. By default, this is set to ``q2k-<version>/q2k_out/keyplus``. You may wish to change this to another folder, such as your local keyplus installation's ``layouts`` folder.
+
+4) Click the Generate Keyboard List button to populate the drop-down menus with keyboard info. This may take a while to initialise.
+
+5) Select your keyboard, revision, keymap and layout template type with the drop-down menus. The layout template names should be more or less descriptive, however if you are unsure, selecting LAYOUT or KEYMAP should provide a good universal template that will work with any layout configuration (wkl, split shift, split backspace, iso, etc.)
+
+6) Click the Convert button. Note that:
+
+* Missing keycodes corresponding to QMK features that keyplus does not support will both be printed in the console as well as in the output .yaml file as comments. 
+
+* If any errors occur during this process, they will both generate an error message popup as well as being displayed in the console. In some cases these errors are recoverable, however you may have to do some manual processing of layout.yaml files after the script has finished. 
+
+7) After successful conversion, your layout.yaml file is now ready to be loaded in by the [``keyplus_flasher``](https://github.com/ahtn/keyplus) keyplus flashing utility.
+
+8) If you update QMK after using this utility, you will have to click Generate Keyboard List again to update the drop-down menus for any new keyboards or keymaps.
+
+### FAQ & Errors
+
+* **My keyboard does not show up in the program**
+
+Check your MCU type. If it is of a type not supported by keyplus, currently the program will completely exclude it from the drop-down menu listings. 
+
+* **avr-gcc is missing?**
+
+This means you have not installed the avr-gcc compiler required by the program to function. Please read the setup section again and install ``avr-gcc``
+
+* **My layout file isn't working**
+
+This could be down to several factors.
+
+If any error messages were returned, read them carefully and ensure that you have fixed the problems with the layout file manually - i.e. for boards with no specified matrix pins, find the matrix pinout manually and input it in the layout file.
+
+Try pressing the reset button and generating a new cache, and try again.
+
+[Note: Currently there is an issue with the windows ``keyplus_flasher`` and it will not work with ANY layouts as of 0.30.0. As such the layout file is probably fine if you are on windows, it's just the binary needs updating.]
+
+If you are sure this was not the issue, then it could be an error in keyplus itself, or some kind of incompatability between your keyboard and keyplus. Try opening an issue there.
+
+* **Certain keycodes aren't working**
+
+Did you select the correct layout template? Try a different one, or just use KEYMAP/LAYOUT if available. Did you receive any error messages? Read them carefully. Some QMK specific functions are not supported in keyplus, so the corresponding keycodes aren't translated. Check the console output or the comments in your layout.yaml file to see if any of these were ignored. 
+
+Try pressing the reset button and generating a new cache, and try again.
+
+If you are sure this was not the issue, then it could be an error in keyplus itself, or some kind of incompatability between your keyboard and keyplus. Try opening an issue there.
+
+* **Other non-listed problems**
+
+If any other errors occur, first try using the Reset button to clear the cache and preference files to their default values. If this fails, try deleting pref.yaml entirely as well as the ``q2k-<version>/.cache`` folder. If clearing the cache and pref.yaml files do not solve your issue, then [create a new issue in github](https://github.com/2Cas/Q2K/issues) if it does not exist and I will get to it ASAP.
+
+
+##Using PyPI and pip to install q2k module (for developers)
+
+### Requirements
+
+ `python3-pip`` `python3-tkinter` `avr-gcc` `pyyaml` `pyparsing` `termcolor`
+
+### Instructions
 
 Install the required dependencies, then run
 
 `pip3 install q2k`
 
-## Run (Binary)
-
-Just double click the program in your file explorer, or use ``./q2k_util``. More or less self-explanatory and inuitive. 
-
-## Run (PyPI Package)
-
-GUI: run with `q2k`
+Display GUI: run with `q2k`
 
 Command Line: `cd` into your local qmk directory then run with `q2k-cli [options]`
 
-## Command Line Options 
+### Command Line Options 
 
 `q2k-cli [KEYBOARD NAME] [CMD LINE OPTIONS]`
 
@@ -56,8 +116,6 @@ q2k-cli k_type -m default => keyplus_out/k_type_default.yaml
 ```
 
 ``q2k-cli -h`` provides a comprehensive list of accepted opts.
-
-## Commands
 
 ```
 usage: q2k-cli [KEYBOARD] [-r REV] [-m KEYMAP] [-t LAYOUT]  [-h] [--cache] [--reset]
@@ -142,7 +200,7 @@ This utility will generate this layout.yaml file automatically for you, however 
 
 There are several inherent limitations with this bridging utility that you should be aware of. 
 
-**Keyplus**
+###Keyplus
 
 Firstly, keyplus currently ONLY supports atmega and xmega based mcus. 32a and cortex-m4 ARM based keyboards will NOT work with keyplus and thus is not supported by q2k.
 
@@ -150,7 +208,7 @@ Keyplus only supports boards running its own kp_32u4 bootloader OR the default a
 
 Thankfully, there is an included program with keyplus that will attempt to flash the custom kp_32u4 bootloader to your pro micro/device, however it is NOT gaurenteed to work, i.e. if particular locking fuses have been set.
 
-**Q2K**
+###Q2K
 
 For obvious reasons it is impractical to parse through hand-written and custom C code functions and attempt to extract data from this. You may have to recreate such code similarly by hand. i.e. code which turns on particular backlight colours when a particular layer is selected, playing audio through onboard speakers on the keyboard, etc.
 
@@ -158,7 +216,7 @@ If a QMK-exclusive function which is not supported by keyplus is defined in a ke
 
 Additionally converting keyboards with an incompatible microcontroller or bootloader will prompt an incompatability warning in the terminal. (This is not implemented for bootloaders yet).
 
-**QMK**
+###QMK
 
 QMK has a very loose and not well defined folder structure, and does not really impose many rules or guidelines on formatting. It is natural then that as more boards are added to the QMK directory that some boards may have a non-standard enough folder structures/keymap formatting to break this script in various ways, and that config.h and keyboard.h headers may be missed. I'd like to think my code is as robust as it possibly could be to guard against this, but I feel that failure on this front is kind of inevitable.
 
