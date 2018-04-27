@@ -146,31 +146,9 @@ optional arguments:
 
 ## Changing Firmware
 
-**For boards with the default atmel-dfu bootloader (majority of use cases)**
+Read [this](https://github.com/angustrau/keyplus/blob/08190a03b666325c53557651868a3cb0e8010392/doc/porting_from_qmk.md)
 
-Changing firmwares from QMK to Keyplus thus involves several more steps than just simply running this utility. 
-
-Layout yaml files can only be updated without flashing after a compiled keyplus firmware hex is flashed onto your board. This process is thankfully a one-off, and once you have successfully flashed the firmware to your board once, you can stop messing with flashing and compiling entirely.
-
-* Ensure you have all the keyplus dependencies listed [here](https://github.com/ahtn/keyplus#building). For building on windows 10, use the bash on windows 10 subsystem or [``msys2``](http://www.msys2.org/). 
-
-* Compile a 32u4 keyplus firmware hex by runnnig `make` (with the correct bootloader type, i.e. `make BOARD=atmel-dfu LAYOUT_FILE=<your_layout>.yaml`). This can have an initial layout if you desire, otherwise can be left blank. (note: right now it is recommended to bake layouts into the initial keyplus firmware hex as bugs can occur otherwise)
-
-* Place your keyboard into bootloader mode. Hit the hardware reset button.
-
-* Use a flashing program of your choice (`QMK Toolbox` being the preferred method) to flash the keyplus hex file.
-
-* (Optional) Update the bootloader to the keyplus bootloader for 100% integration with ``keyplus flasher``, and driverless windows bootloader support.
-
-* Run `keyplus flasher` to either initialise the layout (if none was baked into the firmware) or update the layout. Use either a layout file created by this utility `q2k` or build your own in a text editor (following [these guidelines](https://github.com/ahtn/keyplus/blob/master/doc/layout_format.md)) 
-
-* From now onwards, `keyplus flasher` is all you need to update both the layout information and firmware. The program can also be used to flash updated keyplus firmware hexes if the bootloader was switched to `kp_boot_32u4`, otherwise `QMK toolbox` or `dfu-programmer` is needed to flash keyplus firmware updates.
-
-**For boards with QMK LUFA/LUFA/Caterina or other non-dfu bootloaders (OLKB boards primarily)**
-
-The process here is much the same except the bootloader update step is NOT optional, and you will now have to use the keyplus flasher to flash any hex (no support for it in `QMK Toolbox` yet). Alternatively you can forgo the live layout updating feature and use keyplus much like QMK (having to reflash firmware for layout updates), but this seems redundant. 
-
-## Understanding QMK's Keymap/Layout Structure - How this works
+## How this works
 
 Keymap.c files, which you may be somewhat familiar with, actually contain only some of the required layout information in QMK.
 
@@ -184,23 +162,13 @@ The process is detailed more in depth at http://docs.qmk.fm, however the jist of
 
 First the program pulls matrix col/row pins from config.h, keycode data from keymap.c and template data from [keyboard].h (after exhaustively searching for exactly which [keyboard].h header file contains the layout information). 
 
-It then converts the keycodes and templates to keyplus notation (KC_RIGHT -> rght) and outputs a .yaml file that is compatible with keyplus firmware, as well as other keyplus format based keyboard firmware GUI builders.
+It then converts the keycodes and templates to keyplus notation (KC_RIGHT -> rght) and outputs a single layout.yaml file that is compatible with keyplus firmware, as well as other keyplus format based keyboard firmware GUI builders.
 
-## Keyplus
+### Limitations
 
-Disregarding keyplus's unique wireless capabilities, the first major difference with keyplus is your layout does NOT need to be baked into the firmware at compile time and layouts can be updated without recompiling firmware or even flashing into bootloader mode. 
+There are several inherent limitations with this conversion utility that you should be aware of. 
 
-This paradigm shift can be initially hard to wrap your head around, as it is possible to update layouts without updating firmware, and update firmware without updating layouts. Treat the two as seperate entities in the case of keyplus. For example, a side effect of this is that boards which use the same microcontroller (32u4, 32u2, etc) can use the same BLANK hex file (no layout baked).
-
-The second major difference is how layouts are defined. All (non-wireless) settings, matrix mapping data and keycode data are all in the one file, a layout .yaml file. As previously stated, all the settings in this .yaml file can be updated WITHOUT putting your keyboard into bootloader mode. Advanced features involving custom functions (as in QMK) may require recompiling firmware however, so there is a limit to what can adjusted on the fly.
-
-This utility will generate this layout.yaml file automatically for you, however if you don't already have a precompiled hex, you will need to compile a firmware hex file. (Read the keyplus readme for more details.)
-
-## Limitations
-
-There are several inherent limitations with this bridging utility that you should be aware of. 
-
-###Keyplus
+####Keyplus
 
 Firstly, keyplus currently ONLY supports atmega and xmega based mcus. 32a and cortex-m4 ARM based keyboards will NOT work with keyplus and thus is not supported by q2k.
 
@@ -208,7 +176,7 @@ Keyplus only supports boards running its own kp_32u4 bootloader OR the default a
 
 Thankfully, there is an included program with keyplus that will attempt to flash the custom kp_32u4 bootloader to your pro micro/device, however it is NOT gaurenteed to work, i.e. if particular locking fuses have been set.
 
-###Q2K
+####Q2K
 
 For obvious reasons it is impractical to parse through hand-written and custom C code functions and attempt to extract data from this. You may have to recreate such code similarly by hand. i.e. code which turns on particular backlight colours when a particular layer is selected, playing audio through onboard speakers on the keyboard, etc.
 
@@ -216,7 +184,7 @@ If a QMK-exclusive function which is not supported by keyplus is defined in a ke
 
 Additionally converting keyboards with an incompatible microcontroller or bootloader will prompt an incompatability warning in the terminal. (This is not implemented for bootloaders yet).
 
-###QMK
+####QMK
 
 QMK has a very loose and not well defined folder structure, and does not really impose many rules or guidelines on formatting. It is natural then that as more boards are added to the QMK directory that some boards may have a non-standard enough folder structures/keymap formatting to break this script in various ways, and that config.h and keyboard.h headers may be missed. I'd like to think my code is as robust as it possibly could be to guard against this, but I feel that failure on this front is kind of inevitable.
 
@@ -228,7 +196,7 @@ By contrast, a failure to read a keymap.c file will always result in a fatal ter
 
 It is inevitable that as QMK evolves over time, due to the above reasons and more, this script will become more and more broken than it already is (as active maintenace of this in the long run is unlikely). The last version/commit of QMK that has been verified to be (mostly) working will [always be linked here](https://github.com/qmk/qmk_firmware/tree/3bb647910a09146309cef59eedd78be72697c88f) in the worst case scenario that it blows up horribly. 
 
-## Other Notes
+## Other Notes/Warnings
 
 tl;dr VERY alpha, not gaurenteed to work 100% for every keyboard with QMK support. Lots of caught and uncaught exceptions will be thrown. Flashing firmware always has an element of risk and I am not responsible if your keyboard bricks itself. 
 
