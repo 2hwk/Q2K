@@ -89,7 +89,7 @@ If any other errors occur, first try using the Reset button to clear the cache a
 
 ### Requirements
 
- `python3-pip`` `python3-tkinter` `avr-gcc` `pyyaml` `pyparsing` `termcolor`
+ `python3-pip` `python3-tkinter` `avr-gcc` `pyyaml` `pyparsing` `termcolor`
 
 ### Instructions
 
