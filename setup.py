@@ -24,7 +24,7 @@ setup(
     ],
     license = 'MIT',
     packages = find_packages(include=['q2k', 'q2k.*']),
-    python_requires  = '>=3.0',
+    python_requires  = '>=3.5',
     install_requires = [
         'pyyaml', 'pyparsing', 'termcolor'
     ],

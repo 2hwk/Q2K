@@ -87,18 +87,18 @@ class _console:
     def error(self, info, fatal=True):
         ''' Prints non-fatal and fatal error messages to console'''
         if self.gui:
-            msg = ''
+            msg = ['']
             for info, line in enumerate(info):
-                msg += line+' \n'
+                msg += [line, ' \n']
                 if not info:
                     warning=line
                     self.errors.append(line)
-                    print('❌ ERROR: ' +line)
+                    print('❌ ERROR:', line)
                 else:
                     self.errors.append(line)
-                    print('• '+line)
+                    print('•', line)
             if fatal:
-                tk.messagebox.showerror('Error', msg)
+                tk.messagebox.showerror('Error', ''.join(msg))
                 raise RuntimeError(warning)
         else:
             error_msg = tc.colored('❌ ERROR:', 'red', attrs=['reverse', 'bold'])
@@ -108,42 +108,45 @@ class _console:
                 if not info:
                     self.errors.append(line)
                     line = tc.colored(line, 'red')
-                    print(error_msg + ' ' +line)
+                    print(error_msg, line)
                 else:
                     self.errors.append(line)
-                    print(e_bullet + ' '+line)
+                    print(e_bullet, line)
             if fatal:
                 exit()
 
     def bad_kc(self, kc_type, code):
         """ Prints bad keycode warnings to console"""
         if self.gui:
-            message = 'Invalid '+kc_type+': '+code
-            bad_kc_msg = '❌ Invalid '+kc_type+':'
-            print(bad_kc_msg+' '+code)
-            self.errors.append(message)
+
+            bad_kc_msg = ['❌ ', 'Invalid ', kc_type, ': ', code]
+            print(''.join(bad_kc_msg))
+            del bad_kc_msg[0]
+            self.errors.append(''.join(bad_kc_msg))
         else:
-            message = 'Invalid '+kc_type+': '+code
-            bad_kc_msg = tc.colored('❌ Invalid '+kc_type+':', 'cyan')
-            print(bad_kc_msg+' '+code)
-            self.errors.append(message)
+            message = ['❌ ', 'Invalid ', kc_type, ':']
+            bad_kc_msg = [ tc.colored(''.join(message), 'cyan') ]
+            bad_kc_msg += [' ', code]
+            print(''.join(bad_kc_msg))
+            message += [' ', code]
+            self.errors.append(''.join(message))
 
     def warning(self, info, pause=False):
         """ Prints warnings and interactive warnings to console"""
     
         if self.gui:
-            msg = ''
+            msg = ['']
             for info, line in enumerate(info):
-                msg += line+' \n'
+                msg += [line, ' \n']
                 if not info:
                     warning=line
                     self.errors.append(line)
-                    print('▲ WARNING: ' +line)
+                    print('▲ WARNING:', line)
                 else: 
                     self.errors.append(line)
-                    print('• '+line)
+                    print('•', line)
             if pause:
-                if not tk.messagebox.askyesno('Warning', msg+'\nContinue?'):
+                if not tk.messagebox.askyesno('Warning', ''.join(msg)+'\nContinue?'):
                     raise RuntimeWarning(warning)
 
         else: 
@@ -154,12 +157,12 @@ class _console:
                 if not info:
                     self.errors.append(line)
                     line = tc.colored(line, 'yellow')
-                    print(warning_msg + ' ' +line)
+                    print(warning_msg, line)
                 else:
                     self.errors.append(line)
-                    print(w_bullet + ' '+line)
+                    print(w_bullet, line)
             if pause:
-                print(w_bullet+' Press [ENTER] to continue')
+                print(w_bullet, 'Press [ENTER] to continue')
                 input()
 
 
@@ -177,9 +180,9 @@ class _console:
             
             for info, line in enumerate(info):
                 if not info:
-                    print(note_msg + ' ' +line)
+                    print(note_msg, line)
                 else:
-                    print(n_bullet + ' '+line)
+                    print(n_bullet, line)
 
     def clear(self):
 
@@ -217,7 +220,9 @@ class _parse_txt:
             while tokens.name in names:
                 i += 1
                 if not tokens.name.endswith(')'):
-                    tokens.name += '('+str(i)+')'
+                    dupl_name = [ tokens.name ]
+                    dupl_name += ['(', str(i), ')']
+                    tokens.name = ''.join(dupl_name)
                 else:
                     tokens.name = tokens.name[:-2]+str(i)+')'
             names.append(tokens.name)
@@ -646,19 +651,21 @@ class keycode_layer:
             elif qfunc in ref.keyp_mods.keys() and ')' in func_target:
                 target = func_target
                 # Init functions with the first function
-                functions = ref.keyp_mods[qfunc]
+                functions = [ ref.keyp_mods[qfunc] ]
                 # Recursively pipe func into functions until no more functions are left.
                 while ')' in target:
                     br        = target.index('(')+1
                     func      = target[:br]
                     target    = target[br:-1]
+
                     if func in ref.keyp_mods.keys():
-                        functions += ref.keyp_mods[func]
+                        functions.append(ref.keyp_mods[func])
                 # Check that this LAST element is a keycode
                 if target in  ref.keyp_kc.keys():
                     final_kc  = self.__keycode(target, functions, console, allow_quotes=False)
                     # Wrap with quotes -> '[func]' - note: keyplus Format is [TAP]>[HOLD]
-                    keyp_func = "'"+functions+'-'+final_kc+"'"
+                    keyp_func_list = [ "'", ''.join(functions), '-', final_kc, "'" ]
+                    keyp_func = ''.join(keyp_func_list)
                     return keyp_func
 
             # Legacy TMK-style QMK Functions e.g. FUNC(x)
@@ -1034,7 +1041,7 @@ class _cache:
                 if revo.is_rev:
                     self.__console.warning([os.path.join(kb_n, rev_n)+' might have invalid MCU(s) '+', '.join(bad_mcu)])
                 else:
-                    self.__console.warning([kb_n+' might have Invalid MCU(s) '+', '.join(bad_mcu)])
+                    self.__console.warning([kb_n+' might have invalid MCU(s) '+', '.join(bad_mcu)])
             return True
 
         else:
@@ -1047,7 +1054,7 @@ class _cache:
                 if revo.is_rev:
                     self.__console.error([os.path.join(kb_n, rev_n)+' has invalid MCU(s) '+', '.join(bad_mcu)], fatal=False)
                 else:
-                    self.__console.error([kb_n+' has Invalid MCU(s) '+', '.join(bad_mcu)], fatal=False)
+                    self.__console.error([kb_n+' has invalid MCU(s) '+', '.join(bad_mcu)], fatal=False)
             return False
 
     def __save_cache(self):
@@ -1426,12 +1433,11 @@ class application:
                 # Todo: Implement in pyparsing instead (proper fix)
                 for i, element in enumerate(row):
                     if ')' in element and '(' not in element:
-                        func = ''
-                        func = row[i-1]+','+row[i] 
+                        func = [ row[i-1], ',', row[i] ] 
                         del row[i-1]
                         i -= 1
                         del row[i]
-                        row.insert(i, func)
+                        row.insert(i, ''.join(func))
                 if len(row) > curr_layer.matrix_cols:
                     num_col = len(row)
                 curr_layer.keymap += (list(row))
@@ -1648,7 +1654,7 @@ class application:
 
         # Can't simply dump to yaml as we want to keep layout (array) as a human readable matrix (2D 'array').
         out_dir  = self.dirs['Keyplus YAML output']
-        kb_n     = self.build_kb.name
+        kb_n     = self.build_kb.name.replace('/', '_').replace('\\', '_')
         rev_n    = self.build_rev.name
         if rev_n == 'n/a': rev_n = ''
         keymap   = self.build_kb.build_keymap
@@ -1656,15 +1662,16 @@ class application:
         rev      = self.build_rev
         layers   = rev.build_layout
 
-        errors   = ''
+        errors   = ['']
         for error in self.console.errors:
-            errors += '# '+error+'\n'
+            error = ''.join(['# ', error, '\n'])
+            errors.append(error)
 
         template_matrix = layers[0].matrix_map
         if rev_n:
-            name = kb_n+'_'+rev_n
+            name = [kb_n, rev_n]
         else:
-            name = kb_n
+            name = [kb_n]
 
         if rev.build_m_row_pins and rev.build_m_col_pins:
             rows   = str(rev.build_m_row_pins)
@@ -1675,19 +1682,19 @@ class application:
             cols = '# ------- Input col pins here ------- '
             diodes = rev.build_diodes
        
-        template = ''
+        template = ['']
         for i, row in enumerate(template_matrix):
             for col in row:
-                template += (col+', ')
+                template += [col, ', ']
             if i+1 < len(template_matrix):
-                template += '\n        '
+                template.append('\n        ')
 
-        layout   = ''
+        layout = ['']
         keycode_define = []
         for i, layer in enumerate(layers):
-            layout += '      [ # layer '+str(i)+'\n        ['
+            layout += ['      [ # layer ',str(i),'\n        [' ]
             for row in layer.layout:
-                layout += '\n          '
+                layout.append('\n          ')
                 for keycode in row:
                     if len(keycode) < 4:
                         repeat = 4 - len(keycode)
@@ -1698,33 +1705,35 @@ class application:
                         if keycode not in keycode_define:
                             keycode_define.append(keycode)
 
-                    layout += keycode+', '
-            layout +='\n        ]\n      ],\n'
+                    layout+= [keycode, ', ']
+            layout.append('\n        ]\n      ],\n')
 
-        keycodes = ''
+        keycodes = ['']
         if keycode_define:
-            keycodes = 'keycodes:'
+            keycodes.append('keycodes:')
         for kc in keycode_define:
             split = kc.split('>', 1)
-            tap = split[0][1:]
-            hold = split[1][:-1]
+            tap   = split[0][1:]
+            hold  = split[1][:-1]
 
-            keycodes += ref.keyplus_yaml_keycode_template
-            keycodes = keycodes.replace('<KEYCODE>', kc)
-            keycodes = keycodes.replace('<TAP>', tap)
-            keycodes = keycodes.replace('<HOLD>', hold)
+            kc_template = ref.keyplus_yaml_keycode_template
+            kc_template = kc_template.replace('<KEYCODE>', kc)
+            kc_template = kc_template.replace('<TAP>', tap)
+            kc_template = kc_template.replace('<HOLD>', hold)
+
+            keycodes.append(kc_template)
 
         # Load Template
         output_yaml_info = ref.keyplus_yaml_template
-        output_yaml_info = output_yaml_info.replace('<ERRORS>', errors)
-        output_yaml_info = output_yaml_info.replace('<KB_NAME>', name)
+        output_yaml_info = output_yaml_info.replace('<ERRORS>', ''.join(errors))
+        output_yaml_info = output_yaml_info.replace('<KB_NAME>', '_'.join(name))
         output_yaml_info = output_yaml_info.replace('<LAYOUT_NAME>', keymap)                              
         output_yaml_info = output_yaml_info.replace('<ROWS>', rows)                                 
         output_yaml_info = output_yaml_info.replace('<COLS>', cols)
         output_yaml_info = output_yaml_info.replace('<DIODES>', diodes)
-        output_yaml_info = output_yaml_info.replace('<MATRIX_MAP>', template)
-        output_yaml_info = output_yaml_info.replace('<LAYOUT>', layout)
-        output_yaml_info = output_yaml_info.replace('<KEYCODES>', keycodes)
+        output_yaml_info = output_yaml_info.replace('<MATRIX_MAP>', ''.join(template))
+        output_yaml_info = output_yaml_info.replace('<LAYOUT>', ''.join(layout))
+        output_yaml_info = output_yaml_info.replace('<KEYCODES>', ''.join(keycodes))
 
         kblibs = self.build_kb.libs
         if rev_n:
