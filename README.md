@@ -85,7 +85,7 @@ If you are sure this was not the issue, then it could be an error in keyplus its
 If any other errors occur, first try using the Reset button to clear the cache and preference files to their default values. If this fails, try deleting pref.yaml entirely as well as the ``q2k-<version>/.cache`` folder. If clearing the cache and pref.yaml files do not solve your issue, then [create a new issue in github](https://github.com/2Cas/Q2K/issues) if it does not exist and I will get to it ASAP.
 
 
-##Using PyPI and pip to install q2k module (for developers)
+## Using PyPI and pip to install q2k module (for developers)
 
 ### Requirements
 
@@ -168,7 +168,7 @@ It then converts the keycodes and templates to keyplus notation (KC_RIGHT -> rgh
 
 There are several inherent limitations with this conversion utility that you should be aware of. 
 
-####Keyplus
+#### Keyplus
 
 Firstly, keyplus currently ONLY supports atmega and xmega based mcus. 32a and cortex-m4 ARM based keyboards will NOT work with keyplus and thus is not supported by q2k.
 
@@ -176,7 +176,7 @@ Keyplus only supports boards running its own kp_32u4 bootloader OR the default a
 
 Thankfully, there is an included program with keyplus that will attempt to flash the custom kp_32u4 bootloader to your pro micro/device, however it is NOT gaurenteed to work, i.e. if particular locking fuses have been set.
 
-####Q2K
+#### Q2K
 
 For obvious reasons it is impractical to parse through hand-written and custom C code functions and attempt to extract data from this. You may have to recreate such code similarly by hand. i.e. code which turns on particular backlight colours when a particular layer is selected, playing audio through onboard speakers on the keyboard, etc.
 
@@ -184,7 +184,7 @@ If a QMK-exclusive function which is not supported by keyplus is defined in a ke
 
 Additionally converting keyboards with an incompatible microcontroller or bootloader will prompt an incompatability warning in the terminal. (This is not implemented for bootloaders yet).
 
-####QMK
+#### QMK
 
 QMK has a very loose and not well defined folder structure, and does not really impose many rules or guidelines on formatting. It is natural then that as more boards are added to the QMK directory that some boards may have a non-standard enough folder structures/keymap formatting to break this script in various ways, and that config.h and keyboard.h headers may be missed. I'd like to think my code is as robust as it possibly could be to guard against this, but I feel that failure on this front is kind of inevitable.
 
