@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 fields = {}
 with open(os.path.join('q2k', 'version.py')) as f:
     exec(f.read(), fields)
-    __version__ = fields['q2kversion']
+    __version__ = fields['Q2K_VERSION']
 
 setup(
     name        = 'q2k',
