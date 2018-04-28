@@ -194,7 +194,7 @@ Failing to find layout templates (read from [keyboard].h) whilst also non-fatal 
 
 By contrast, a failure to read a keymap.c file will always result in a fatal termination and a failed conversion. In this case, try converting a different keymap.c file for the same board, as particular keymaps may have unique #define declarations that can throw the script off.
 
-It is inevitable that as QMK evolves over time, due to the above reasons and more, this script will become more and more broken than it already is (as active maintenace of this in the long run is unlikely). The last version/commit of QMK that has been verified to be (mostly) working will [always be linked here](https://github.com/qmk/qmk_firmware/tree/3bb647910a09146309cef59eedd78be72697c88f) in the worst case scenario that it blows up horribly. 
+It is inevitable that as QMK evolves over time, due to the above reasons and more, this script will become more and more broken than it already is (as active maintenace of this in the long run is unlikely). The last version/commit of QMK that has been verified to be (mostly) working will [always be linked here](https://github.com/qmk/qmk_firmware/tree/19aa2c34e859946edae24108fe7df69c949b124e) in the worst case scenario that it blows up horribly. 
 
 ## Other Notes/Warnings
 
