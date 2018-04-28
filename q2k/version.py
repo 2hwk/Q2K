@@ -1,1 +1,1 @@
-q2kversion = '1.2.0.a2'
+q2kversion = '1.2.1.a1'
