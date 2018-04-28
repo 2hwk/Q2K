@@ -1,36 +1,37 @@
 import q2k.core as core
-import sys
 import os
-import threading
 import platform
+import sys
+import threading
 import traceback
-import yaml
 
 from tkinter import filedialog, Tk, E, W, LEFT, CENTER, INSERT, NORMAL, ttk, Menu, Text, scrolledtext, messagebox, Button, Entry, StringVar, LabelFrame, Label, Frame
 from tkinter.ttk import Combobox
 
+import yaml
+
 class ConsoleText(Text):
-    '''A Tkinter Text widget that provides a scrolling display of console
-    stderr and stdout.'''
+    """A Tkinter Text widget that provides a scrolling display of console
+    stderr and stdout."""
 
     class IORedirector(object):
-        '''A general class for redirecting I/O to this Text gcwidget.'''
+        """A general class for redirecting I/O to this Text gcwidget."""
         def __init__(self,text_area):
             self.text_area = text_area
 
     class StdoutRedirector(IORedirector):
-        '''A class for redirecting stdout to this Text widget.'''
+        """A class for redirecting stdout to this Text widget."""
         def write(self,str):
             self.text_area.write(str,False)
 
     class StderrRedirector(IORedirector):
-        '''A class for redirecting stderr to this Text widget.'''
+        """A class for redirecting stderr to this Text widget."""
         def write(self,str):
             self.text_area.write(str,True)
 
     def __init__(self, master=None, cnf={}, **kw):
         self.__debug = False
-        '''See the __init__ for Tkinter.Text for most of this stuff.'''
+        """See the __init__ for Tkinter.Text for most of this stuff."""
 
         Text.__init__(self, master, cnf, **kw)
 
@@ -90,7 +91,7 @@ class Window():
         # Load Core Q2K
        # =============================================================================================================
         self.output.start() # Ensure output from loading q2k gets printed to console
-        self.q2k_app = core.application('keyplus', is_gui=True)
+        self.q2k_app = core.Q2KApp('keyplus', is_gui=True)
         self.output.stop() # Stop output printing
        # =============================================================================================================
         # Set dynamic lists and enter main loop
@@ -311,7 +312,7 @@ class Window():
         self.kb['values'] = kb_list
 
     def save_pref(self):
-        pref_yaml = os.path.join(core.defaults.src, 'pref.yaml')
+        pref_yaml = os.path.join(core.Defaults.SRC, 'pref.yaml')
         with open(pref_yaml, 'w') as f:
             f.write('# Q2K Folder Locations\n')
             yaml.dump(self.q2k_app.dirs, f, default_flow_style = False)
@@ -329,7 +330,7 @@ class Window():
         self.save_pref()
 
     def show_about(self):
-        messagebox.showinfo('About', 'Q2K Keymap Utility\nv '+core.defaults.version)
+        messagebox.showinfo('About', 'Q2K Keymap Utility\nv '+core.Defaults.VERSION)
 
     def btn_generate_lists(self):
         self.output.start()
@@ -341,10 +342,17 @@ class Window():
         self.save_pref()
         #self.q2k_app.refresh_dir()
         self.q2k_app.refresh_cache()
+
         # Get KB list, sort and set combobox to this list.
         kb_list = self.q2k_app.keyboard_list()
         kb_list.sort()
         self.kb['values'] = kb_list
+
+        # Reset other combo boxes
+        self.rev['values'] = []
+        self.keymap['values'] = []
+        self.template['values'] = []
+
         # Reset comboboxes to blank
         self.kb.set('')
         self.rev.set('')
@@ -359,18 +367,29 @@ class Window():
         # Reset Q2K App to defaults
         self.q2k_app.reset()
         # Set fields to defaults
-        self.qmk_dir.set(core.defaults.qmk)
-        self.keyplus_dir.set(core.defaults.keyp)
+        self.qmk_dir.set(core.Defaults.QMK)
+        self.keyplus_dir.set(core.Defaults.KEYP)
         # Set all combo boxes to blank
         self.kb.set('')
         self.rev.set('')
         self.keymap.set('')
         self.template.set('')
 
-        self.kb['values'] = []
+        # Get KB list, sort and set combobox to this list.
+        kb_list = self.q2k_app.keyboard_list()
+        kb_list.sort()
+        self.kb['values'] = kb_list
+
+        # Reset other combo boxes
         self.rev['values'] = []
         self.keymap['values'] = []
         self.template['values'] = []
+
+        # Reset comboboxes to blank
+        self.kb.set('')
+        self.rev.set('')
+        self.keymap.set('')
+        self.template.set('')
 
         self.output.stop()
 
