@@ -606,10 +606,9 @@ class KeycodeLayer:
                 keyp_func = ''.join(["'", Q2KRef.keyp_mods[qfunc], '-', keycode, "'"])
                 return keyp_func
 
-            # For Layer-Tap Keys e.g. LT(1, KC_SPACE), LM(3, MOD_CTL) - Format FN(HOLD,TAP)
+            # For Layer-Tap Keys e.g. LT(1, KC_SPACE) - Format FN(HOLD,TAP)
             # Hold = Layer for these
-            elif qfunc in Q2KRef.keyp_tap_layer.keys():
-
+            elif qfunc in Q2KRef.keyp_double_param.keys():
                 # Split up into [TAP_LAYER], [HOLD_KC]
                 split = func_target.split(',', 1)
                 if len(split) != 2:
@@ -617,28 +616,32 @@ class KeycodeLayer:
                     console.bad_kc('FN', kc_err_out)
                     return invalid
                 else:
-                    layer_t = split[0].replace(' ', '')
-                    keycode = split[1].replace(' ', '')
+                    first = split[0].replace(' ', '')
+                    second = split[1].replace(' ', '')
 
-                # Check if [TAP_LAYER] references a layer
-                if layer_t not in layer_names:
-                    kc_err_out = ''.join(['[', qmk_func, '] - set to ', invalid])
-                    console.bad_kc('FN', kc_err_out)
-                    return invalid
-                else:
-                    layer = str(layer_names.index(layer_t))
-                    hold = Q2KRef.keyp_tap_layer[qfunc]+layer
+                # MT([HOLD_MOD], [TAP_KEY])
+                if first in Q2KRef.qmk_legacy_mod.keys() and second in Q2KRef.keyp_kc.keys():
+                    hold = Q2KRef.qmk_legacy_mod[first]+'-none'
+                    tap = self.__keycode(second, functions, console, allow_quotes=False)
+                    keyp_func = ''.join(["'", tap, '>', hold, "'"])
+                        return keyp_func
+
+                # LT([HOLD_LAYER], [TAP_KEY])
+                elif first in layer_names:
+                    layer = str(layer_names.index(first))
+                    hold = Q2KRef.keyp_double_param[qfunc]+layer
 
                     # For regular QMK Keycodes LT([HOLD],[TAP]) - KC_E, KC_ESC, etc.
-                    if keycode in Q2KRef.keyp_kc.keys():
-                        tap = self.__keycode(keycode, functions, console, allow_quotes=False)
+                    if second in Q2KRef.keyp_kc.keys():
+                        tap = self.__keycode(second, functions, console, allow_quotes=False)
                         # Wrap with quotes -> '[func]' - note: Keyplus Format is [TAP]>[HOLD]
                         keyp_func = ''.join(["'", tap, '>', hold, "'"])
                         return keyp_func
 
                     # [For legacy QMK Keycodes  LM([HOLD],[TAP]) - [TAP]= MOD_LCTL, etc.
-                    elif keycode in Q2KRef.qmk_legacy_mod.keys():
-                        tap = Q2KRef.qmk_legacy_mod[keycode]+'-none'
+                    # TODO: Change to S-L1 type format
+                    elif second in Q2KRef.qmk_legacy_mod.keys():
+                        tap = Q2KRef.qmk_legacy_mod[second]+'-none'
                         # Wrap with quotes -> '[func]' - note Keyplus Format is [TAP]>[HOLD]
                         keyp_func = ''.join(["'", tap, '>', hold, "'"])
                         return keyp_func
@@ -1523,7 +1526,7 @@ class Q2KApp:
                         second = params[1].replace(' ','')
                         first = params[0].replace(' ','')
 
-                        # ACTION_LAYER_TAP_KEY
+                        # ACTION_firstAP_KEY
                         # (HOLD, TAP) => Tap>Hold
                         if first in layer_names and second in Q2KRef.keyp_kc.keys():
                             layer = str(layer_names.index(first))

@@ -459,9 +459,10 @@ class Q2KRef:
         "OSM(KC_RCMD)"                     :          "s_rgui", 
     }
 
-    keyp_tap_layer = {
+    keyp_double_param = {
         "LT("                              :          "L",
-        "LM("                              :          "L",
+        "LM("                              :          "L",      # Does not actually implement LM
+        "MT("                              :          "",
     }
 
     keyp_tap_mod = {
@@ -529,12 +530,6 @@ class Q2KRef:
         # Backlight
         "BL_STEP",
         # QMK Modifiers
-        "LCTL(", "LALT(", "LGUI(", "LCMD(", "LWIN(", "RCTL(", "RSFT(", "RALT(", 
-        "RGUI(", "RCMD(", "RWIN(", "KC_HYPR", "KC_MEH", "HYPR(", "MEH(", "LCAG(", 
-        "ALTG(", "SGUI(", "SCMD(", "SWIN(", "LCA(", "LCTL_T(", "CTL_T(", "RCTL_T(",
-        "LSFT_T(", "RSFT_T(", "LALT_T(", "ALT_T(", "RALT_T(", "ALGR_T(", "LGUI_T(",
-        "LCMD_T(", "RWIN_T(", "GUI_T(", "RGUI_T(", "RCMD_T(", "RWIN_T(", "C_S_T(",
-        "MEH_T(", "LCAG_T(" , "RCAG_T(", "ALL_T(", "SCMD_T(", "SWIN_T(", "LCA_T(",
     }
 
     # KBfirmware json compatability list
