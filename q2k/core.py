@@ -624,7 +624,7 @@ class KeycodeLayer:
                     hold = Q2KRef.qmk_legacy_mod[first]+'-none'
                     tap = self.__keycode(second, functions, console, allow_quotes=False)
                     keyp_func = ''.join(["'", tap, '>', hold, "'"])
-                        return keyp_func
+                    return keyp_func
 
                 # LT([HOLD_LAYER], [TAP_KEY])
                 elif first in layer_names:
